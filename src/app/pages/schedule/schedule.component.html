@@ -1,1 +1,25 @@
-<p>schedule works!</p>
+<div class="schedule-container">
+  <div class="schedule-grid">
+    <div class="empty"></div>
+    @for (day of days; track $index) {
+      <div class="header">{{ day }}</div>
+    }
+
+
+    @for (hour of hours; track $index) {
+      <div class="hour-label">{{ hour }}</div>
+
+      @for (day of days; track $index) {
+        <div class="cell">
+          @if (getClassesFor(day, hour); as cls) {
+            <div class="class-card" [style.background]="cls.subject.color || '#007bff'">
+              <div class="class-name">{{ cls.subject.name }}</div>
+              <div class="class-professor">{{ cls.subject.professor }}</div>
+              <div class="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>
