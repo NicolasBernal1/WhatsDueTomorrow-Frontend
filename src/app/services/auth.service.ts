@@ -3,6 +3,10 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { BaseResponseDto } from '../models/base-response.dto';
+import { LoginDto } from '../models/login.dto';
+import { CreateUserDto } from '../models/create-user.dto';
+import { UserDto } from '../models/user.dto';
+import { LoggedInDto } from '../models/logged-in.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -12,17 +16,17 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(credentials: { email: string, password: string }): Observable<BaseResponseDto<{ access_token: string }>> { //En angular tambien deberia usar dtos?
-    return this.http.post<BaseResponseDto<{ access_token: string }>>(`${this.apiUrl}/auth/login`, credentials)
+  login(credentials: LoginDto): Observable<BaseResponseDto<LoggedInDto>> {
+    return this.http.post<BaseResponseDto<LoggedInDto>>(`${this.apiUrl}/auth/login`, credentials)
     .pipe(tap(response => {
-      if(response.data?.access_token) {
-        localStorage.setItem('token', response.data.access_token);
+      if(response.data?.token) {
+        localStorage.setItem('token', response.data.token);
       }
     }))
   }
 
-  register(data: { name: string, email: string, password: string }): Observable<BaseResponseDto<null>> {
-    return this.http.post<BaseResponseDto<null>>(`${this.apiUrl}/auth/register`, data);
+  register(data: CreateUserDto): Observable<BaseResponseDto<UserDto>> {
+    return this.http.post<BaseResponseDto<UserDto>>(`${this.apiUrl}/auth/register`, data);
   }
 
   logout():void {

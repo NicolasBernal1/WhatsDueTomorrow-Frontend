@@ -20,10 +20,13 @@ export class LoginComponent {
     })
   }
 
-  onSubmit(): void{
+  onSubmit(): void {
     if(this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
-        next: () => this.router.navigate(['/schedule']),
+        next: () => {
+          this.loginForm.reset();
+          this.router.navigate(['/schedule']);
+        },
         error: () => alert('Invalid Credentials')
       })
     }
