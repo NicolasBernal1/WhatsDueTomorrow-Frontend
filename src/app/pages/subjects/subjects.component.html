@@ -1,0 +1,25 @@
+<div class="subjects-container">
+  <div class="header">
+    <h2>Your Subjects</h2>
+    <button class="add-btn" (click)="addSubjectModal()">+ Add Subject</button>
+  </div>
+
+  @if (this.loading) {
+    <p>Loading Subjects...</p>
+  } @else if (this.subjects.length === 0) {
+    <p class="empty">You have no subjects yet</p>
+  } @else {
+    @for (sub of this.subjects; track $index) {
+      <div class="subject-card" [style.background]="sub.color" (click)="goToSubjectDetais(sub.id)">
+        <div class="subject-info">
+          <h3>{{ sub.name }}</h3>
+          <p>{{ sub.professor }}</p>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+@if (this.showAddModal) {
+  <app-add-subject-modal (close)="closeAddSubjectModal()" (save)="saveSubject()"></app-add-subject-modal>
+}

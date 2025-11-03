@@ -1,0 +1,40 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+
+<div class="modal" (click)="$event.stopImmediatePropagation()">
+  <h2>Add New Subject</h2>
+
+  <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()">
+    <div class="form-group">
+      <label>Subject Name</label>
+      <input type="text" formControlName="name" placeholder="e.g. Desarrollo Web">
+      @if (name?.touched) {
+        <small class="error">Name is required</small>
+      }
+    </div>
+
+    <div class="form-group">
+      <label>Professor's Name</label>
+      <input type="text" formControlName="professor" placeholder="e.g. Lugel Franco">
+      @if (name?.touched) {
+        <small class="error">Professor is required</small>
+      }
+    </div>
+
+    <div class="form-group">
+      <label>Color</label>
+      <div class="color-options">
+        @for (color of this.colors; track $index) {
+          <div class="color-selector" 
+          [style.background]="color" 
+          [class.selected]="addSubjectForm.value.color === color"
+          (click)="selectColor(color)"></div>
+        }
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="cancel" type="button" (click)="onClose()">Cancel</button>
+      <button class="submit" type="submit">Save</button>
+    </div>
+  </form>
+</div>

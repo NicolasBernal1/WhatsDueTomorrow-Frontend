@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { SubjectService } from '../../services/subject.service';
 import { ClassResponseDto } from '../../models/class-response.dto';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [NavbarComponent],
+  imports: [],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
