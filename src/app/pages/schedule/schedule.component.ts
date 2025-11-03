@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { SubjectService } from '../../services/subject.service';
 import { ClassResponseDto } from '../../models/class-response.dto';
+import { NavbarComponent } from '../../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [],
+  imports: [NavbarComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
@@ -29,10 +30,19 @@ export class ScheduleComponent implements OnInit{
     })
   }
 
-  getClassesFor(day: string, hour: string){
-    const currClass = this.classes.find(c => 
-      c.dayOfWeek.toLowerCase() === day && c.startTime <= hour && c.endTime < hour
+  getClassesFor(day: string, hour: string) {
+    const hourToMinutes = (h: string) => {
+      const [hh, mm] = h.split(':').map(Number);
+      return hh * 60 + mm;
+    };
+
+    const current = hourToMinutes(hour);
+
+    return this.classes.find(c =>
+      c.dayOfWeek.toLowerCase() === day &&
+      hourToMinutes(c.startTime) <= current &&
+      current < hourToMinutes(c.endTime)
     );
-    return currClass;
   }
+
 }

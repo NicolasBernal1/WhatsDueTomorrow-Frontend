@@ -1,0 +1,24 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <div class="logo" routerLink="/schedule">What's Due Tomorrow</div>
+  </div>
+
+  <div class="navbar-center">
+    <a routerLink="/schedule" routerLinkActive="active">Schedule</a>
+    <a routerLink="/subjects" routerLinkActive="active">Subjects</a>
+    <a routerLink="/assignments" routerLinkActive="active">Assignments</a>
+  </div>
+
+  <div class="navbar-right">
+    <div class="profile-menu" (click)="toggleDropdown()">
+      <span>Profile</span>
+      @if (dropDownOpened) {
+        <div class="dropdown">
+          <button (click)="logout()">Log Out</button>
+          <button class="danger" (click)="confirmDelete()">Delete Account</button>
+        </div>
+      }
+    </div>
+  </div>
+
+</nav>
