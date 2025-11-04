@@ -1,0 +1,22 @@
+<div class="assignments-container">
+  <h2>Your Assignments</h2>
+
+  @if (loading) {
+    <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+  } @else if (!assignments.length) {
+    <p class="empty">You have no assignments yet.</p>
+  } @else {
+    <div class="assignments-grid">
+      @for (a of assignments; track a.id) {
+        <mat-card class="assignment-card" (contextmenu)="onRightClickAssignment($event, a)">
+          <mat-card-title>{{ a.title }}</mat-card-title>
+          <mat-card-subtitle>{{ a.subjectName }}</mat-card-subtitle>
+
+          <mat-card-content>
+            <p class="date">📅 {{ a.dueDate | date: 'mediumDate' }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

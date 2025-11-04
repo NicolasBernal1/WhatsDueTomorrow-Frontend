@@ -1,0 +1,63 @@
+.assignments-container {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f4f7fb;
+  min-height: 100vh;
+
+  h2 {
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #1e88e5;
+  }
+
+  .empty {
+    color: #888;
+    font-size: 1.1rem;
+    margin-top: 40px;
+  }
+
+  mat-progress-spinner {
+    margin-top: 40px;
+  }
+
+  .assignments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .assignment-card {
+    padding: 16px;
+    border-radius: 12px;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    background: white;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    mat-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    mat-card-subtitle {
+      color: #777;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .date {
+      color: #1e88e5;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+  }
+}

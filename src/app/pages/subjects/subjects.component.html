@@ -1,0 +1,27 @@
+<div class="subjects-container">
+  <div class="header">
+    <h2>Your Subjects</h2>
+    <button mat-flat-button color="primary" (click)="addSubjectModal()">+ Add Subject</button>
+  </div>
+
+  @if (this.loading) {
+    <p class="loading">Loading Subjects...</p>
+  } @else if (this.subjects.length === 0) {
+    <p class="empty">You have no subjects yet</p>
+  } @else {
+    <div class="subjects-grid">
+      @for (sub of this.subjects; track $index) {
+        <mat-card class="subject-card" [style.border-top]=" '6px solid ' + sub.color" (click)="goToSubjectDetais(sub.id)" (contextmenu)="onRightClickSubject($event, sub)">
+          <div class="subject-info">
+            <h3>{{ sub.name }}</h3>
+            <p>{{ sub.professor }}</p>
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>
+
+@if (this.showAddModal) {
+  <app-add-subject-modal (close)="closeAddSubjectModal()" (save)="saveSubject()" />
+}

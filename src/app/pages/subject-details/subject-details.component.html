@@ -1,0 +1,52 @@
+@if (subject) {
+  <div class="subject-details">
+
+    <mat-card class="subject-header" [style.border-left]="'6px solid ' + subject.color">
+      <mat-card-title>{{ subject.name }}</mat-card-title>
+      <mat-card-subtitle>{{ subject.professor }}</mat-card-subtitle>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" (click)="openAssignmentModal()">+ Add Assignment</button>
+        <button mat-stroked-button color="accent" (click)="openClassModal()">+ Add Class</button>
+      </div>
+    </mat-card>
+
+    <h3>Assignments</h3>
+
+    @if (assignments.length) {
+      <div class="assignments-list">
+        @for (a of assignments; track a.id) {
+          <mat-card class="assignment-item" (contextmenu)="onRightClickAssignment($event, a)">
+            <mat-card-title>{{ a.title }}</mat-card-title>
+            <mat-card-content>
+              <p class="assignment-date">
+                📅 {{ a.dueDate | date: 'mediumDate' }}
+              </p>
+              <p class="assignment-desc">
+                {{ a.description }}
+              </p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    } @else {
+      <p class="empty">No assignments yet.</p>
+    }
+
+    @if (showAssignmentModal) {
+      <app-add-assignment-modal
+        [subjectId]="subject.id"
+        (close)="closeAssignmentModal()"
+        (save)="onAssignmentSaved()"
+      />
+    }
+
+    @if (showClassModal) {
+      <app-add-class-modal
+        [subjectId]="subject.id"
+        (close)="closeClassModal()"
+        (save)="onClassSaved()"
+      />
+    }
+  </div>
+}

@@ -1,0 +1,26 @@
+<mat-toolbar color="primary" class="navbar">
+  <span class="logo" routerLink="/schedule">What's Due Tomorrow?</span>
+
+  <span class="navbar-center">
+    <a mat-button routerLink="/schedule" routerLinkActive="active">Schedule</a>
+    <a mat-button routerLink="/subjects" routerLinkActive="active">Subjects</a>
+    <a mat-button routerLink="/assignments" routerLinkActive="active">Assignments</a>
+  </span>
+
+  <span class="spacer"></span>
+  <button mat-button [matMenuTriggerFor]="profileMenu">
+    <mat-icon>account_circle</mat-icon>
+    Profile
+  </button>
+
+  <mat-menu #profileMenu="matMenu">
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Log Out
+    </button>
+    <button mat-menu-item (click)="confirmDelete()" class="danger">
+      <mat-icon color="warn">delete_forever</mat-icon>
+      Delete Account
+    </button>
+  </mat-menu>
+</mat-toolbar>

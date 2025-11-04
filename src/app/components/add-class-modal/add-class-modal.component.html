@@ -1,0 +1,39 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+
+<mat-card class="modal" (click)="$event.stopPropagation()">
+  <h2>Add Class Schedule</h2>
+
+  <form [formGroup]="addClassForm" (ngSubmit)="onSave()">
+    <mat-form-field appearance="outline" class="form-field full-width">
+      <mat-label>Day</mat-label>
+      <mat-select formControlName="dayOfWeek">
+        @for (day of days; track day) {
+          <mat-option [value]="day">{{ day | titlecase }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field full-width">
+      <mat-label>Start time</mat-label>
+      <mat-select formControlName="startTime">
+        @for (hour of hours; track hour) {
+          <mat-option [value]="hour">{{ hour }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field full-width">
+      <mat-label>End time</mat-label>
+      <mat-select formControlName="endTime">
+        @for (hour of hours; track hour) {
+          <mat-option [value]="hour">{{ hour }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-stroked-button type="button" color="warn" (click)="onClose()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit">Save</button>
+    </div>
+  </form>
+</mat-card>

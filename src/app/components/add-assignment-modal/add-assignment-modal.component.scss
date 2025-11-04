@@ -1,0 +1,44 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 420px;
+  transform: translate(-50%, -50%);
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  z-index: 20;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form-field {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
