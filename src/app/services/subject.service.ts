@@ -26,4 +26,8 @@ export class SubjectService {
   addSubject(data: AddSubjectDto): Observable<BaseResponseDto<null>> {
     return this.http.post<BaseResponseDto<null>>(`${this.apiUrl}/subjects`, data);
   }
+
+  getSubjectById(id: number): Observable<BaseResponseDto<SubjectResponseDto>>{
+    return this.http.get<BaseResponseDto<SubjectResponseDto>>(`${this.apiUrl}/subjects/${id}`);
+  }
 }

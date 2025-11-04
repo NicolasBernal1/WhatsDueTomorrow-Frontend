@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { SubjectResponseDto } from '../../models/subject-response.dto';
 import { SubjectService } from '../../services/subject.service';
 import { Router } from '@angular/router';
-import { AddSubjectDto } from '../../models/add-subject.dto';
 import { AddSubjectModalComponent } from '../../components/add-subject-modal/add-subject-modal.component';
 
 @Component({

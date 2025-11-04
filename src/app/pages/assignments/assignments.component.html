@@ -1,0 +1,21 @@
+<div class="assignments-container">
+  <h2>Your Assignments</h2>
+
+  @if (loading) {
+    <p>Loading assignments...</p>
+  } @else if (!assignments.length) {
+    <p class="empty">You have no assignments yet.</p>
+  } @else {
+    <ul class="assignments-list">
+      @for (a of assignments; track a.id) {
+        <li class="assignment-card">
+          <div class="info">
+            <h3>{{ a.title }}</h3>
+            <p class="subject">{{ a.subjectName }}
+          </div>
+          <div class="date">{{ a.dueDate | date: 'mediumDate' }}</div>
+        </li>
+      }
+    </ul>
+  }
+</div>

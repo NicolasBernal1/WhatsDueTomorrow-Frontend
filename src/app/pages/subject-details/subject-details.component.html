@@ -1,0 +1,42 @@
+@if (subject) {
+  <div class="subject-details">
+    <h2 [style.color]="subject.color">{{ subject.name }}</h2>
+    <p>{{ subject.professor }}</p>
+
+    <div class="actions">
+      <button (click)="this.openAssignmentModal()">+ Add Assignment</button>
+      <button (click)="this.openClassModal()">+ Add Class</button>
+    </div>
+
+    <h3>Assignments</h3>
+
+    @if (assignments.length) {
+      <ul>
+        @for (a of assignments; track a.id) {
+          <li class="assignment-item">
+            <div class="assignment-title">{{ a.title }}</div>
+            <div class="assignment-date">{{ a.dueDate | date: 'mediumDate' }}</div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p>No assignments yet.</p>
+    }
+
+    @if (showAssignmentModal) {
+      <app-add-assignment-modal
+        [subjectId]="subject.id"
+        (close)="closeAssignmentModal()"
+        (save)="onAssignmentSaved()"
+      />
+    }
+
+    @if (showClassModal) {
+      <app-add-class-modal
+        [subjectId]="subject.id"
+        (close)="closeClassModal()"
+        (save)="onClassSaved()"
+      />
+    }
+  </div>
+}

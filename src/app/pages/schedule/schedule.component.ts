@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SubjectService } from '../../services/subject.service';
 import { ClassResponseDto } from '../../models/class-response.dto';
+import { days, hours } from '../../common/data.common'
 
 @Component({
   selector: 'app-schedule',
@@ -12,15 +13,11 @@ import { ClassResponseDto } from '../../models/class-response.dto';
 export class ScheduleComponent implements OnInit{
   constructor(private subjectService: SubjectService){}
 
-  hours: string[] = [];
-  days: string[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  hours: string[] = hours;
+  days: string[] = days;
   classes: ClassResponseDto[] = [];
 
   ngOnInit(): void {
-    for(let h = 6; h <= 22; h++){
-      this.hours.push(`${h.toString().padStart(2, '0')}:00`);
-    }
-
     this.subjectService.getClass().subscribe({
       next: (res) => {
         this.classes = res.data || [];
