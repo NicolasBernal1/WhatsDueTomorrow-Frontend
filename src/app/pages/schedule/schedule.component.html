@@ -12,7 +12,7 @@
       @for (day of days; track $index) {
         <div class="cell">
           @if (getClassesFor(day, hour); as cls) {
-            <div class="class-card" [style.background]="cls.subject.color || '#007bff'">
+            <div class="class-card" [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)" (contextmenu)="onRightClickClass($event, cls)">
               <div class="class-name">{{ cls.subject.name }}</div>
               <div class="class-professor">{{ cls.subject.professor }}</div>
               <div class="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>

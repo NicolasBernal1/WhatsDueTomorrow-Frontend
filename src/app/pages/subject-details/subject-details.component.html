@@ -1,26 +1,36 @@
 @if (subject) {
   <div class="subject-details">
-    <h2 [style.color]="subject.color">{{ subject.name }}</h2>
-    <p>{{ subject.professor }}</p>
 
-    <div class="actions">
-      <button (click)="this.openAssignmentModal()">+ Add Assignment</button>
-      <button (click)="this.openClassModal()">+ Add Class</button>
-    </div>
+    <mat-card class="subject-header" [style.border-left]="'6px solid ' + subject.color">
+      <mat-card-title>{{ subject.name }}</mat-card-title>
+      <mat-card-subtitle>{{ subject.professor }}</mat-card-subtitle>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" (click)="openAssignmentModal()">+ Add Assignment</button>
+        <button mat-stroked-button color="accent" (click)="openClassModal()">+ Add Class</button>
+      </div>
+    </mat-card>
 
     <h3>Assignments</h3>
 
     @if (assignments.length) {
-      <ul>
+      <div class="assignments-list">
         @for (a of assignments; track a.id) {
-          <li class="assignment-item">
-            <div class="assignment-title">{{ a.title }}</div>
-            <div class="assignment-date">{{ a.dueDate | date: 'mediumDate' }}</div>
-          </li>
+          <mat-card class="assignment-item" (contextmenu)="onRightClickAssignment($event, a)">
+            <mat-card-title>{{ a.title }}</mat-card-title>
+            <mat-card-content>
+              <p class="assignment-date">
+                📅 {{ a.dueDate | date: 'mediumDate' }}
+              </p>
+              <p class="assignment-desc">
+                {{ a.description }}
+              </p>
+            </mat-card-content>
+          </mat-card>
         }
-      </ul>
+      </div>
     } @else {
-      <p>No assignments yet.</p>
+      <p class="empty">No assignments yet.</p>
     }
 
     @if (showAssignmentModal) {

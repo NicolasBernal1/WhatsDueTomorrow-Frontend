@@ -1,14 +1,32 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  <h2>Log In</h2>
-  <div>
-    <label>Email</label>
-    <input type="email" formControlName="email">
-  </div>
-  <div>
-    <label>Password</label>
-    <input type="password" formControlName="password">
-  </div>
-  <button type="submit" [disabled]="loginForm.invalid">Log In</button>
-</form>
+<div class="login-container">
+  <mat-card class="login-card">
+    <h2 class="title">Log In</h2>
 
-<p>You don't have an account yet? Register now!</p>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" />
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        color="primary"
+        class="full-width"
+        type="submit"
+        [disabled]="loginForm.invalid"
+      >
+        Log In
+      </button>
+    </form>
+
+    <p class="register-text">
+      You don't have an account yet?
+      <a routerLink="/register">Register now!</a>
+    </p>
+  </mat-card>
+</div>

@@ -26,4 +26,8 @@ export class AssignmentService {
   getAllAssignments(): Observable<BaseResponseDto<AssignmentResponseCompDto[]>> {
     return this.http.get<BaseResponseDto<AssignmentResponseCompDto[]>>(`${this.apiUrl}/assignments`);
   }
+
+  deleteAssignment(id: number): Observable<BaseResponseDto<null>> {
+    return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/assignments/${id}`);
+  }
 }

@@ -2,10 +2,14 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AddSubjectDto } from '../../models/add-subject.dto';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SubjectService } from '../../services/subject.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-add-subject-modal',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatButtonModule, MatInputModule],
   standalone: true,
   templateUrl: './add-subject-modal.component.html',
   styleUrl: './add-subject-modal.component.scss'
@@ -52,6 +56,10 @@ export class AddSubjectModalComponent {
 
   get name(){
     return this.addSubjectForm.get('name');
+  }
+
+  get professor(){
+    return this.addSubjectForm.get('professor');
   }
 
 

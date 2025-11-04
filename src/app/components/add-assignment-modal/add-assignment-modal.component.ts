@@ -2,10 +2,16 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AssignmentService } from '../../services/assignment.service';
 import { AddAssignmentDto } from '../../models/add-assignment.dto';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-add-assignment-modal',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatButtonModule, MatInputModule, MatDatepickerModule, MatNativeDateModule],
   standalone: true,
   templateUrl: './add-assignment-modal.component.html',
   styleUrl: './add-assignment-modal.component.scss'
@@ -14,6 +20,8 @@ export class AddAssignmentModalComponent {
   @Input() subjectId!: number;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
+
+  minDate = new Date();
 
   addAssignmentForm: FormGroup;
 

@@ -1,0 +1,122 @@
+.subject-details {
+  padding: 40px;
+  min-height: 100vh;
+  background: #f4f7fb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+
+  .subject-header {
+    width: 100%;
+    max-width: 800px;
+    padding: 24px;
+    border-radius: 12px;
+    background: #fff;
+
+    mat-card-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    mat-card-subtitle {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 16px;
+
+      button {
+        font-weight: 500;
+      }
+    }
+  }
+
+  h3 {
+    align-self: flex-start;
+    margin: 16px 0 8px 10%;
+    font-size: 1.2rem;
+    color: #333;
+  }
+
+  .assignments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .assignment-item {
+    padding: 16px;
+    border-radius: 12px;
+    background: #fff;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    mat-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .assignment-date {
+      color: #1e88e5;
+      font-weight: 500;
+      margin-top: 6px;
+    }
+    .assignment-desc {
+      max-height: 80px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      word-wrap: break-word;
+      font-size: 0.9rem;
+      color: #444;
+    }
+    .assignment-item {
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  mat-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .assignment-date {
+    color: #1e88e5;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+}
+
+  }
+
+  .empty {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #888;
+  }
+}

@@ -4,10 +4,15 @@ import { days, hours } from '../../common/data.common';
 import { ClassService } from '../../services/class.service';
 import { AddClassDto } from '../../models/add-class.dto';
 import { TitleCasePipe } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-add-class-modal',
-  imports: [ReactiveFormsModule, TitleCasePipe],
+  imports: [ReactiveFormsModule, TitleCasePipe, MatFormFieldModule, MatSelectModule, MatOptionModule, MatCardModule, MatButtonModule],
   standalone: true,
   templateUrl: './add-class-modal.component.html',
   styleUrl: './add-class-modal.component.scss'

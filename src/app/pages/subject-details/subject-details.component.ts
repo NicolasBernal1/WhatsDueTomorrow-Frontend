@@ -7,10 +7,12 @@ import { AssignmentService } from '../../services/assignment.service';
 import { DatePipe } from '@angular/common';
 import { AddAssignmentModalComponent } from '../../components/add-assignment-modal/add-assignment-modal.component';
 import { AddClassModalComponent } from '../../components/add-class-modal/add-class-modal.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-subject-details',
-  imports: [DatePipe, AddAssignmentModalComponent, AddClassModalComponent],
+  imports: [DatePipe, AddAssignmentModalComponent, AddClassModalComponent, MatCardModule, MatButtonModule],
   standalone: true,
   templateUrl: './subject-details.component.html',
   styleUrl: './subject-details.component.scss'
@@ -18,6 +20,7 @@ import { AddClassModalComponent } from '../../components/add-class-modal/add-cla
 export class SubjectDetailsComponent implements OnInit{
   subject?: SubjectResponseDto;
   assignments: AssignmentResponseDto[] = [];
+  
 
   showAssignmentModal = false;
   showClassModal = false;
@@ -79,5 +82,15 @@ export class SubjectDetailsComponent implements OnInit{
 
   onClassSaved(): void {
     this.closeClassModal();
+  }
+  onRightClickAssignment(event: MouseEvent, assignment: AssignmentResponseDto){
+    event.preventDefault();
+    const confirmed = confirm('Delete Assignment?');
+    if(confirmed){
+      this.assignmentService.deleteAssignment(assignment.id).subscribe({
+        next: () => this.loadAssignments(assignment.subjectId),
+        error: (err) => console.error(err)
+      })
+    } 
   }
 }

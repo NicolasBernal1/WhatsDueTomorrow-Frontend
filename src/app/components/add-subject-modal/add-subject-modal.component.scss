@@ -1,8 +1,8 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 10;
 }
 
 .modal {
@@ -10,62 +10,47 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(320px, 40%, 480px);
-  background: #fff;
+  z-index: 11;
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
   border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 1001;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1.5rem;
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 0.5rem;
+  color: #1565c0;
+  font-weight: 600;
 }
 
-form {
+.form-content {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 1.5rem;
 }
 
-.form-group {
+.color-picker {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.6rem;
 
-  label {
-    font-weight: 600;
-    font-size: 14px;
+  p {
+    font-weight: 500;
+    color: #444;
+    margin: 0;
   }
 
-  input {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: #007bff;
-    }
+  .color-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
-
-  small.error {
-    color: #dc3545;
-    font-size: 12px;
-  }
-}
-
-.color-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
 
   .color-selector {
     width: 28px;
@@ -73,14 +58,14 @@ form {
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: transform 0.15s ease, border-color 0.2s ease;
+    transition: transform 0.2s, border-color 0.2s;
 
     &:hover {
       transform: scale(1.1);
     }
 
     &.selected {
-      border-color: #000;
+      border: 2px solid #1565c0;
     }
   }
 }
@@ -88,28 +73,9 @@ form {
 .buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 1rem;
 
   button {
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.2s ease;
-
-    &.cancel {
-      background: #ccc;
-    }
-
-    &.submit {
-      background: #28a745;
-      color: #fff;
-
-      &:hover {
-        background: #218838;
-      }
-    }
+    min-width: 90px;
   }
 }

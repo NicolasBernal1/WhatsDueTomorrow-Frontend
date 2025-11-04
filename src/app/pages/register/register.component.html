@@ -1,18 +1,37 @@
-<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-  <h2>Register</h2>
-  <div>
-    <label>Name</label>
-    <input type="text" formControlName="name">
-  </div>
-  <div>
-    <label>Email</label>
-    <input type="email" formControlName="email">
-  </div>
-  <div>
-    <label>Password</label>
-    <input type="password" formControlName="password">
-  </div>
-  <button type="submit" [disabled]="registerForm.invalid">Register</button>
-</form>
+<div class="register-container">
+  <mat-card class="register-card">
+    <h2 class="title">Register</h2>
 
-<p>Already have an account? Login now!</p>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput type="text" formControlName="name" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" />
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        color="primary"
+        class="full-width"
+        type="submit"
+        [disabled]="registerForm.invalid"
+      >
+        Register
+      </button>
+    </form>
+
+    <p class="login-text">
+      Already have an account?
+      <a routerLink="/login">Log in</a>
+    </p>
+  </mat-card>
+</div>

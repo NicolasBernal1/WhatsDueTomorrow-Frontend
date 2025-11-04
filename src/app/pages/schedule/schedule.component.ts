@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SubjectService } from '../../services/subject.service';
 import { ClassResponseDto } from '../../models/class-response.dto';
 import { days, hours } from '../../common/data.common'
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-schedule',
@@ -11,7 +12,7 @@ import { days, hours } from '../../common/data.common'
   styleUrl: './schedule.component.scss'
 })
 export class ScheduleComponent implements OnInit{
-  constructor(private subjectService: SubjectService){}
+  constructor(private subjectService: SubjectService, private router: Router){}
 
   hours: string[] = hours;
   days: string[] = days;
@@ -39,6 +40,24 @@ export class ScheduleComponent implements OnInit{
       hourToMinutes(c.startTime) <= current &&
       current < hourToMinutes(c.endTime)
     );
+  }
+
+  onClickClass(id: number) {
+    this.router.navigate([`/subjects/${id}`]);
+  }
+
+  onRightClickClass(event: MouseEvent, subjectClass: ClassResponseDto){
+    event.preventDefault();
+    const confirmed = confirm('Delete Class?');
+
+    if(confirmed){
+      this.subjectService.deleteClass(subjectClass.id).subscribe({
+        next: () => {
+          this.classes = this.classes.filter(c => c.id !== subjectClass.id);
+        },
+        error: (err) => console.error(err)
+      })
+    }
   }
 
 }

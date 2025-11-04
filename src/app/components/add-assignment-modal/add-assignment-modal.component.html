@@ -1,33 +1,35 @@
-<div class="modal-backdrop" (click)="this.onclose()"></div>
+<div class="modal-backdrop" (click)="onclose()"></div>
 
-<div class="modal">
-  <h2>Add Assignment</h2>
+<mat-card class="modal" (click)="$event.stopPropagation()">
+  <h2 mat-card-title>Add Assignment</h2>
 
   <form [formGroup]="addAssignmentForm" (ngSubmit)="onSave()">
-    <div class="form-group">
-      <label for="title">Title</label>
-      <input id="title" type="text" formControlName="title" placeholder="Enter title" />
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="Enter title" />
       @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.invalid) {
-        <small class="error">Title is required</small>
+        <mat-hint class="error">Title is required</mat-hint>
       }
-    </div>
+    </mat-form-field>
 
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea id="description" formControlName="description" rows="3" placeholder="Optional"></textarea>
-    </div>
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3" placeholder="Optional"></textarea>
+    </mat-form-field>
 
-    <div class="form-group">
-      <label for="dueDate">Due date</label>
-      <input id="dueDate" type="date" formControlName="dueDate" />
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Due date</mat-label>
+      <input matInput [min]="minDate" [matDatepicker]="picker" formControlName="dueDate" placeholder="Choose a date" />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
       @if (addAssignmentForm.get('dueDate')?.touched && addAssignmentForm.get('dueDate')?.invalid) {
-        <small class="error">Due date is required</small>
+        <mat-hint class="error">Due date is required</mat-hint>
       }
-    </div>
+    </mat-form-field>
 
     <div class="actions">
-      <button type="button" class="cancel" (click)="this.onclose()">Cancel</button>
-      <button type="submit" class="save">Save</button>
+      <button mat-stroked-button type="button" color="warn" (click)="onclose()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit">Save</button>
     </div>
   </form>
-</div>
+</mat-card>

@@ -40,4 +40,8 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
+
+  deleteAccount(): Observable<BaseResponseDto<null>>{
+    return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/users/profile`);
+  }
 }

@@ -30,4 +30,12 @@ export class SubjectService {
   getSubjectById(id: number): Observable<BaseResponseDto<SubjectResponseDto>>{
     return this.http.get<BaseResponseDto<SubjectResponseDto>>(`${this.apiUrl}/subjects/${id}`);
   }
+
+  deleteSubject(id: number): Observable<BaseResponseDto<null>> {
+    return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/subjects/${id}`);
+  }
+
+  deleteClass(id: number): Observable<BaseResponseDto<null>> {
+    return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/subjects/classes/${id}`);
+  }
 }

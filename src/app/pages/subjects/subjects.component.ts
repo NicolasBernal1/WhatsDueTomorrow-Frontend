@@ -3,10 +3,12 @@ import { SubjectResponseDto } from '../../models/subject-response.dto';
 import { SubjectService } from '../../services/subject.service';
 import { Router } from '@angular/router';
 import { AddSubjectModalComponent } from '../../components/add-subject-modal/add-subject-modal.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-subjects',
-  imports: [AddSubjectModalComponent],
+  imports: [AddSubjectModalComponent, MatButtonModule, MatCardModule],
   standalone: true,
   templateUrl: './subjects.component.html',
   styleUrl: './subjects.component.scss'
@@ -52,5 +54,16 @@ export class SubjectsComponent implements OnInit{
   saveSubject(){
     this.closeAddSubjectModal();
     this.loadSubjects();
+  }
+
+  onRightClickSubject(event: MouseEvent, subject: SubjectResponseDto){
+    event.preventDefault();
+    const confirmed = confirm('Delete subject?');
+    if(confirmed){
+      this.subjectService.deleteSubject(subject.id).subscribe({
+        next: () => this.loadSubjects(),
+        error: (err) => console.error(err)
+      })
+    }
   }
 }
