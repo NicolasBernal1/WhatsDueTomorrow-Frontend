@@ -26,6 +26,7 @@ export class AddClassModalComponent {
 
   days = days;
   hours = hours;
+  isStartGrater = false;
 
   constructor(private fb: FormBuilder, private classService: ClassService){
     this.addClassForm = this.fb.group({
@@ -35,12 +36,19 @@ export class AddClassModalComponent {
     })
   }
 
+
+
   onSave(): void {
     if(this.addClassForm.invalid){
       this.addClassForm.markAllAsTouched();
       return;
     }
 
+    if(this.addClassForm.value.endTime < this.addClassForm.value.startTime){
+      this.isStartGrater = true;
+      return;
+    }
+    this.isStartGrater = false;
     const dto: AddClassDto = {
       ...this.addClassForm.value,
       subjectId: this.subjectId
