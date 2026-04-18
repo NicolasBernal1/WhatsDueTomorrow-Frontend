@@ -6,6 +6,9 @@ What's Due Tomorrow? is a web application made for students where they can organ
 - Angular
 - Angular Materials
 
+## How to install
+You can install it either by cloning this repository or with this image from Docker Hub: [What's Due Tomorrow? - Frontend Image](https://hub.docker.com/r/nicolasbernal1/frontend-wdt)
+
 ## Hints
 - You can right click to delete entities
 
