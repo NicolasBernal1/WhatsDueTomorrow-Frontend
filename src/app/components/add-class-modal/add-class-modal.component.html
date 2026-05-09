@@ -31,6 +31,12 @@
       </mat-select>
     </mat-form-field>
 
+    @if (isStartGrater) {
+      <mat-error>
+        Start time must be greater than End time
+      </mat-error>
+    }
+
     <div class="actions">
       <button mat-stroked-button type="button" color="warn" (click)="onClose()">Cancel</button>
       <button mat-flat-button color="primary" type="submit">Save</button>
