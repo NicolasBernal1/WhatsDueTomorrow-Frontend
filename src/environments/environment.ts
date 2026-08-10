@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: "https://whatsduetomorrow-backed.onrender.com"
+  apiUrl: "https://whatsduetomorrow-backed.onrender.com" 
 }

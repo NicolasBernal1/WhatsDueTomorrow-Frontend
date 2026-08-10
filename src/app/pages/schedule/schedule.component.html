@@ -2,24 +2,31 @@
   <div class="schedule-grid">
     <div class="empty"></div>
     @for (day of days; track $index) {
-      <div class="header">{{ day }}</div>
+    <div class="header">{{ day }}</div>
     }
 
 
     @for (hour of hours; track $index) {
-      <div class="hour-label">{{ hour }}</div>
+    <div class="hour-label">{{ hour }}</div>
 
-      @for (day of days; track $index) {
-        <div class="cell">
-          @if (getClassesFor(day, hour); as cls) {
-            <div class="class-card" [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)" (contextmenu)="onRightClickClass($event, cls)">
-              <div class="class-name">{{ cls.subject.name }}</div>
-              <div class="class-professor">{{ cls.subject.professor }}</div>
-              <div class="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>
-            </div>
-          }
-        </div>
+    @for (day of days; track $index) {
+    <div class="cell">
+      @if (getClassesFor(day, hour); as cls) {
+      <div class="class-card" [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)"
+        (contextmenu)="onRightClickClass($event, cls)">
+        <div class="class-name">{{ cls.subject.name }}</div>
+        <div class="class-professor">{{ cls.subject.professor }}</div>
+        <div class="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>
+      </div>
       }
+    </div>
+    }
+    }
+    @if (contextMenuVisible) {
+    <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
+      <button>Edit</button>
+      <button (click)="deleteClass()">Delete</button>
+    </div>
     }
   </div>
 </div>

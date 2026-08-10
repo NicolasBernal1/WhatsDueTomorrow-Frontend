@@ -17,6 +17,10 @@ export class ScheduleComponent implements OnInit{
   hours: string[] = hours;
   days: string[] = days;
   classes: ClassResponseDto[] = [];
+  contextMenuVisible: boolean = false;
+  contextMenuX: number = 0;
+  contextMenuY: number = 0;
+  selectedClass: ClassResponseDto | null = null;
 
   ngOnInit(): void {
     this.subjectService.getClass().subscribe({
@@ -46,18 +50,36 @@ export class ScheduleComponent implements OnInit{
     this.router.navigate([`/subjects/${id}`]);
   }
 
-  onRightClickClass(event: MouseEvent, subjectClass: ClassResponseDto){
+  onRightClickClass(event: MouseEvent, subjectClass: ClassResponseDto) {
     event.preventDefault();
+
+    this.selectedClass = subjectClass;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+    this.contextMenuVisible = true;
+  }
+
+  deleteClass() {
+    if (!this.selectedClass) return;
+
     const confirmed = confirm('Delete Class?');
 
-    if(confirmed){
-      this.subjectService.deleteClass(subjectClass.id).subscribe({
+    if (confirmed) {
+      this.subjectService.deleteClass(this.selectedClass.id).subscribe({
         next: () => {
-          this.classes = this.classes.filter(c => c.id !== subjectClass.id);
+          this.classes = this.classes.filter(
+            c => c.id !== this.selectedClass!.id
+          );
+          this.closeContextMenu();
         },
         error: (err) => console.error(err)
-      })
+      });
     }
+  }
+
+  closeContextMenu() {
+    this.contextMenuVisible = false;
+    this.selectedClass = null;
   }
 
 }
