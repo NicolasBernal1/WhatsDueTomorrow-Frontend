@@ -75,6 +75,7 @@ export class ScheduleComponent implements OnInit{
         error: (err) => console.error(err)
       });
     }
+    this.closeContextMenu();
   }
 
   closeContextMenu() {
