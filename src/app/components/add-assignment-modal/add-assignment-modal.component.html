@@ -7,8 +7,11 @@
     <mat-form-field appearance="outline" class="form-field">
       <mat-label>Title</mat-label>
       <input matInput formControlName="title" placeholder="Enter title" />
-      @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.invalid) {
+      @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.hasError('required')) {
         <mat-hint class="error">Title is required</mat-hint>
+      }
+      @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.hasError('pattern')) {
+        <mat-hint class="error">Title must contain at least one letter</mat-hint>
       }
     </mat-form-field>
 

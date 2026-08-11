@@ -7,16 +7,22 @@
     <mat-form-field appearance="outline">
       <mat-label>Subject Name</mat-label>
       <input matInput type="text" formControlName="name" placeholder="e.g. Desarrollo Web" />
-      @if (name?.touched && name?.invalid) {
+      @if (name?.touched && name?.hasError('required')) {
         <mat-error>Name is required</mat-error>
+      }
+      @if (name?.touched && name?.hasError('pattern')) {
+        <mat-error>Name must contain at least one letter</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Professor's Name</mat-label>
       <input matInput type="text" formControlName="professor" placeholder="e.g. Lugel Franco" />
-      @if (professor?.touched && professor?.invalid) {
+      @if (professor?.touched && professor?.hasError('required')) {
         <mat-error>Professor is required</mat-error>
+      }
+      @if (professor?.touched && professor?.hasError('pattern')) {
+        <mat-error>Professor must contain at least one letter</mat-error>
       }
     </mat-form-field>
 
