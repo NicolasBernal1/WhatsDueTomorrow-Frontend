@@ -44,7 +44,7 @@ export class AddClassModalComponent {
       return;
     }
 
-    if(this.addClassForm.value.endTime < this.addClassForm.value.startTime){
+    if(this.addClassForm.value.endTime <= this.addClassForm.value.startTime){
       this.isStartGrater = true;
       return;
     }
