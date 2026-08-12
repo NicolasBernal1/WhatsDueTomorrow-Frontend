@@ -6,11 +6,20 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" />
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')) {
+          <mat-error>Email is required</mat-error>
+        }
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')) {
+          <mat-error>Email must be a valid email address</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Password</mat-label>
         <input matInput type="password" formControlName="password" />
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
+            <mat-error>Password is required</mat-error>
+          }
       </mat-form-field>
 
       <button

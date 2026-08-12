@@ -33,7 +33,12 @@
 
     @if (isStartGrater) {
       <mat-error>
-        Start time must be greater than End time
+        End time must be greater than start time.
+      </mat-error>
+    }
+    @if (hasConflict) {
+      <mat-error>
+        This class overlaps with another class in your schedule.
       </mat-error>
     }
 
