@@ -1,5 +1,5 @@
 @if (subject) {
-  <div class="subject-details">
+  <div class="subject-details" (click)="closeContextMenu()">
 
     <mat-card class="subject-header" [style.border-left]="'6px solid ' + subject.color">
       <mat-card-title>{{ subject.name }}</mat-card-title>
@@ -33,9 +33,17 @@
       <p class="empty">No assignments yet.</p>
     }
 
+    @if (contextMenuVisible) {
+      <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
+        <button (click)="editAssignment()">Edit</button>
+        <button (click)="deleteAssignment()">Delete</button>
+      </div>
+    }
+
     @if (showAssignmentModal) {
       <app-add-assignment-modal
         [subjectId]="subject.id"
+        [assignment]="selectedAssignment ?? undefined"
         (close)="closeAssignmentModal()"
         (save)="onAssignmentSaved()"
       />

@@ -21,9 +21,14 @@ export class SubjectDetailsComponent implements OnInit{
   subject?: SubjectResponseDto;
   assignments: AssignmentResponseDto[] = [];
   
-
   showAssignmentModal = false;
   showClassModal = false;
+
+  showEditModal = false;
+  selectedAssignment: AssignmentResponseDto | null = null;
+  contextMenuVisible = false;
+  contextMenuX = 0;
+  contextMenuY = 0;
 
   constructor(private route: ActivatedRoute, private subjectService: SubjectService, private assignmentService: AssignmentService){}
 
@@ -60,6 +65,7 @@ export class SubjectDetailsComponent implements OnInit{
 
   closeAssignmentModal(): void {
     this.showAssignmentModal = false;
+    this.selectedAssignment = null;
     document.body.style.overflow = ''
   }
 
@@ -70,6 +76,7 @@ export class SubjectDetailsComponent implements OnInit{
 
   closeClassModal(): void {
     this.showClassModal = false;
+    this.selectedAssignment = null;
     document.body.style.overflow = ''
   }
 
@@ -83,14 +90,46 @@ export class SubjectDetailsComponent implements OnInit{
   onClassSaved(): void {
     this.closeClassModal();
   }
-  onRightClickAssignment(event: MouseEvent, assignment: AssignmentResponseDto){
+
+  onRightClickAssignment(event: MouseEvent, assignment: AssignmentResponseDto): void {
     event.preventDefault();
+
+    this.selectedAssignment = assignment;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+    this.contextMenuVisible = true;
+  }
+
+  closeContextMenu(): void {
+    this.contextMenuVisible = false;
+  }
+
+  deleteAssignment(): void {
+    if (!this.selectedAssignment) return;
+
     const confirmed = confirm('Delete Assignment?');
-    if(confirmed){
-      this.assignmentService.deleteAssignment(assignment.id).subscribe({
-        next: () => this.loadAssignments(assignment.subjectId),
+
+    if (confirmed) {
+      this.assignmentService.deleteAssignment(this.selectedAssignment.id).subscribe({
+        next: () => {
+          if (this.subject) {
+            this.loadAssignments(this.subject.id);
+          }
+          this.closeContextMenu();
+        },
         error: (err) => console.error(err)
-      })
-    } 
+      });
+    } else {
+      this.closeContextMenu();
+    }
+  }
+
+  editAssignment(): void {
+    if (!this.selectedAssignment) return;
+
+    this.showAssignmentModal = true;
+    this.contextMenuVisible = false;
+
+    document.body.style.overflow = 'hidden';
   }
 }
