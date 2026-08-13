@@ -1,4 +1,4 @@
-<div class="subjects-container">
+<div class="subjects-container" (click)="closeContextMenu()">
   <div class="header">
     <h2>Your Subjects</h2>
     <button mat-flat-button color="primary" (click)="addSubjectModal()">+ Add Subject</button>
@@ -24,4 +24,23 @@
 
 @if (this.showAddModal) {
   <app-add-subject-modal (close)="closeAddSubjectModal()" (save)="saveSubject()" />
+}
+
+@if (contextMenuVisible) {
+  <div
+    class="context-menu"
+    [style.left.px]="contextMenuX"
+    [style.top.px]="contextMenuY"
+  >
+    <button (click)="editSubject()">Edit</button>
+    <button (click)="deleteSubject()">Delete</button>
+  </div>
+}
+
+@if (showEditModal && selectedSubject) {
+  <app-add-subject-modal
+    [subject]="selectedSubject"
+    (close)="closeEditModal()"
+    (save)="onSubjectSaved()"
+  />
 }

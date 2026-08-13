@@ -1,7 +1,7 @@
 <div class="modal-backdrop" (click)="onClose()"></div>
 
 <div class="modal" (click)="$event.stopImmediatePropagation()">
-  <h2>Add New Subject</h2>
+ <h2>{{ subject ? 'Edit Subject' : 'Add New Subject' }}</h2>
 
   <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()" class="form-content">
     <mat-form-field appearance="outline">
@@ -43,7 +43,7 @@
     <div class="buttons">
       <button mat-stroked-button color="warn" type="button" (click)="onClose()">Cancel</button>
       <button mat-flat-button color="primary" type="submit" [disabled]="addSubjectForm.invalid">
-        Save
+        {{ subject ? 'Update' : 'Save' }}
       </button>
     </div>
   </form>
