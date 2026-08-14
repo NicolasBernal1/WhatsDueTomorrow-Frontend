@@ -8,19 +8,97 @@
   </span>
 
   <span class="spacer"></span>
-  <button mat-button [matMenuTriggerFor]="profileMenu">
+
+  <button
+    mat-button
+    [matMenuTriggerFor]="profileMenu"
+    (click)="loadProfile(); resetPasswordState()">
     <mat-icon>account_circle</mat-icon>
     Profile
   </button>
 
-  <mat-menu #profileMenu="matMenu">
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      Log Out
-    </button>
-    <button mat-menu-item (click)="confirmDelete()" class="danger">
-      <mat-icon color="warn">delete_forever</mat-icon>
-      Delete Account
-    </button>
+  <mat-menu #profileMenu="matMenu" class="profile-menu">
+
+    <div class="profile-content" (click)="$event.stopPropagation()">
+
+      @if (user) {
+        <div class="profile-info">
+          <mat-icon class="profile-icon">account_circle</mat-icon>
+
+          <div>
+            <h3>{{ user.name }}</h3>
+            <p>{{ user.email }}</p>
+          </div>
+        </div>
+      }
+
+      <div class="divider"></div>
+
+      <div class="password-section">
+        <h4>Change Password</h4>
+
+        @if (!passwordVerified) {
+
+          <mat-form-field appearance="outline">
+            <mat-label>Current password</mat-label>
+            <input
+              matInput
+              type="password"
+              [(ngModel)]="password"
+              (keydown.enter)="verifyPassword()" />
+          </mat-form-field>
+
+          @if (passwordError) {
+            <p class="error-message">
+              Incorrect password
+            </p>
+          }
+
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="verifyPassword()"
+            [disabled]="!password">
+            Verify Password
+          </button>
+
+        } @else {
+
+          <p class="verified-message">
+            ✓ Current password verified
+          </p>
+
+          <mat-form-field appearance="outline">
+            <mat-label>New password</mat-label>
+            <input
+              matInput
+              type="password"
+              [(ngModel)]="newPassword" />
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="changePassword()"
+            [disabled]="!newPassword || changingPassword">
+            {{ changingPassword ? 'Changing...' : 'Change Password' }}
+          </button>
+        }
+      </div>
+
+      <div class="divider"></div>
+
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Log Out
+      </button>
+
+      <button mat-menu-item (click)="confirmDelete()">
+        <mat-icon color="warn">delete_forever</mat-icon>
+        Delete Account
+      </button>
+
+    </div>
+
   </mat-menu>
 </mat-toolbar>
