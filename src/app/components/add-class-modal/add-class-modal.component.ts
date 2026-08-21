@@ -11,6 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { ClassResponseDto } from '../../models/class-response.dto';
 import { SubjectService } from '../../services/subject.service';
+import { EditClassDto } from '../../models/edit-class.dto';
 
 @Component({
   selector: 'app-add-class-modal',
@@ -23,6 +24,7 @@ export class AddClassModalComponent {
   @Input() subjectId!: number;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
+  @Input() classToEdit: ClassResponseDto | null = null;
 
   addClassForm: FormGroup;
 
@@ -48,15 +50,23 @@ export class AddClassModalComponent {
       },
       error: () => alert('Error getting classes')
     });
+
+    if (this.classToEdit) {
+      this.addClassForm.patchValue({
+        dayOfWeek: this.classToEdit.dayOfWeek,
+        startTime: this.classToEdit.startTime.substring(0, 5),
+        endTime: this.classToEdit.endTime.substring(0, 5)
+      });
+    }
   }
 
   onSave(): void {
-    if(this.addClassForm.invalid){
+    if (this.addClassForm.invalid) {
       this.addClassForm.markAllAsTouched();
       return;
     }
 
-    if(this.addClassForm.value.endTime <= this.addClassForm.value.startTime){
+    if (this.addClassForm.value.endTime <= this.addClassForm.value.startTime) {
       this.isStartGrater = true;
       return;
     }
@@ -68,6 +78,10 @@ export class AddClassModalComponent {
     const newDay = this.addClassForm.value.dayOfWeek;
 
     this.hasConflict = this.classes.some(c => {
+      if (this.classToEdit && c.id === this.classToEdit.id) {
+        return false;
+      }
+
       if (c.dayOfWeek.toLowerCase() !== newDay.toLowerCase()) {
         return false;
       }
@@ -81,7 +95,26 @@ export class AddClassModalComponent {
     if (this.hasConflict) {
       return;
     }
+
     this.hasConflict = false;
+
+    if (this.classToEdit) {
+      const dto: EditClassDto = {
+        dayOfWeek: this.addClassForm.value.dayOfWeek,
+        startTime: this.addClassForm.value.startTime,
+        endTime: this.addClassForm.value.endTime
+      };
+
+      this.subjectService.editClass(this.classToEdit.id, dto).subscribe({
+        next: () => {
+          this.save.emit();
+          this.close.emit();
+        },
+        error: (err) => console.error(err)
+      });
+
+      return;
+    }
 
     const dto: AddClassDto = {
       ...this.addClassForm.value,

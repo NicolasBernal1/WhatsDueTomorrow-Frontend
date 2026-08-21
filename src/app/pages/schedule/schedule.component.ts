@@ -3,11 +3,12 @@ import { SubjectService } from '../../services/subject.service';
 import { ClassResponseDto } from '../../models/class-response.dto';
 import { days, hours } from '../../common/data.common'
 import { Router } from '@angular/router';
+import { AddClassModalComponent } from "../../components/add-class-modal/add-class-modal.component";
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [],
+  imports: [AddClassModalComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
@@ -18,6 +19,7 @@ export class ScheduleComponent implements OnInit{
   days: string[] = days;
   classes: ClassResponseDto[] = [];
   contextMenuVisible: boolean = false;
+  showEditModal: boolean = false;
   contextMenuX: number = 0;
   contextMenuY: number = 0;
   selectedClass: ClassResponseDto | null = null;
@@ -81,6 +83,33 @@ export class ScheduleComponent implements OnInit{
   closeContextMenu() {
     this.contextMenuVisible = false;
     this.selectedClass = null;
+  }
+
+  editClass() {
+    if (!this.selectedClass) return;
+
+    this.showEditModal = true;
+    this.contextMenuVisible = false;
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.selectedClass = null;
+
+    document.body.style.overflow = '';
+  }
+
+  onClassSaved(): void {
+  this.closeEditModal();
+
+  this.subjectService.getClass().subscribe({
+    next: (res) => {
+      this.classes = res.data || [];
+    },
+    error: () => alert('Error getting classes')
+    });
   }
 
 }

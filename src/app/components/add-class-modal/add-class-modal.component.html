@@ -1,7 +1,7 @@
 <div class="modal-backdrop" (click)="onClose()"></div>
 
 <mat-card class="modal" (click)="$event.stopPropagation()">
-  <h2>Add Class Schedule</h2>
+  <h2>{{ classToEdit ? 'Edit Class Schedule' : 'Add Class Schedule' }}</h2>
 
   <form [formGroup]="addClassForm" (ngSubmit)="onSave()">
     <mat-form-field appearance="outline" class="form-field full-width">

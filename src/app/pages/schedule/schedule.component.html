@@ -23,10 +23,19 @@
     }
     }
     @if (contextMenuVisible) {
-    <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
-      <button>Edit</button>
-      <button (click)="deleteClass()">Delete</button>
-    </div>
+      <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY" (click)="$event.stopPropagation()">
+        <button (click)="editClass()">Edit</button>
+        <button (click)="deleteClass()">Delete</button>
+      </div>
+    }
+    @if (showEditModal && selectedClass) {
+      <app-add-class-modal
+        [subjectId]="selectedClass.subject.id"
+        [classToEdit]="selectedClass"
+        (close)="closeEditModal()"
+        (save)="onClassSaved()"
+      />
     }
   </div>
 </div>
+
