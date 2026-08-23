@@ -1,4 +1,4 @@
-<div class="assignments-container">
+<div class="assignments-container" (click)="closeContextMenu()">
   <h2>Your Assignments</h2>
 
   @if (loading) {
@@ -6,6 +6,12 @@
   } @else if (!assignments.length) {
     <p class="empty">You have no assignments yet.</p>
   } @else {
+    @if (contextMenuVisible){
+      <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
+        <button (click)="editAssignment()">Edit</button>
+        <button (click)="deleteAssignment()">Delete</button>
+      </div>
+    }
     <div class="assignments-grid">
       @for (a of assignments; track a.id) {
         <mat-card class="assignment-card" (contextmenu)="onRightClickAssignment($event, a)">
@@ -18,5 +24,13 @@
         </mat-card>
       }
     </div>
+    @if (showEditModal && selectedAssignment) {
+      <app-add-assignment-modal
+      [subjectId]="selectedAssignment.subjectId"
+      [assignment]="selectedAssignment"
+      (close)="closeEditModal()"
+      (save)="saveAssignment()"
+        />
+    }
   }
 </div>

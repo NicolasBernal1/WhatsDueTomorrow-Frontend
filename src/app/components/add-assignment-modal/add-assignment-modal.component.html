@@ -1,14 +1,17 @@
 <div class="modal-backdrop" (click)="onclose()"></div>
 
 <mat-card class="modal" (click)="$event.stopPropagation()">
-  <h2 mat-card-title>Add Assignment</h2>
+  <h2>{{ assignment ? 'Edit Assignment' : 'Add Assignment' }}</h2>
 
   <form [formGroup]="addAssignmentForm" (ngSubmit)="onSave()">
     <mat-form-field appearance="outline" class="form-field">
       <mat-label>Title</mat-label>
       <input matInput formControlName="title" placeholder="Enter title" />
-      @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.invalid) {
+      @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.hasError('required')) {
         <mat-hint class="error">Title is required</mat-hint>
+      }
+      @if (addAssignmentForm.get('title')?.touched && addAssignmentForm.get('title')?.hasError('pattern')) {
+        <mat-hint class="error">Title must contain at least one letter</mat-hint>
       }
     </mat-form-field>
 
@@ -29,7 +32,7 @@
 
     <div class="actions">
       <button mat-stroked-button type="button" color="warn" (click)="onclose()">Cancel</button>
-      <button mat-flat-button color="primary" type="submit">Save</button>
+      <button mat-flat-button color="primary" type="submit">{{ assignment ? 'Update' : 'Save' }}</button>
     </div>
   </form>
 </mat-card>

@@ -17,6 +17,11 @@ export class SubjectsComponent implements OnInit{
   subjects: SubjectResponseDto[] = [];
   loading = true;
   showAddModal = false;
+  showEditModal = false;
+  selectedSubject: SubjectResponseDto | null = null;
+  contextMenuVisible = false;
+  contextMenuX = 0;
+  contextMenuY = 0;
   
   constructor(private subjectService: SubjectService, private router: Router){}
 
@@ -56,14 +61,55 @@ export class SubjectsComponent implements OnInit{
     this.loadSubjects();
   }
 
-  onRightClickSubject(event: MouseEvent, subject: SubjectResponseDto){
+  onRightClickSubject(event: MouseEvent, subject: SubjectResponseDto): void {
     event.preventDefault();
+
+    this.selectedSubject = subject;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+    this.contextMenuVisible = true;
+  }
+
+  editSubject(): void {
+    if (!this.selectedSubject) return;
+
+    this.showEditModal = true;
+    this.contextMenuVisible = false;
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.selectedSubject = null;
+    document.body.style.overflow = '';
+  }
+
+  onSubjectSaved(): void {
+    this.closeEditModal();
+    this.loadSubjects();
+  }
+
+  deleteSubject(): void {
+    if (!this.selectedSubject) return;
+
     const confirmed = confirm('Delete subject?');
-    if(confirmed){
-      this.subjectService.deleteSubject(subject.id).subscribe({
-        next: () => this.loadSubjects(),
+
+    if (confirmed) {
+      this.subjectService.deleteSubject(this.selectedSubject.id).subscribe({
+        next: () => {
+          this.loadSubjects();
+          this.closeContextMenu();
+        },
         error: (err) => console.error(err)
-      })
+      });
+    } else {
+      this.closeContextMenu();
     }
+  }
+
+  closeContextMenu(): void {
+    this.contextMenuVisible = false;
+    this.selectedSubject = null;
   }
 }

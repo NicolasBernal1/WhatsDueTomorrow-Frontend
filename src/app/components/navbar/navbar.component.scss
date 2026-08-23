@@ -51,3 +51,79 @@ mat-toolbar.navbar {
     color: #ffffff;
   }
 }
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+
+  .profile-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+  }
+}
+
+.profile-content {
+  width: 360px;
+  max-width: 360px;
+  box-sizing: border-box;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
+}
+
+.password-section {
+  padding: 16px 20px;
+
+  h4 {
+    margin: 0 0 14px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin: -8px 0 10px;
+}
+
+.verified-message {
+  color: #2e7d32;
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+::ng-deep .profile-menu {
+  min-width: 360px !important;
+  max-width: 360px !important;
+}
+
+::ng-deep .profile-menu .mat-mdc-menu-content {
+  padding: 0 !important;
+}

@@ -6,6 +6,7 @@ import { BaseResponseDto } from '../models/base-response.dto';
 import { AssignmentResponseDto } from '../models/assignment-response.dto';
 import { AddAssignmentDto } from '../models/add-assignment.dto';
 import { AssignmentResponseCompDto } from '../models/assignment-response-comp.dto';
+import { UpdateAssignmentDto } from '../models/update-assignment.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,9 @@ export class AssignmentService {
 
   deleteAssignment(id: number): Observable<BaseResponseDto<null>> {
     return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/assignments/${id}`);
+  }
+
+  editAssignment(data: UpdateAssignmentDto, id: number): Observable<BaseResponseDto<null>> {
+    return this.http.patch<BaseResponseDto<null>>(`${this.apiUrl}/assignments/${id}`, data);
   }
 }

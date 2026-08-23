@@ -6,6 +6,8 @@ import { BaseResponseDto } from '../models/base-response.dto';
 import { ClassResponseDto } from '../models/class-response.dto';
 import { SubjectResponseDto } from '../models/subject-response.dto';
 import { AddSubjectDto } from '../models/add-subject.dto';
+import { updateSubjectDto } from '../models/update-subject.dto';
+import { EditClassDto } from '../models/edit-class.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -37,5 +39,12 @@ export class SubjectService {
 
   deleteClass(id: number): Observable<BaseResponseDto<null>> {
     return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/subjects/classes/${id}`);
+  }
+  editSubject(id: number, data: updateSubjectDto): Observable<BaseResponseDto<null>> {
+    return this.http.patch<BaseResponseDto<null>>(`${this.apiUrl}/subjects/${id}`, data);
+  }
+
+  editClass(id: number, data: EditClassDto): Observable<BaseResponseDto<null>> {
+    return this.http.patch<BaseResponseDto<null>>(`${this.apiUrl}/subjects/classes/${id}`, data);
   }
 }

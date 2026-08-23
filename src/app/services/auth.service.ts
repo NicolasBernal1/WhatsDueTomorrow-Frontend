@@ -7,6 +7,7 @@ import { LoginDto } from '../models/login.dto';
 import { CreateUserDto } from '../models/create-user.dto';
 import { UserDto } from '../models/user.dto';
 import { LoggedInDto } from '../models/logged-in.dto';
+import { ChangePasswordDto } from '../models/change-password.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -43,5 +44,17 @@ export class AuthService {
 
   deleteAccount(): Observable<BaseResponseDto<null>>{
     return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/users/profile`);
+  }
+
+  changePassword(data: ChangePasswordDto): Observable<BaseResponseDto<null>> {
+    return this.http.patch<BaseResponseDto<null>>(`${this.apiUrl}/auth/change-password`, data);
+  }
+
+  verifyPassword(password: string): Observable<BaseResponseDto<null>> {
+    return this.http.patch<BaseResponseDto<null>>(`${this.apiUrl}/auth/verify-password`,{ password });
+  }
+
+  getProfile(): Observable<BaseResponseDto<UserDto>> {
+    return this.http.get<BaseResponseDto<UserDto>>(`${this.apiUrl}/users/profile`);
   }
 }

@@ -96,3 +96,27 @@
   opacity: 0.8;
   margin-top: 2px;
 }
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+
+  button {
+    display: block;
+    width: 120px;
+    padding: 10px 14px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: #f3f6fa;
+    }
+  }
+}

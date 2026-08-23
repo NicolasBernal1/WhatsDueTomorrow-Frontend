@@ -1,22 +1,28 @@
 <div class="modal-backdrop" (click)="onClose()"></div>
 
 <div class="modal" (click)="$event.stopImmediatePropagation()">
-  <h2>Add New Subject</h2>
+ <h2>{{ subject ? 'Edit Subject' : 'Add New Subject' }}</h2>
 
   <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()" class="form-content">
     <mat-form-field appearance="outline">
       <mat-label>Subject Name</mat-label>
       <input matInput type="text" formControlName="name" placeholder="e.g. Desarrollo Web" />
-      @if (name?.touched && name?.invalid) {
+      @if (name?.touched && name?.hasError('required')) {
         <mat-error>Name is required</mat-error>
+      }
+      @if (name?.touched && name?.hasError('pattern')) {
+        <mat-error>Name must contain at least one letter</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Professor's Name</mat-label>
       <input matInput type="text" formControlName="professor" placeholder="e.g. Lugel Franco" />
-      @if (professor?.touched && professor?.invalid) {
+      @if (professor?.touched && professor?.hasError('required')) {
         <mat-error>Professor is required</mat-error>
+      }
+      @if (professor?.touched && professor?.hasError('pattern')) {
+        <mat-error>Professor must contain at least one letter</mat-error>
       }
     </mat-form-field>
 
@@ -37,7 +43,7 @@
     <div class="buttons">
       <button mat-stroked-button color="warn" type="button" (click)="onClose()">Cancel</button>
       <button mat-flat-button color="primary" type="submit" [disabled]="addSubjectForm.invalid">
-        Save
+        {{ subject ? 'Update' : 'Save' }}
       </button>
     </div>
   </form>
