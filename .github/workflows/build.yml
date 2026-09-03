@@ -25,6 +25,9 @@ jobs:
       - name: Correr tests con cobertura
         run: npx ng test --no-watch --no-progress --browsers=ChromeHeadless --code-coverage
 
+      - name: DEBUG - listar archivos de coverage
+        run: find . -iname "lcov.info" -not -path "*/node_modules/*"
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         env:
