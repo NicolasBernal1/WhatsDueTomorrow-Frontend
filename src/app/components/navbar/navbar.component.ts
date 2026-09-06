@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,6 +10,7 @@ import { UserDto } from '../../models/user.dto';
 import { ChangePasswordDto } from '../../models/change-password.dto';
 import { MatLabel } from "@angular/material/form-field";
 import { FormsModule } from '@angular/forms';
+import { UrgentAlertService } from '../../services/urgent-alert.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,7 +19,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   dropDownOpened = false;
 
   user?: UserDto;
@@ -30,7 +31,15 @@ export class NavbarComponent {
   passwordError = false;
   changingPassword = false;
 
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private urgentAlertService: UrgentAlertService
+  ) { }
+
+  ngOnInit(): void {
+    this.urgentAlertService.start();
+  }
 
   toggleDropdown() {
     this.dropDownOpened = !this.dropDownOpened;

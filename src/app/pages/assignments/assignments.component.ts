@@ -5,6 +5,7 @@ import { AssignmentResponseCompDto } from '../../models/assignment-response-comp
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddAssignmentModalComponent } from '../../components/add-assignment-modal/add-assignment-modal.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-assignments',
@@ -22,7 +23,7 @@ export class AssignmentsComponent implements OnInit{
   contextMenuX = 0;
   contextMenuY = 0;
 
-  constructor(private assignmentService: AssignmentService){}
+  constructor(private assignmentService: AssignmentService, private router: Router){}
 
   ngOnInit(): void {
       this.loadAssignments();
@@ -56,6 +57,10 @@ export class AssignmentsComponent implements OnInit{
     this.contextMenuX = event.clientX;
     this.contextMenuY = event.clientY;
     this.contextMenuVisible = true;
+  }
+
+  openAssignmentDetails(assignmentId: number): void {
+    this.router.navigate(['/assignments', assignmentId]);
   }
 
   editAssignment(): void {

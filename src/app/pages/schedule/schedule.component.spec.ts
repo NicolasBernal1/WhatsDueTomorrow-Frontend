@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ScheduleComponent } from './schedule.component';
 import { SubjectService } from '../../services/subject.service';
+import { CalendarService } from '../../services/calendar.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
@@ -10,6 +11,7 @@ describe('ScheduleComponent', () => {
   let fixture: ComponentFixture<ScheduleComponent>;
 
   let subjectServiceMock: jasmine.SpyObj<SubjectService>;
+  let calendarServiceMock: jasmine.SpyObj<CalendarService>;
   let routerMock: jasmine.SpyObj<Router>;
 
   const classesMock: any[] = [
@@ -47,6 +49,8 @@ describe('ScheduleComponent', () => {
       })
     );
 
+    calendarServiceMock = jasmine.createSpyObj('CalendarService', ['createSubscription', 'download']);
+
     await TestBed.configureTestingModule({
       imports: [ScheduleComponent],
       providers: [
@@ -57,6 +61,10 @@ describe('ScheduleComponent', () => {
         {
           provide: Router,
           useValue: routerMock
+        },
+        {
+          provide: CalendarService,
+          useValue: calendarServiceMock
         }
       ]
     }).compileComponents();

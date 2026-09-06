@@ -1,0 +1,48 @@
+<main class="assignment-details">
+  <button mat-button class="back-button" (click)="goBack()"><mat-icon>arrow_back</mat-icon> Volver a entregas</button>
+  @if (assignment) {
+    <mat-card class="assignment-header">
+      <p class="subject-name">{{ assignment.subjectName }}</p>
+      <h1>{{ assignment.title }}</h1>
+      @if (assignment.description) { <p>{{ assignment.description }}</p> }
+      <div class="progress-label"><span>Avance de la entrega</span><strong>{{ progress }}%</strong></div>
+      <mat-progress-bar mode="determinate" [value]="progress" aria-label="Avance de la entrega"></mat-progress-bar>
+      @if (progress === 100 && subtasks.length) { <p class="completion-tip" role="status">Completaste todos los pasos. Puedes cambiar el estado general de la tarea a completada.</p> }
+    </mat-card>
+
+    <section class="subtasks-section" aria-labelledby="subtasks-title">
+      <h2 id="subtasks-title">Subtareas</h2>
+      <div class="new-subtask">
+        <input [(ngModel)]="newTitle" (keyup.enter)="addSubtask()" placeholder="Agregar un paso para esta entrega" aria-label="Nueva subtarea" />
+        <button mat-flat-button color="primary" (click)="addSubtask()" [disabled]="!newTitle.trim()">Agregar</button>
+      </div>
+      @if (error) { <p class="error" role="alert">{{ error }}</p> }
+      @if (loading) {
+        <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+      } @else if (!subtasks.length) {
+        <p class="empty">Aún no hay subtareas. Agrega el primer paso para comenzar.</p>
+      } @else {
+        <div class="subtasks-list">
+          @for (subtask of subtasks; track subtask.id; let first = $first; let last = $last) {
+            <mat-card class="subtask-item" [class.completed]="subtask.completed">
+              <mat-checkbox [checked]="subtask.completed" (change)="toggleSubtask(subtask)" [aria-label]="'Completar ' + subtask.title"></mat-checkbox>
+              @if (editingId === subtask.id) {
+                <input class="edit-input" [(ngModel)]="editingTitle" (keyup.enter)="saveEditing(subtask)" aria-label="Editar subtarea" />
+              } @else { <span class="subtask-title">{{ subtask.title }}</span> }
+              <div class="subtask-actions">
+                @if (editingId === subtask.id) {
+                  <button mat-icon-button aria-label="Guardar" (click)="saveEditing(subtask)"><mat-icon>check</mat-icon></button>
+                } @else {
+                  <button mat-icon-button aria-label="Editar" (click)="startEditing(subtask)"><mat-icon>edit</mat-icon></button>
+                }
+                <button mat-icon-button aria-label="Subir" (click)="move(subtask, -1)" [disabled]="first"><mat-icon>arrow_upward</mat-icon></button>
+                <button mat-icon-button aria-label="Bajar" (click)="move(subtask, 1)" [disabled]="last"><mat-icon>arrow_downward</mat-icon></button>
+                <button mat-icon-button color="warn" aria-label="Eliminar" (click)="deleteSubtask(subtask)"><mat-icon>delete</mat-icon></button>
+              </div>
+            </mat-card>
+          }
+        </div>
+      }
+    </section>
+  }
+</main>

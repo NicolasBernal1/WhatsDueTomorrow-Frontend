@@ -8,8 +8,251 @@
       <div class="actions">
         <button mat-flat-button color="primary" (click)="openAssignmentModal()">+ Add Assignment</button>
         <button mat-stroked-button color="accent" (click)="openClassModal()">+ Add Class</button>
+        <button mat-stroked-button color="primary" (click)="openNoteModal()">+ Agregar Apunte</button>
+        <button mat-stroked-button color="accent" (click)="openEvaluationModal()">+ Registrar Calificación</button>
       </div>
     </mat-card>
+
+    <!-- F25: Calculadora y simulador de calificaciones por asignatura -->
+    <div class="calculator-section">
+      <div class="section-title-bar">
+        <h3>Calculadora y simulador de calificaciones</h3>
+        <button mat-flat-button color="primary" (click)="openEvaluationModal()">+ Nueva Evaluación</button>
+      </div>
+
+      <!-- Alertas Visuales (RF25) -->
+      @if (gradeSummary?.weightExceeded) {
+        <div class="alert-banner alert-warning">
+          ⚠️ <strong>Alerta de ponderación:</strong> La suma de los porcentajes evaluados ({{ gradeSummary?.totalWeight | number: '1.2-2' }}%) excede el 100%. Por favor, ajusta los porcentajes de tus evaluaciones registradas.
+        </div>
+      }
+
+      @if (gradeSummary && !gradeSummary.isAttainable && !gradeSummary.weightExceeded && evaluations.length > 0) {
+        <div class="alert-banner alert-danger">
+          ⚠️ <strong>Nota inalcanzable:</strong> La calificación mínima requerida ({{ gradeSummary.requiredGrade | number: '1.2-2' }}) supera el límite de 5.0. No es matemáticamente posible alcanzar la nota de aprobación (3.0).
+        </div>
+      }
+
+      <!-- Panel de Métricas y Estado Académico -->
+      <div class="metrics-grid">
+        <mat-card class="metric-card">
+          <span class="metric-title">Promedio Ponderado Actual</span>
+          <span class="metric-value">{{ (gradeSummary?.currentAverage | number: '1.2-2') || '0.00' }}</span>
+          <span class="metric-sub">Ponderado sobre {{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}% evaluado</span>
+        </mat-card>
+
+        <mat-card class="metric-card">
+          <span class="metric-title">Puntos Acumulados</span>
+          <span class="metric-value">{{ (gradeSummary?.currentContribution | number: '1.2-2') || '0.00' }} <span class="metric-unit">/ 5.0</span></span>
+          <span class="metric-sub">Aporte directo a la nota final</span>
+        </mat-card>
+
+        <mat-card class="metric-card">
+          <span class="metric-title">Porcentaje Evaluado</span>
+          <span class="metric-value" [class.warn-text]="gradeSummary?.weightExceeded">
+            {{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}%
+          </span>
+          <span class="metric-sub">Restante: {{ (gradeSummary?.remainingWeight | number: '1.2-2') || '100.00' }}%</span>
+        </mat-card>
+
+        <mat-card class="metric-card">
+          <span class="metric-title">Nota Requerida (Aprobar 3.0)</span>
+          <span class="metric-value" [class.danger-text]="gradeSummary && !gradeSummary.isAttainable && evaluations.length > 0">
+            @if (gradeSummary?.status === 'Aprobado') {
+              0.00
+            } @else if (gradeSummary && !gradeSummary.isAttainable && evaluations.length > 0) {
+              Inalcanzable
+            } @else if (evaluations.length === 0) {
+              3.00
+            } @else {
+              {{ gradeSummary?.requiredGrade | number: '1.2-2' }}
+            }
+          </span>
+          <span class="metric-sub">
+            @if (gradeSummary?.status === 'Aprobado') {
+              ¡Materia aprobada!
+            } @else {
+              Mínimo en el {{ (gradeSummary?.remainingWeight | number: '1.2-2') || '100.00' }}% restante
+            }
+          </span>
+        </mat-card>
+      </div>
+
+      <!-- Barra de Progreso Reactiva del Porcentaje Evaluado (RNF09) -->
+      <div class="progress-container">
+        <div class="progress-info">
+          <span class="progress-label">Progreso evaluado del semestre ({{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}% de 100%)</span>
+          <span
+            class="status-chip"
+            [class.status-aprobado]="gradeSummary?.status === 'Aprobado'"
+            [class.status-aprobando]="gradeSummary?.status === 'Aprobando'"
+            [class.status-en-riesgo]="gradeSummary?.status === 'En riesgo'"
+            [class.status-sin-calificaciones]="!gradeSummary?.status || gradeSummary?.status === 'Sin calificaciones'"
+          >
+            Estado: {{ gradeSummary?.status || 'Sin calificaciones' }}
+          </span>
+        </div>
+        <div class="progress-bar-track">
+          <div
+            class="progress-bar-fill"
+            [class.progress-exceeded]="gradeSummary?.weightExceeded"
+            [style.width.%]="gradeSummary ? (gradeSummary.totalWeight > 100 ? 100 : gradeSummary.totalWeight) : 0"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Simulador de Escenarios Hipotéticos (CA2) -->
+      @if (evaluations.length > 0 && gradeSummary && gradeSummary.remainingWeight > 0) {
+        <mat-card class="simulator-card">
+          <div class="simulator-header">
+            <h4>🎯 Simulador de Escenarios ({{ gradeSummary.remainingWeight | number: '1.2-2' }}% restante por evaluar)</h4>
+            <p>Calcula en tiempo real tu nota definitiva proyectada o simula la nota necesaria para alcanzar cualquier meta.</p>
+          </div>
+
+          <div class="simulator-inputs">
+            <div class="sim-input-group">
+              <label for="hypotheticalInput">Si obtengo esta nota en lo restante (0.0 - 5.0):</label>
+              <input
+                id="hypotheticalInput"
+                type="number"
+                class="sim-input"
+                [(ngModel)]="hypotheticalScore"
+                (ngModelChange)="onSimulationChange()"
+                placeholder="Ej. 3.8"
+                min="0"
+                max="5"
+                step="0.1"
+              />
+              @if (simResult?.hypotheticalFinalGrade !== null && simResult?.hypotheticalFinalGrade !== undefined) {
+                <div class="sim-feedback">
+                  Definitiva estimada: <strong>{{ simResult?.hypotheticalFinalGrade | number: '1.2-2' }}</strong>
+                  <span
+                    class="sim-badge"
+                    [class.sim-badge-pass]="simResult?.hypotheticalStatus === 'Aprobando'"
+                    [class.sim-badge-risk]="simResult?.hypotheticalStatus === 'En riesgo'"
+                  >
+                    {{ simResult?.hypotheticalStatus }}
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div class="sim-input-group">
+              <label for="targetGoalInput">Calcular nota para obtener una meta específica:</label>
+              <input
+                id="targetGoalInput"
+                type="number"
+                class="sim-input"
+                [(ngModel)]="targetGoal"
+                (ngModelChange)="onSimulationChange()"
+                placeholder="3.0"
+                min="3"
+                max="5"
+                step="0.1"
+              />
+              @if (simResult?.requiredForTarget !== null && simResult?.requiredForTarget !== undefined) {
+                <div class="sim-feedback">
+                  @if (simResult?.isTargetAttainable) {
+                    Nota requerida: <strong>{{ simResult?.requiredForTarget | number: '1.2-2' }}</strong>
+                  } @else {
+                    <span class="danger-text">⚠️ Requiere {{ simResult?.requiredForTarget | number: '1.2-2' }} (Supera 5.0)</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </mat-card>
+      }
+
+      <!-- Listado de Evaluaciones Registradas (CA1 & CA3) -->
+      @if (loadingEvaluations) {
+        <div class="loading-state">
+          <p>Cargando evaluaciones...</p>
+        </div>
+      } @else if (evaluations.length === 0) {
+        <div class="empty-evaluations">
+          <div class="empty-icon">📊</div>
+          <h4>No hay evaluaciones registradas para esta asignatura</h4>
+          <p>Registra tus parciales, talleres y quizes para calcular tu promedio acumulado en tiempo real y simular la nota requerida para aprobar.</p>
+          <button mat-raised-button color="primary" (click)="openEvaluationModal()">Registrar primera evaluación</button>
+        </div>
+      } @else {
+        <div class="evaluations-table-wrapper">
+          <table class="evaluations-table">
+            <thead>
+              <tr>
+                <th>Evaluación</th>
+                <th>Porcentaje</th>
+                <th>Calificación</th>
+                <th>Aporte a definitiva</th>
+                <th class="actions-col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ev of evaluations; track ev.id) {
+                <tr>
+                  <td class="eval-name">{{ ev.name }}</td>
+                  <td><span class="weight-chip">{{ ev.weight }}%</span></td>
+                  <td><span class="score-badge" [class.score-low]="ev.score < 3.0">{{ ev.score | number: '1.2-2' }}</span></td>
+                  <td class="contribution-col">+{{ (ev.score * ev.weight / 100) | number: '1.2-2' }} pts</td>
+                  <td class="actions-col">
+                    <button mat-button color="primary" (click)="openEvaluationModal(ev)">Editar</button>
+                    <button mat-button color="warn" (click)="deleteEvaluation(ev)">Eliminar</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- F24: Bitácora de apuntes y recursos rápidos por asignatura -->
+    <div class="bitacora-section">
+      <div class="section-title-bar">
+        <h3>Bitácora de apuntes y recursos rápidos</h3>
+        <button mat-flat-button color="primary" (click)="openNoteModal()">+ Nuevo Apunte</button>
+      </div>
+
+      @if (loadingNotes) {
+        <div class="loading-state">
+          <p>Cargando bitácora de apuntes...</p>
+        </div>
+      } @else if (notes.length === 0) {
+        <!-- HU24 Criterio 3: Mensaje informativo ante ausencia de apuntes con opción de crear el primero -->
+        <div class="empty-bitacora">
+          <div class="empty-icon">📝</div>
+          <h4>No hay apuntes ni recursos registrados para esta asignatura</h4>
+          <p>Centraliza aquí tus notas de estudio, fórmulas, acuerdos de clase y accesos virtuales.</p>
+          <button mat-raised-button color="primary" (click)="openNoteModal()">Crear el primer apunte</button>
+        </div>
+      } @else {
+        <div class="notes-list">
+          @for (note of notes; track note.id) {
+            <mat-card class="note-card">
+              <div class="note-header">
+                <mat-card-title class="note-title">{{ note.title }}</mat-card-title>
+                <span class="note-date">📅 {{ note.createdAt | date: 'dd/MM/yyyy, h:mm a' }}</span>
+              </div>
+              <mat-card-content>
+                <p class="note-content">{{ note.content }}</p>
+                @if (note.linkUrl) {
+                  <div class="note-link-container">
+                    <a [href]="note.linkUrl" target="_blank" rel="noopener noreferrer" class="note-link">
+                      🔗 <span class="link-url">{{ note.linkUrl }}</span>
+                    </a>
+                  </div>
+                }
+              </mat-card-content>
+              <div class="note-actions">
+                <button mat-button color="primary" (click)="editNote(note)">Editar</button>
+                <button mat-button color="warn" (click)="deleteNote(note)">Eliminar</button>
+              </div>
+            </mat-card>
+          }
+        </div>
+      }
+    </div>
 
     <h3>Assignments</h3>
 
@@ -54,6 +297,25 @@
         [subjectId]="subject.id"
         (close)="closeClassModal()"
         (save)="onClassSaved()"
+      />
+    }
+
+    @if (showNoteModal) {
+      <app-note-modal
+        [subjectId]="subject.id"
+        [note]="selectedNote"
+        (close)="closeNoteModal()"
+        (save)="onNoteSaved()"
+      />
+    }
+
+    @if (showEvaluationModal) {
+      <app-evaluation-modal
+        [subjectId]="subject.id"
+        [evaluation]="selectedEvaluation"
+        [currentTotalWeight]="gradeSummary?.totalWeight || 0"
+        (close)="closeEvaluationModal()"
+        (save)="onEvaluationSaved()"
       />
     }
   </div>

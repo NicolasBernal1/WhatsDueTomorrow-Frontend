@@ -1,12 +1,31 @@
 .schedule-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   align-items: flex-start;
-  height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px);
   background: #fafafa;
   padding: 20px 40px;
-  overflow: hidden;
+  box-sizing: border-box;
 }
+
+.calendar-sync {
+  width: clamp(60%, 85vw, 1100px);
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  background: #fff;
+  border-radius: 12px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+
+  h2 { margin: 0 0 4px; color: #1e88e5; font-size: 1.2rem; }
+  p { margin: 0; color: #555; }
+}
+
+.calendar-actions { display: flex; gap: 10px; margin-top: 14px; }
+.subscription-link { display: flex; gap: 8px; margin-top: 14px; input { flex: 1; min-width: 0; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; } }
+.calendar-message { margin-top: 10px !important; color: #155724 !important; font-size: .9rem; }
 
 .schedule-grid {
   width: clamp(60%, 85vw, 1100px);
@@ -19,6 +38,11 @@
   border-radius: 12px;
   overflow-y: auto; 
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 640px) {
+  .calendar-sync, .schedule-grid { width: 100%; }
+  .calendar-actions, .subscription-link { flex-direction: column; align-items: stretch; }
 }
 
 .header {

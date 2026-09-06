@@ -1,0 +1,47 @@
+<main class="radar-container" aria-labelledby="radar-title">
+  <section class="radar-header">
+    <div>
+      <p class="eyebrow">PRIORIDAD ACADÉMICA</p>
+      <h1 id="radar-title">Radar de entregas urgentes</h1>
+      <p>Entregas que vencen dentro de las próximas 24 horas.</p>
+    </div>
+    <button mat-stroked-button color="primary" (click)="enableNotifications()">
+      <mat-icon>notifications_active</mat-icon>
+      Activar alertas web
+    </button>
+  </section>
+
+  @if (notificationMessage) {
+    <p class="notification-message" role="status">{{ notificationMessage }}</p>
+  }
+
+  @if (loading) {
+    <mat-progress-spinner mode="indeterminate" diameter="40" aria-label="Cargando entregas urgentes"></mat-progress-spinner>
+  } @else if (!urgentAssignments.length) {
+    <section class="empty-radar" role="status">
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+      <h2>No hay entregas urgentes</h2>
+      <p>No tienes entregas pendientes con vencimiento en las próximas 24 horas.</p>
+    </section>
+  } @else {
+    <section class="urgent-grid" aria-label="Entregas urgentes">
+      @for (assignment of urgentAssignments; track assignment.id) {
+        <mat-card class="urgent-card">
+          <mat-card-header>
+            <mat-card-subtitle>{{ assignment.subjectName }}</mat-card-subtitle>
+            <mat-card-title>{{ assignment.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="countdown" aria-label="Tiempo restante">
+              <mat-icon aria-hidden="true">timer</mat-icon>
+              <span>{{ assignment.countdown }}</span>
+            </div>
+            @if (assignment.reminderMinutes !== undefined && assignment.reminderMinutes !== null) {
+              <p class="reminder">Recordatorio: {{ assignment.reminderMinutes }} min antes</p>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </section>
+  }
+</main>

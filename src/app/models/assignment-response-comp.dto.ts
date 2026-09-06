@@ -5,4 +5,5 @@ export interface AssignmentResponseCompDto {
   dueDate: string;
   subjectId: number;
   subjectName: string;
+  reminderMinutes?: number | null;
 }
