@@ -1,4 +1,21 @@
 <div class="schedule-container" (click)="closeContextMenu()">
+  <section class="calendar-sync" aria-labelledby="calendar-sync-title">
+    <div>
+      <h2 id="calendar-sync-title">Calendar sync</h2>
+      <p>Export your classes and due dates to Google Calendar, Apple Calendar, or Outlook.</p>
+    </div>
+    <div class="calendar-actions">
+      <button mat-stroked-button color="primary" (click)="createCalendarSubscription()"><mat-icon>sync</mat-icon> Sync calendar</button>
+      <button mat-flat-button color="primary" (click)="downloadCalendar()"><mat-icon>download</mat-icon> Download .ics</button>
+    </div>
+    @if (subscriptionUrl) {
+      <div class="subscription-link">
+        <input [value]="subscriptionUrl" readonly aria-label="Calendar subscription link" />
+        <button mat-button color="primary" (click)="copySubscriptionUrl()">Copy link</button>
+      </div>
+    }
+    @if (calendarMessage) { <p class="calendar-message" role="status">{{ calendarMessage }}</p> }
+  </section>
   <div class="schedule-grid">
     <div class="empty"></div>
     @for (day of days; track $index) {
@@ -38,4 +55,3 @@
     }
   </div>
 </div>
-

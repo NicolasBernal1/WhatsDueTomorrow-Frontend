@@ -32,7 +32,9 @@ export class AddAssignmentModalComponent implements OnInit{
     this.addAssignmentForm = this.fb.group({
       title: ["", [Validators.required, Validators.pattern(/.*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*/)]],
       description: [""],
-      dueDate: ['', [Validators.required]]
+      dueDate: ['', [Validators.required]],
+      dueTime: ['23:59', [Validators.required]],
+      reminderMinutes: [null]
     })
   }
 
@@ -41,7 +43,9 @@ export class AddAssignmentModalComponent implements OnInit{
       this.addAssignmentForm.patchValue({
         title: this.assignment.title,
         description: this.assignment.description,
-        dueDate: this.assignment.dueDate
+        dueDate: new Date(this.assignment.dueDate),
+        dueTime: this.formatTime(this.assignment.dueDate),
+        reminderMinutes: this.assignment.reminderMinutes ?? null
       });
     }
   }
@@ -52,10 +56,19 @@ export class AddAssignmentModalComponent implements OnInit{
       return;
     }
 
-    const dto = this.addAssignmentForm.value as AddAssignmentDto;
+    const value = this.addAssignmentForm.value;
+    const dueDate = new Date(value.dueDate);
+    const [hours, minutes] = value.dueTime.split(':').map(Number);
+    dueDate.setHours(hours, minutes, 0, 0);
+    const dto: AddAssignmentDto = {
+      title: value.title,
+      description: value.description,
+      dueDate: dueDate.toISOString(),
+      reminderMinutes: value.reminderMinutes
+    };
 
     if (this.assignment) {
-      const updateDto = this.addAssignmentForm.value as UpdateAssignmentDto;
+      const updateDto = dto as UpdateAssignmentDto;
       this.assignmentService.editAssignment(updateDto, this.assignment.id).subscribe({
         next: () => {
           this.save.emit();
@@ -78,5 +91,10 @@ export class AddAssignmentModalComponent implements OnInit{
 
   onclose(): void {
     this.close.emit();
+  }
+
+  private formatTime(date: string): string {
+    const dueDate = new Date(date);
+    return `${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`;
   }
 }

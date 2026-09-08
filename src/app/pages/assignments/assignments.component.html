@@ -14,7 +14,7 @@
     }
     <div class="assignments-grid">
       @for (a of assignments; track a.id) {
-        <mat-card class="assignment-card" (contextmenu)="onRightClickAssignment($event, a)">
+        <mat-card class="assignment-card" (click)="openAssignmentDetails(a.id)" (contextmenu)="onRightClickAssignment($event, a)">
           <mat-card-title>{{ a.title }}</mat-card-title>
           <mat-card-subtitle>{{ a.subjectName }}</mat-card-subtitle>
 

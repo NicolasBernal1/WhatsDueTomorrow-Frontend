@@ -28,6 +28,10 @@ export class AssignmentService {
     return this.http.get<BaseResponseDto<AssignmentResponseCompDto[]>>(`${this.apiUrl}/assignments`);
   }
 
+  getUrgentAssignments(): Observable<BaseResponseDto<AssignmentResponseCompDto[]>> {
+    return this.http.get<BaseResponseDto<AssignmentResponseCompDto[]>>(`${this.apiUrl}/assignments/urgent`);
+  }
+
   deleteAssignment(id: number): Observable<BaseResponseDto<null>> {
     return this.http.delete<BaseResponseDto<null>>(`${this.apiUrl}/assignments/${id}`);
   }

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavbarComponent } from './navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { UrgentAlertService } from '../../services/urgent-alert.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -10,16 +11,19 @@ describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
   let authServiceMock: jasmine.SpyObj<AuthService>;
+  let urgentAlertServiceMock: jasmine.SpyObj<UrgentAlertService>;
   let router: Router;
 
   beforeEach(async () => {
     authServiceMock = jasmine.createSpyObj('AuthService', ['logout', 'deleteAccount']);
+    urgentAlertServiceMock = jasmine.createSpyObj('UrgentAlertService', ['start']);
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
       providers: [
         provideRouter([]),
         { provide: AuthService, useValue: authServiceMock },
+        { provide: UrgentAlertService, useValue: urgentAlertServiceMock },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
