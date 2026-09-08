@@ -2,35 +2,33 @@
   <h2>Your Assignments</h2>
 
   @if (loading) {
-    <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+  <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
   } @else if (!assignments.length) {
-    <p class="empty">You have no assignments yet.</p>
+  <p class="empty">You have no assignments yet.</p>
   } @else {
-    @if (contextMenuVisible){
-      <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
-        <button (click)="editAssignment()">Edit</button>
-        <button (click)="deleteAssignment()">Delete</button>
-      </div>
-    }
-    <div class="assignments-grid">
-      @for (a of assignments; track a.id) {
-        <mat-card class="assignment-card" (click)="openAssignmentDetails(a.id)" (contextmenu)="onRightClickAssignment($event, a)">
-          <mat-card-title>{{ a.title }}</mat-card-title>
-          <mat-card-subtitle>{{ a.subjectName }}</mat-card-subtitle>
+  @if (contextMenuVisible){
+  <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
+    <button (click)="editAssignment()">Edit</button>
+    <button (click)="deleteAssignment()">Delete</button>
+  </div>
+  }
+  <div class="assignments-grid">
+    @for (a of assignments; track a.id) {
+    <mat-card class="assignment-card" tabindex="0" role="button" (click)="openAssignmentDetails(a.id)"
+      (contextmenu)="onRightClickAssignment($event, a)" (keydown.enter)="openAssignmentDetails(a.id)"
+      (keydown.space)="openAssignmentDetails(a.id); $event.preventDefault()">
+      <mat-card-title>{{ a.title }}</mat-card-title>
+      <mat-card-subtitle>{{ a.subjectName }}</mat-card-subtitle>
 
-          <mat-card-content>
-            <p class="date">📅 {{ a.dueDate | date: 'mediumDate' }}</p>
-          </mat-card-content>
-        </mat-card>
-      }
-    </div>
-    @if (showEditModal && selectedAssignment) {
-      <app-add-assignment-modal
-      [subjectId]="selectedAssignment.subjectId"
-      [assignment]="selectedAssignment"
-      (close)="closeEditModal()"
-      (save)="saveAssignment()"
-        />
+      <mat-card-content>
+        <p class="date">📅 {{ a.dueDate | date: 'mediumDate' }}</p>
+      </mat-card-content>
+    </mat-card>
     }
+  </div>
+  @if (showEditModal && selectedAssignment) {
+  <app-add-assignment-modal [subjectId]="selectedAssignment.subjectId" [assignment]="selectedAssignment"
+    (close)="closeEditModal()" (save)="saveAssignment()" />
+  }
   }
 </div>

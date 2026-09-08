@@ -1,6 +1,8 @@
-<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-backdrop" tabindex="0" role="button" aria-label="Cerrar modal" (click)="onClose()"
+  (keydown.enter)="onClose()" (keydown.space)="onClose(); $event.preventDefault()">
+</div>
 
-<mat-card class="modal" (click)="$event.stopPropagation()">
+<mat-card class="modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
   <h2>{{ note ? 'Editar Apunte' : 'Nuevo Apunte o Recurso' }}</h2>
 
   <form [formGroup]="noteForm" (ngSubmit)="onSave()">
@@ -8,20 +10,16 @@
       <mat-label>Título de la nota</mat-label>
       <input matInput formControlName="title" placeholder="Ej. Fórmulas de cálculo o Acuerdos de clase" />
       @if (noteForm.get('title')?.touched && noteForm.get('title')?.invalid) {
-        <mat-hint class="error">El título es obligatorio</mat-hint>
+      <mat-hint class="error">El título es obligatorio</mat-hint>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="form-field">
       <mat-label>Contenido descriptivo</mat-label>
-      <textarea
-        matInput
-        formControlName="content"
-        rows="4"
-        placeholder="Redacta apuntes, fórmulas, notas de estudio o acuerdos..."
-      ></textarea>
+      <textarea matInput formControlName="content" rows="4"
+        placeholder="Redacta apuntes, fórmulas, notas de estudio o acuerdos..."></textarea>
       @if (noteForm.get('content')?.touched && noteForm.get('content')?.invalid) {
-        <mat-hint class="error">El contenido es obligatorio</mat-hint>
+      <mat-hint class="error">El contenido es obligatorio</mat-hint>
       }
     </mat-form-field>
 
@@ -29,18 +27,19 @@
       <mat-label>Enlace a recurso virtual (opcional)</mat-label>
       <input matInput type="url" formControlName="linkUrl" placeholder="https://ejemplo.com/material-apoyo" />
       @if (noteForm.get('linkUrl')?.touched && noteForm.get('linkUrl')?.hasError('invalidUrl')) {
-        <mat-hint class="error">Ingresa una URL válida que comience con http:// o https://</mat-hint>
+      <mat-hint class="error">Ingresa una URL válida que comience con http:// o https://</mat-hint>
       } @else {
-        <mat-hint>Opcional: enlace a carpetas de drive, repositorios, libros virtuales, etc.</mat-hint>
+      <mat-hint>Opcional: enlace a carpetas de drive, repositorios, libros virtuales, etc.</mat-hint>
       }
     </mat-form-field>
 
     @if (errorMessage) {
-      <div class="server-error">{{ errorMessage }}</div>
+    <div class="server-error">{{ errorMessage }}</div>
     }
 
     <div class="actions">
-      <button mat-stroked-button type="button" color="warn" (click)="onClose()" [disabled]="isSubmitting">Cancelar</button>
+      <button mat-stroked-button type="button" color="warn" (click)="onClose()"
+        [disabled]="isSubmitting">Cancelar</button>
       <button mat-flat-button color="primary" type="submit" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Guardando...' : (note ? 'Actualizar' : 'Guardar') }}
       </button>
