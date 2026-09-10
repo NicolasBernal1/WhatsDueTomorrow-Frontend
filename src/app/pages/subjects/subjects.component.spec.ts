@@ -166,4 +166,90 @@ describe('SubjectsComponent', () => {
 
   });
 
+
+  // Orquestación de UI (modales / menú contextual) — no forma parte
+  // de la tabla de caminos de F07-F11, pero se cubre para elevar
+  // el % de coverage de Sonar.
+
+  describe('Orquestación de UI (complementario)', () => {
+
+    beforeEach(() => {
+      subjectServiceMock.getSubjects.and.returnValue(
+        of({ status: 200, message: 'ok', data: [] }),
+      );
+      spyOn(component, 'loadSubjects').and.callThrough();
+    });
+
+    it('8. goToSubjectDetais navega a /subjects/:id', () => {
+      component.goToSubjectDetais(10);
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/subjects', 10]);
+    });
+
+    it('9. addSubjectModal abre el modal y bloquea el scroll', () => {
+      component.addSubjectModal();
+      expect(component.showAddModal).toBeTrue();
+      expect(document.body.style.overflow).toBe('hidden');
+    });
+
+    it('10. closeAddSubjectModal cierra el modal y libera el scroll', () => {
+      component.closeAddSubjectModal();
+      expect(component.showAddModal).toBeFalse();
+      expect(document.body.style.overflow).toBe('');
+    });
+
+    it('11. saveSubject cierra el modal de creación y recarga la lista', () => {
+      component.saveSubject();
+      expect(component.showAddModal).toBeFalse();
+      expect(component.loadSubjects).toHaveBeenCalled();
+    });
+
+    it('12. onRightClickSubject abre el menú contextual con la asignatura seleccionada', () => {
+      const event = { preventDefault: () => {}, clientX: 50, clientY: 80 } as MouseEvent;
+
+      component.onRightClickSubject(event, subjectMock);
+
+      expect(component.selectedSubject).toEqual(subjectMock);
+      expect(component.contextMenuX).toBe(50);
+      expect(component.contextMenuY).toBe(80);
+      expect(component.contextMenuVisible).toBeTrue();
+    });
+
+    it('13. editSubject no hace nada si no hay asignatura seleccionada', () => {
+      component.selectedSubject = null;
+
+      component.editSubject();
+
+      expect(component.showEditModal).toBeFalse();
+    });
+
+    it('14. editSubject abre el modal de edición si hay asignatura seleccionada', () => {
+      component.selectedSubject = subjectMock;
+      component.contextMenuVisible = true;
+
+      component.editSubject();
+
+      expect(component.showEditModal).toBeTrue();
+      expect(component.contextMenuVisible).toBeFalse();
+      expect(document.body.style.overflow).toBe('hidden');
+    });
+
+    it('15. closeEditModal cierra el modal, limpia la selección y libera el scroll', () => {
+      component.showEditModal = true;
+      component.selectedSubject = subjectMock;
+
+      component.closeEditModal();
+
+      expect(component.showEditModal).toBeFalse();
+      expect(component.selectedSubject).toBeNull();
+      expect(document.body.style.overflow).toBe('');
+    });
+
+    it('16. onSubjectSaved cierra el modal de edición y recarga la lista', () => {
+      component.onSubjectSaved();
+      expect(component.showEditModal).toBeFalse();
+      expect(component.loadSubjects).toHaveBeenCalled();
+    });
+
+  });
+
 });
