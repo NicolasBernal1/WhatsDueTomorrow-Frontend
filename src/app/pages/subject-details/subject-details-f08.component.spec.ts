@@ -8,7 +8,7 @@ import { AssignmentService } from '../../services/assignment.service';
 import { NoteService } from '../../services/note.service';
 import { EvaluationService } from '../../services/evaluation.service';
 
-describe('SubjectDetailsComponent', () => {
+describe('SubjectDetailsComponent (F08)', () => {
 
   let component: SubjectDetailsComponent;
   let fixture: ComponentFixture<SubjectDetailsComponent>;
@@ -25,8 +25,25 @@ describe('SubjectDetailsComponent', () => {
     color: '#0078d4',
   };
 
+  const assignmentMock: any = { id: 5, name: 'Tarea 1', status: 'pending' };
+
+  const summaryMock: any = {
+    totalWeight: 0,
+    remainingWeight: 100,
+    currentContribution: 0,
+    currentAverage: 0,
+    requiredGrade: 3.0,
+    isPassing: false,
+    isAttainable: true,
+    status: 'Sin calificaciones',
+    weightExceeded: false,
+    passingGrade: 3.0,
+    maxGrade: 5.0,
+  };
+
   function configureTestBed(routeId: string | null) {
     subjectServiceMock = jasmine.createSpyObj('SubjectService', ['getSubjectById']);
+
     assignmentServiceMock = jasmine.createSpyObj('AssignmentService', [
       'getAssignmentsBySubject',
       'deleteAssignment',
@@ -35,34 +52,31 @@ describe('SubjectDetailsComponent', () => {
       of({ status: 200, message: 'ok', data: [] }),
     );
 
-    noteServiceMock = jasmine.createSpyObj('NoteService', ['getNotesBySubject']);
+    noteServiceMock = jasmine.createSpyObj('NoteService', ['getNotesBySubject', 'deleteNote']);
     noteServiceMock.getNotesBySubject.and.returnValue(
       of({ status: 200, message: 'ok', data: [] }),
     );
 
-    evaluationServiceMock = jasmine.createSpyObj('EvaluationService', ['getEvaluationsBySubject']);
+    // Se mockean TODOS los métodos usados en cualquier punto de ngOnInit
+    // (getEvaluationsBySubject -> calculateSummaryLocally/simulateLocally en
+    // cadena), aunque en la mayoría de los tests nunca se disparen, para que
+    // la construcción del componente nunca falle por un método sin mockear.
+    evaluationServiceMock = jasmine.createSpyObj('EvaluationService', [
+      'getEvaluationsBySubject',
+      'deleteEvaluation',
+      'calculateSummaryLocally',
+      'simulateLocally',
+    ]);
     evaluationServiceMock.getEvaluationsBySubject.and.returnValue(
-      of({
-        status: 200,
-        message: 'ok',
-        data: {
-          evaluations: [],
-          summary: {
-            totalWeight: 0,
-            remainingWeight: 100,
-            currentContribution: 0,
-            currentAverage: 0,
-            requiredGrade: 3.0,
-            isPassing: false,
-            isAttainable: true,
-            status: 'Sin calificaciones',
-            weightExceeded: false,
-            passingGrade: 3.0,
-            maxGrade: 5.0,
-          },
-        },
-      }),
+      of({ status: 200, message: 'ok', data: { evaluations: [], summary: summaryMock } }),
     );
+    evaluationServiceMock.calculateSummaryLocally.and.returnValue(summaryMock);
+    evaluationServiceMock.simulateLocally.and.returnValue({
+      requiredForTarget: null,
+      isTargetAttainable: false,
+      hypotheticalFinalGrade: null,
+      hypotheticalStatus: null,
+    });
 
     TestBed.configureTestingModule({
       imports: [SubjectDetailsComponent],
@@ -130,18 +144,23 @@ describe('SubjectDetailsComponent', () => {
     expect(component.subject).toEqual(subjectMock);
   });
 
-  
+
+  // =========================================================
+  // Gestión de tareas (Assignment) — NO forma parte de F07-F11,
+  // es funcionalidad de un compañero. Se cubre como aporte
+  // adicional al coverage del proyecto.
+  //
+  // Ninguno de estos tests llama a ngOnInit(): se asigna
+  // component.subject directamente para evitar disparar la
+  // cascada completa de loadNotes/loadEvaluations, que no tiene
+  // relación con lo que aquí se está probando.
+  // =========================================================
 
   describe('Gestión de tareas (complementario, no es F07-F11)', () => {
 
-    const assignmentMock: any = { id: 5, name: 'Tarea 1', status: 'pending' };
-
     beforeEach(() => {
-      configureTestBed('10');
-      subjectServiceMock.getSubjectById.and.returnValue(
-        of({ status: 200, message: 'ok', data: subjectMock }),
-      );
-      component.ngOnInit();
+      configureTestBed(null);
+      component.subject = subjectMock;
     });
 
     it('4. openAssignmentModal abre el modal y bloquea el scroll', () => {
