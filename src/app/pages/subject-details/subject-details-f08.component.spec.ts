@@ -5,6 +5,8 @@ import { convertToParamMap, ActivatedRoute } from '@angular/router';
 import { SubjectDetailsComponent } from './subject-details.component';
 import { SubjectService } from '../../services/subject.service';
 import { AssignmentService } from '../../services/assignment.service';
+import { NoteService } from '../../services/note.service';
+import { EvaluationService } from '../../services/evaluation.service';
 
 describe('SubjectDetailsComponent', () => {
 
@@ -13,6 +15,8 @@ describe('SubjectDetailsComponent', () => {
 
   let subjectServiceMock: jasmine.SpyObj<SubjectService>;
   let assignmentServiceMock: jasmine.SpyObj<AssignmentService>;
+  let noteServiceMock: jasmine.SpyObj<NoteService>;
+  let evaluationServiceMock: jasmine.SpyObj<EvaluationService>;
 
   const subjectMock: any = {
     id: 10,
@@ -31,11 +35,42 @@ describe('SubjectDetailsComponent', () => {
       of({ status: 200, message: 'ok', data: [] }),
     );
 
+    noteServiceMock = jasmine.createSpyObj('NoteService', ['getNotesBySubject']);
+    noteServiceMock.getNotesBySubject.and.returnValue(
+      of({ status: 200, message: 'ok', data: [] }),
+    );
+
+    evaluationServiceMock = jasmine.createSpyObj('EvaluationService', ['getEvaluationsBySubject']);
+    evaluationServiceMock.getEvaluationsBySubject.and.returnValue(
+      of({
+        status: 200,
+        message: 'ok',
+        data: {
+          evaluations: [],
+          summary: {
+            totalWeight: 0,
+            remainingWeight: 100,
+            currentContribution: 0,
+            currentAverage: 0,
+            requiredGrade: 3.0,
+            isPassing: false,
+            isAttainable: true,
+            status: 'Sin calificaciones',
+            weightExceeded: false,
+            passingGrade: 3.0,
+            maxGrade: 5.0,
+          },
+        },
+      }),
+    );
+
     TestBed.configureTestingModule({
       imports: [SubjectDetailsComponent],
       providers: [
         { provide: SubjectService, useValue: subjectServiceMock },
         { provide: AssignmentService, useValue: assignmentServiceMock },
+        { provide: NoteService, useValue: noteServiceMock },
+        { provide: EvaluationService, useValue: evaluationServiceMock },
         {
           provide: ActivatedRoute,
           useValue: {
