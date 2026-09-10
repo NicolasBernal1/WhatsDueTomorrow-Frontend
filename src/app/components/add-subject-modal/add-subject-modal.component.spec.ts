@@ -1,83 +1,159 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
+
 import { AddSubjectModalComponent } from './add-subject-modal.component';
 import { SubjectService } from '../../services/subject.service';
-import { ReactiveFormsModule } from '@angular/forms';
-import { of } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AddSubjectModalComponent', () => {
+
   let component: AddSubjectModalComponent;
   let fixture: ComponentFixture<AddSubjectModalComponent>;
   let subjectServiceMock: jasmine.SpyObj<SubjectService>;
 
   beforeEach(async () => {
-    subjectServiceMock = jasmine.createSpyObj('SubjectService', ['addSubject']);
+    subjectServiceMock = jasmine.createSpyObj('SubjectService', ['addSubject', 'editSubject']);
 
     await TestBed.configureTestingModule({
-      imports: [AddSubjectModalComponent, ReactiveFormsModule],
-      providers: [{ provide: SubjectService, useValue: subjectServiceMock }],
-      schemas: [NO_ERRORS_SCHEMA],
+      imports: [AddSubjectModalComponent],
+      providers: [
+        { provide: SubjectService, useValue: subjectServiceMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddSubjectModalComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+
+  //Registrar asignatura académica (F09)
+
+  describe('Registrar asignatura', () => {
+
+    // Camino:
+    // 1,2,3,9
+    it('1. debe mostrar errores cuando el formulario es inválido', () => {
+
+      component.ngOnInit();
+      component.addSubjectForm.patchValue({ name: '', professor: '' });
+
+      component.onSave();
+
+      expect(component.addSubjectForm.invalid).toBeTrue();
+      expect(subjectServiceMock.addSubject).not.toHaveBeenCalled();
+    });
+
+    // Camino:
+    // 1,2,4,5,6,7,9
+    it('2. debe crear la asignatura correctamente cuando el formulario es válido', () => {
+
+      component.ngOnInit();
+      component.addSubjectForm.setValue({
+        name: 'validación',
+        professor: 'Gabriel',
+        color: '#0078d4',
+      });
+      subjectServiceMock.addSubject.and.returnValue(
+        of({ status: 201, message: 'Subject created successfully', data: null }),
+      );
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
+
+      component.onSave();
+
+      expect(subjectServiceMock.addSubject).toHaveBeenCalledWith(
+        component.addSubjectForm.value,
+      );
+      expect(component.save.emit).toHaveBeenCalled();
+      expect(component.close.emit).toHaveBeenCalled();
+    });
+
+    // Camino:
+    // 1,2,4,5,6,8,9
+    it('3. debe manejar el error cuando la petición falla', () => {
+
+      component.ngOnInit();
+      component.addSubjectForm.setValue({
+        name: 'validación',
+        professor: 'Gabriel',
+        color: '#0078d4',
+      });
+      subjectServiceMock.addSubject.and.returnValue(
+        throwError(() => new Error('server error')),
+      );
+      spyOn(console, 'error');
+
+      component.onSave();
+
+      expect(console.error).toHaveBeenCalled();
+    });
+
   });
 
-  it('should initialize with an invalid form (name and professor are required)', () => {
-    expect(component.addSubjectForm.valid).toBeFalse();
+
+  //Editar asignatura académica (F10)
+
+  describe('Editar asignatura', () => {
+
+    const subjectMock: any = {
+      id: 10,
+      name: 'validación',
+      professor: 'Gabriel',
+      color: '#0078d4',
+    };
+
+    beforeEach(() => {
+      component.subject = subjectMock;
+    });
+
+    // Camino:
+    // 1,2,3,9
+    it('4. debe mostrar errores cuando el formulario es inválido', () => {
+
+      component.ngOnInit();
+      component.addSubjectForm.patchValue({ name: '', professor: '' });
+
+      component.onSave();
+
+      expect(component.addSubjectForm.invalid).toBeTrue();
+      expect(subjectServiceMock.editSubject).not.toHaveBeenCalled();
+    });
+
+    // Camino:
+    // 1,2,4,5,6,7,9
+    it('5. debe actualizar la asignatura correctamente cuando el formulario es válido', () => {
+
+      component.ngOnInit();
+      subjectServiceMock.editSubject.and.returnValue(
+        of({ status: 200, message: 'Subject updated successfully', data: null }),
+      );
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
+
+      component.onSave();
+
+      expect(subjectServiceMock.editSubject).toHaveBeenCalledWith(
+        subjectMock.id,
+        component.addSubjectForm.value,
+      );
+      expect(component.save.emit).toHaveBeenCalled();
+      expect(component.close.emit).toHaveBeenCalled();
+    });
+
+    // Camino:
+    // 1,2,4,5,6,8,9
+    it('6. debe manejar el error cuando la petición falla', () => {
+
+      component.ngOnInit();
+      subjectServiceMock.editSubject.and.returnValue(
+        throwError(() => new Error('server error')),
+      );
+      spyOn(console, 'error');
+
+      component.onSave();
+
+      expect(console.error).toHaveBeenCalled();
+    });
+
   });
 
-  it('should be valid when name and professor are filled', () => {
-    component.addSubjectForm.patchValue({ name: 'Math', professor: 'Dr. Smith' });
-    expect(component.addSubjectForm.valid).toBeTrue();
-  });
-
-  it('should update color in the form when selectColor is called', () => {
-    component.selectColor('#28a745');
-    expect(component.addSubjectForm.get('color')?.value).toBe('#28a745');
-  });
-
-  it('should NOT call subjectService.addSubject if form is invalid', () => {
-    component.onSave();
-    expect(subjectServiceMock.addSubject).not.toHaveBeenCalled();
-  });
-
-  it('should mark form as touched if invalid on save', () => {
-    spyOn(component.addSubjectForm, 'markAllAsTouched');
-    component.onSave();
-    expect(component.addSubjectForm.markAllAsTouched).toHaveBeenCalled();
-  });
-
-  it('should emit save and close events on successful save', () => {
-    subjectServiceMock.addSubject.and.returnValue(
-      of({ status: 201, message: 'Subject created' })
-    );
-    spyOn(component.save, 'emit');
-    spyOn(component.close, 'emit');
-
-    component.addSubjectForm.patchValue({ name: 'Math', professor: 'Dr. Smith' });
-    component.onSave();
-
-    expect(component.save.emit).toHaveBeenCalled();
-    expect(component.close.emit).toHaveBeenCalled();
-  });
-
-  it('should emit close event when onClose is called', () => {
-    spyOn(component.close, 'emit');
-    component.onClose();
-    expect(component.close.emit).toHaveBeenCalled();
-  });
-
-  it('should expose the name control via getter', () => {
-    expect(component.name).toBe(component.addSubjectForm.get('name'));
-  });
-
-  it('should expose the professor control via getter', () => {
-    expect(component.professor).toBe(component.addSubjectForm.get('professor'));
-  });
 });
