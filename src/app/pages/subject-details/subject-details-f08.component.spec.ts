@@ -130,13 +130,7 @@ describe('SubjectDetailsComponent', () => {
     expect(component.subject).toEqual(subjectMock);
   });
 
-
-  // =========================================================
-  // Gestión de tareas (Assignment) — NO forma parte de F07-F11,
-  // es funcionalidad de un compañero (Consultar/Registrar/Editar/
-  // Eliminar tarea). Se cubre como aporte adicional al coverage
-  // del proyecto, no como parte de la tabla de caminos propia.
-  // =========================================================
+  
 
   describe('Gestión de tareas (complementario, no es F07-F11)', () => {
 
