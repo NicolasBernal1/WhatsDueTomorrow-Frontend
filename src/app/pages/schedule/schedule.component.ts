@@ -54,6 +54,73 @@ export class ScheduleComponent implements OnInit{
     );
   }
 
+  isCurrentClass(cls: ClassResponseDto): boolean {
+    const now = new Date();
+    const currentDay = this.days[this.getTodayIndex(now)];
+
+    if (cls.dayOfWeek.toLowerCase() !== currentDay) {
+      return false;
+    }
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return this.toMinutes(cls.startTime) <= currentMinutes && currentMinutes < this.toMinutes(cls.endTime);
+  }
+
+  getNextClass(): ClassResponseDto | null {
+    if (!this.classes.length) return null;
+
+    const now = new Date();
+    const todayIndex = this.getTodayIndex(now);
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    for (let offset = 0; offset <= 7; offset++) {
+      const day = this.days[(todayIndex + offset) % 7];
+
+      let candidates = this.classes.filter(
+        c => c.dayOfWeek.toLowerCase() === day
+      );
+
+      if (offset === 0) {
+        candidates = candidates.filter(
+          c => this.toMinutes(c.startTime) > currentMinutes
+        );
+      }
+
+      candidates = candidates
+        .slice()
+        .sort((a, b) => this.toMinutes(a.startTime) - this.toMinutes(b.startTime));
+
+      if (candidates.length > 0) {
+        return candidates[0];
+      }
+    }
+
+    return null;
+  }
+
+  getNextClassDayLabel(cls: ClassResponseDto): string {
+    const now = new Date();
+    const todayIndex = this.getTodayIndex(now);
+    const classDayIndex = this.days.indexOf(cls.dayOfWeek.toLowerCase());
+
+    if (classDayIndex === todayIndex) return 'Hoy';
+    if (classDayIndex === (todayIndex + 1) % 7) return 'Mañana';
+
+    return cls.dayOfWeek.charAt(0).toUpperCase() + cls.dayOfWeek.slice(1);
+  }
+
+  private toMinutes(h: string): number {
+    const [hh, mm] = h.split(':').map(Number);
+    return hh * 60 + mm;
+  }
+
+  // Date#getDay(): 0 = domingo ... 6 = sabado.
+  // this.days empieza en 'monday', asi que se desplaza para alinear los indices.
+  private getTodayIndex(now: Date): number {
+    return (now.getDay() + 6) % 7;
+  }
+
   onClickClass(id: number) {
     this.router.navigate([`/subjects/${id}`]);
   }

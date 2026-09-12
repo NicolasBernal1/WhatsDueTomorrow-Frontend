@@ -73,7 +73,6 @@ describe('ScheduleComponent', () => {
     component = fixture.componentInstance;
   });
 
-  //Consultar horario
   describe('Consultar horario', () => {
 
     // Camino:
@@ -155,9 +154,6 @@ describe('ScheduleComponent', () => {
 
   });
 
-
-  //Ver detalles de una asignatura desde una clase
-
   describe('Ver detalles de asignatura desde la clase', () => {
 
     // Camino:
@@ -174,9 +170,6 @@ describe('ScheduleComponent', () => {
     });
 
   });
-
-
-  //Eliminar clase
 
   describe('Eliminar clase', () => {
 
@@ -274,9 +267,6 @@ describe('ScheduleComponent', () => {
 
   });
 
-
-  //Editar clase
-
   describe('Editar clase', () => {
 
     // Camino:
@@ -309,6 +299,157 @@ describe('ScheduleComponent', () => {
       expect(component.contextMenuVisible)
         .toBeFalse();
 
+    });
+
+  });
+
+  describe('Resaltar clase en curso (isCurrentClass)', () => {
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    // Camino: clase de otro dia
+    it('12. debe retornar false cuando la clase no es de hoy', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      const claseDeOtroDia = { ...classesMock[0], dayOfWeek: 'tuesday' };
+
+      const result = component.isCurrentClass(claseDeOtroDia);
+
+      expect(result).toBeFalse();
+    });
+
+    // Camino: mismo dia pero antes de que empiece la clase
+    it('13. debe retornar false cuando aún no empieza la clase de hoy', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 7, 30));
+
+      const result = component.isCurrentClass(classesMock[0]);
+
+      expect(result).toBeFalse();
+    });
+
+    // Camino: mismo dia pero después de que termina la clase
+    it('14. debe retornar false cuando la clase de hoy ya terminó', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 10, 0));
+
+      const result = component.isCurrentClass(classesMock[0]);
+
+      expect(result).toBeFalse();
+    });
+
+    // Camino: mismo dia y dentro del rango horario
+    it('15. debe retornar true cuando la clase de hoy está en curso', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      const result = component.isCurrentClass(classesMock[0]);
+
+      expect(result).toBeTrue();
+    });
+
+  });
+
+  describe('Ver proxima clase (getNextClass / getNextClassDayLabel)', () => {
+
+    const buildClass = (overrides: any) => ({
+      id: overrides.id,
+      dayOfWeek: overrides.dayOfWeek,
+      startTime: overrides.startTime,
+      endTime: overrides.endTime,
+      subject: {
+        id: overrides.id + 100,
+        name: `subject-${overrides.id}`,
+        professor: 'gabriel',
+        color: '#0078d4'
+      }
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    // Camino: sin clases registradas
+    it('16. debe retornar null cuando el usuario no tiene clases', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      component.classes = [];
+
+      expect(component.getNextClass()).toBeNull();
+    });
+
+    // Camino: hay varias clases hoy mas tarde, debe elegir la mas cercana
+    it('17. debe retornar la clase mas proxima de hoy cuando aun faltan por empezar', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0)); 
+
+      const clasesHoy = [
+        buildClass({ id: 2, dayOfWeek: 'monday', startTime: '14:00', endTime: '15:00' }),
+        buildClass({ id: 1, dayOfWeek: 'monday', startTime: '11:00', endTime: '12:00' })
+      ];
+      component.classes = clasesHoy;
+
+      const result = component.getNextClass();
+
+      expect(result?.id).toBe(1);
+      expect(component.getNextClassDayLabel(result!)).toBe('Hoy');
+    });
+
+    // Camino: ya pasaron todas las clases de hoy, hay una mañana
+    it('18. debe retornar la clase de mañana cuando ya no quedan clases hoy', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      component.classes = [
+        buildClass({ id: 1, dayOfWeek: 'monday', startTime: '07:00', endTime: '08:00' }), // ya pasó
+        buildClass({ id: 2, dayOfWeek: 'tuesday', startTime: '09:00', endTime: '10:00' })
+      ];
+
+      const result = component.getNextClass();
+
+      expect(result?.id).toBe(2);
+      expect(component.getNextClassDayLabel(result!)).toBe('Mañana');
+    });
+
+    // Camino: la clase mas proxima esta mas adelante en la semana
+    it('19. debe usar el nombre del dia para una clase que no es hoy ni mañana', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0)); 
+
+      const clase = buildClass({ id: 3, dayOfWeek: 'wednesday', startTime: '09:00', endTime: '10:00' });
+      component.classes = [clase];
+
+      const result = component.getNextClass();
+
+      expect(result?.id).toBe(3);
+      expect(component.getNextClassDayLabel(result!)).toBe('Wednesday');
+    });
+
+    // Camino: todas las clases de la semana ya pasaron, se envuelve a la proxima semana
+    it('20. debe volver a la primera clase de hoy cuando ya pasaron todas las de la semana', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      component.classes = [
+        buildClass({ id: 1, dayOfWeek: 'monday', startTime: '07:00', endTime: '08:00' })
+      ];
+
+      const result = component.getNextClass();
+
+      expect(result?.id).toBe(1);
     });
 
   });

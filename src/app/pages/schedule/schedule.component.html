@@ -1,4 +1,19 @@
 <div class="schedule-container" (click)="closeContextMenu()">
+  <section class="next-class" aria-labelledby="next-class-title">
+    <h2 id="next-class-title">Your Next Class</h2>
+    @if (getNextClass(); as nextClass) {
+      <div class="next-class-card" [style.borderLeftColor]="nextClass.subject.color || '#007bff'">
+        <div class="next-class-info">
+          <div class="next-class-subject">{{ nextClass.subject.name }}</div>
+          <div class="next-class-professor">{{ nextClass.subject.professor }}</div>
+          <div class="next-class-time">{{ getNextClassDayLabel(nextClass) }} · {{ nextClass.startTime }} - {{ nextClass.endTime }}</div>
+        </div>
+        <button mat-stroked-button color="primary" (click)="onClickClass(nextClass.subject.id)">Details</button>
+      </div>
+    } @else {
+      <p class="next-class-empty">You do not have more classes.</p>
+    }
+  </section>
   <section class="calendar-sync" aria-labelledby="calendar-sync-title">
     <div>
       <h2 id="calendar-sync-title">Calendar sync</h2>
@@ -29,8 +44,11 @@
     @for (day of days; track $index) {
     <div class="cell">
       @if (getClassesFor(day, hour); as cls) {
-      <div class="class-card" [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)"
+      <div class="class-card" [class.class-card--current]="isCurrentClass(cls)" [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)"
         (contextmenu)="onRightClickClass($event, cls)">
+        @if (isCurrentClass(cls)) {
+          <div class="current-badge" aria-label="Clase en curso">Ahora</div>
+        }
         <div class="class-name">{{ cls.subject.name }}</div>
         <div class="class-professor">{{ cls.subject.professor }}</div>
         <div class="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>
