@@ -5,15 +5,16 @@ import { Router } from '@angular/router';
 import { AddSubjectModalComponent } from '../../components/add-subject-modal/add-subject-modal.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-subjects',
-  imports: [AddSubjectModalComponent, MatButtonModule, MatCardModule],
+  imports: [AddSubjectModalComponent, MatButtonModule, MatCardModule, FormsModule],
   standalone: true,
   templateUrl: './subjects.component.html',
   styleUrl: './subjects.component.scss'
 })
-export class SubjectsComponent implements OnInit{
+export class SubjectsComponent implements OnInit {
   subjects: SubjectResponseDto[] = [];
   loading = true;
   showAddModal = false;
@@ -22,11 +23,11 @@ export class SubjectsComponent implements OnInit{
   contextMenuVisible = false;
   contextMenuX = 0;
   contextMenuY = 0;
-  
-  constructor(private subjectService: SubjectService, private router: Router){}
+
+  constructor(private subjectService: SubjectService, private router: Router) { }
 
   ngOnInit(): void {
-      this.loadSubjects();
+    this.loadSubjects();
   }
 
   loadSubjects(): void {
@@ -56,7 +57,7 @@ export class SubjectsComponent implements OnInit{
     document.body.style.overflow = '';
   }
 
-  saveSubject(){
+  saveSubject() {
     this.closeAddSubjectModal();
     this.loadSubjects();
   }
@@ -111,5 +112,25 @@ export class SubjectsComponent implements OnInit{
   closeContextMenu(): void {
     this.contextMenuVisible = false;
     this.selectedSubject = null;
+  }
+  //Agrego nueva funcionalidad en el front de buscar/filtrar asignaturas
+  searchQuery = '';
+
+  onSearch(): void {
+    const term = this.searchQuery.trim();
+
+    if (!term) {
+      this.loadSubjects();
+      return;
+    }
+
+    this.subjectService.searchSubjects(term).subscribe({
+      next: (res) => {
+        this.subjects = res.data || [];
+      },
+      error: () => {
+        alert('Error searching subjects');
+      }
+    });
   }
 }

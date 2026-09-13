@@ -1,8 +1,14 @@
 <div class="subjects-container" (click)="closeContextMenu()" role="button" tabindex="0" (keydown.escape)="closeContextMenu()">
   <div class="header">
-    <h2>Your Subjects</h2>
-    <button mat-flat-button color="primary" (click)="addSubjectModal()">+ Add Subject</button>
-  </div>
+  <h2>Your Subjects</h2>
+  <input
+    type="text"
+    placeholder="Buscar por asignatura o profesor..."
+    [(ngModel)]="searchQuery"
+    (input)="onSearch()"
+  />
+  <button mat-flat-button color="primary" (click)="addSubjectModal()">+ Add Subject</button>
+</div>
 
   @if (this.loading) {
     <p class="loading">Loading Subjects...</p>

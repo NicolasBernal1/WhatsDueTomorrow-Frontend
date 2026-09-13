@@ -47,4 +47,9 @@ export class SubjectService {
   editClass(id: number, data: EditClassDto): Observable<BaseResponseDto<null>> {
     return this.http.patch<BaseResponseDto<null>>(`${this.apiUrl}/subjects/classes/${id}`, data);
   }
+  //Agrego nueva funcionalidad en el frontend de buscar/filtrar asignaturas
+  searchSubjects(query: string): Observable<BaseResponseDto<SubjectResponseDto[]>> {
+  return this.http.get<BaseResponseDto<SubjectResponseDto[]>>(
+    `${this.apiUrl}/subjects/search?q=${encodeURIComponent(query)}`,);
+  }
 }
