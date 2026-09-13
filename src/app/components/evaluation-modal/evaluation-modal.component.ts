@@ -97,7 +97,7 @@ export class EvaluationModalComponent implements OnInit {
   get calculatedContribution(): number {
     const weight = Number(this.evaluationForm.get('weight')?.value);
     const score = Number(this.evaluationForm.get('score')?.value);
-    if (!isNaN(weight) && !isNaN(score) && weight > 0 && score >= 0) {
+    if (!Number.isNaN(weight) && !Number.isNaN(score) && weight > 0 && score >= 0) {
       return round2((score * weight) / 100);
     }
     return 0;
