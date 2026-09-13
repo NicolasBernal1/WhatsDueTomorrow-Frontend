@@ -1,4 +1,4 @@
-<div class="schedule-container" (click)="closeContextMenu()">
+<div class="schedule-container" (click)="closeContextMenu()" role="button" tabindex="0" (keydown.escape)="closeContextMenu()">
   <section class="next-class" aria-labelledby="next-class-title">
     <h2 id="next-class-title">Your Next Class</h2>
     @if (getNextClass(); as nextClass) {
@@ -45,7 +45,8 @@
     <div class="cell">
       @if (getClassesFor(day, hour); as cls) {
       <div class="class-card" [class.class-card--current]="isCurrentClass(cls)" [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)"
-        (contextmenu)="onRightClickClass($event, cls)">
+        (contextmenu)="onRightClickClass($event, cls)"
+        role="button" tabindex="0" (keydown.enter)="onClickClass(cls.subject.id)">
         @if (isCurrentClass(cls)) {
           <div class="current-badge" aria-label="Clase en curso">Ahora</div>
         }
@@ -58,7 +59,7 @@
     }
     }
     @if (contextMenuVisible) {
-      <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY" (click)="$event.stopPropagation()">
+      <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY" (click)="$event.stopPropagation()" role="button" tabindex="0" (keydown.escape)="$event.stopPropagation()">
         <button (click)="editClass()">Edit</button>
         <button (click)="deleteClass()">Delete</button>
       </div>

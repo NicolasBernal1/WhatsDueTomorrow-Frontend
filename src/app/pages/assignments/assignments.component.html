@@ -1,4 +1,4 @@
-<div class="assignments-container" (click)="closeContextMenu()">
+<div class="assignments-container" (click)="closeContextMenu()" role="button" tabindex="0" (keydown.escape)="closeContextMenu()">
   <h2>Your Assignments</h2>
 
   @if (loading) {

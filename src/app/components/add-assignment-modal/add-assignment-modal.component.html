@@ -1,4 +1,4 @@
-<div class="modal-backdrop" (click)="onclose()"></div>
+<div class="modal-backdrop" (click)="onclose()" role="button" tabindex="0" (keydown.enter)="onclose()"></div>
 
 <mat-card class="modal" (click)="$event.stopPropagation()">
   <h2>{{ assignment ? 'Edit Assignment' : 'Add Assignment' }}</h2>
