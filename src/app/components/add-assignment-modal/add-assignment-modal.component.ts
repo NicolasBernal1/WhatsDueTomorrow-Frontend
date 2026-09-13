@@ -30,7 +30,7 @@ export class AddAssignmentModalComponent implements OnInit{
 
   constructor(private fb: FormBuilder, private assignmentService: AssignmentService){
     this.addAssignmentForm = this.fb.group({
-      title: ["", [Validators.required, Validators.pattern(/.*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*/)]],
+      title: ['', [Validators.required, Validators.pattern(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/)]],
       description: [""],
       dueDate: ['', [Validators.required]],
       dueTime: ['23:59', [Validators.required]],
