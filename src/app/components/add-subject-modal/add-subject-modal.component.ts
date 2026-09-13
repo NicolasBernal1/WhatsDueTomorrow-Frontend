@@ -26,8 +26,8 @@ export class AddSubjectModalComponent implements OnInit{
 
   constructor(private fb: FormBuilder, private subjectService: SubjectService){
     this.addSubjectForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(/.*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*/)]],
-      professor: ['', [Validators.required, Validators.pattern(/.*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*/)]],
+      name: ['', [Validators.required, Validators.pattern(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/)]],
+      professor: ['', [Validators.required, Validators.pattern(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/)]],
       color: [this.colors[0]]
     })
   }
