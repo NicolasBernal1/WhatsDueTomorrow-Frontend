@@ -1,4 +1,4 @@
-<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-backdrop" (click)="onClose()" role="button" tabindex="0" (keydown.enter)="onClose()"></div>
 
 <mat-card class="modal" (click)="$event.stopPropagation()">
   <h2>{{ classToEdit ? 'Edit Class Schedule' : 'Add Class Schedule' }}</h2>

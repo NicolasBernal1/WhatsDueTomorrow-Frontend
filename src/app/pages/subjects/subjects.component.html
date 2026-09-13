@@ -1,4 +1,4 @@
-<div class="subjects-container" (click)="closeContextMenu()">
+<div class="subjects-container" (click)="closeContextMenu()" role="button" tabindex="0" (keydown.escape)="closeContextMenu()">
   <div class="header">
     <h2>Your Subjects</h2>
     <button mat-flat-button color="primary" (click)="addSubjectModal()">+ Add Subject</button>

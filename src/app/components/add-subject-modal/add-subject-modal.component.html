@@ -1,6 +1,6 @@
-<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-backdrop" (click)="onClose()" role="button" tabindex="0" (keydown.enter)="onClose()"></div>
 
-<div class="modal" (click)="$event.stopImmediatePropagation()">
+<div class="modal" (click)="$event.stopImmediatePropagation()" role="button" tabindex="0" (keydown.enter)="$event.stopImmediatePropagation()">
  <h2>{{ subject ? 'Edit Subject' : 'Add New Subject' }}</h2>
 
   <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()" class="form-content">
@@ -34,7 +34,10 @@
             class="color-selector"
             [style.background]="color"
             [class.selected]="addSubjectForm.value.color === color"
-            (click)="selectColor(color)">
+            (click)="selectColor(color)"
+            role="button" 
+            tabindex="0" 
+            (keydown.enter)="selectColor(color)">
           </div>
         }
       </div>

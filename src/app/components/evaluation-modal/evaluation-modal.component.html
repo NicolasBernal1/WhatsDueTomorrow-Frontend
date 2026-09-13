@@ -1,4 +1,4 @@
-<div class="modal-backdrop" (click)="onClose()"> </div>
+<div class="modal-backdrop" (click)="onClose()" role="button" tabindex="0" (keydown.enter)="onClose()"> </div>
 
 <mat-card class="modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">v
   <h2>{{ evaluation ? 'Editar Evaluación' : 'Nueva Evaluación Ponderada' }}</h2>

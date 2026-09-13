@@ -20,7 +20,7 @@
 
   <mat-menu #profileMenu="matMenu" class="profile-menu">
 
-    <div class="profile-content" (click)="$event.stopPropagation()">
+    <div class="profile-content" (click)="$event.stopPropagation()" role="button" tabindex="0" (keydown.escape)="$event.stopPropagation()">
 
       @if (user) {
         <div class="profile-info">
