@@ -1,5 +1,5 @@
 @if (subject) {
-  <div class="subject-details" (click)="closeContextMenu()">
+  <div class="subject-details" (click)="closeContextMenu()" role="button" tabindex="0" (keydown.escape)="closeContextMenu()">
 
     <mat-card class="subject-header" [style.border-left]="'6px solid ' + subject.color">
       <mat-card-title>{{ subject.name }}</mat-card-title>
