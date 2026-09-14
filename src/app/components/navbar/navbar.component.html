@@ -10,6 +10,34 @@
   <span class="spacer"></span>
 
   <button
+    mat-icon-button
+    [matMenuTriggerFor]="upcomingMenu"
+    [matBadge]="upcomingAssignments.length"
+    [matBadgeHidden]="upcomingAssignments.length === 0"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+    aria-label="Upcoming assignments">
+    <mat-icon>notifications</mat-icon>
+  </button>
+
+  <mat-menu #upcomingMenu="matMenu" class="upcoming-menu">
+    <div class="upcoming-content" (click)="$event.stopPropagation()">
+      <h4>Due soon</h4>
+
+      @if (upcomingAssignments.length === 0) {
+        <p class="empty-message">Nothing due in the next 48 hours 🎉</p>
+      } @else {
+        @for (assignment of upcomingAssignments; track assignment.id) {
+          <div class="upcoming-item">
+            <strong>{{ assignment.title }}</strong>
+            <span>{{ assignment.subjectName }} · {{ assignment.dueDate | date:'short' }}</span>
+          </div>
+        }
+      }
+    </div>
+  </mat-menu>
+
+  <button
     mat-button
     [matMenuTriggerFor]="profileMenu"
     (click)="loadProfile(); resetPasswordState()">

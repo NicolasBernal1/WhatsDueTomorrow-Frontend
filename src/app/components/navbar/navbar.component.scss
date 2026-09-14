@@ -127,3 +127,47 @@ mat-toolbar.navbar {
 ::ng-deep .profile-menu .mat-mdc-menu-content {
   padding: 0 !important;
 }
+
+.upcoming-content {
+  width: 280px;
+  max-width: 280px;
+  box-sizing: border-box;
+  padding: 16px 20px;
+
+  h4 {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+.empty-message {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.upcoming-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  strong {
+    font-size: 0.9rem;
+  }
+
+  span {
+    font-size: 0.78rem;
+    color: #666;
+  }
+}
+
+::ng-deep .upcoming-menu {
+  min-width: 280px !important;
+  max-width: 280px !important;
+}

@@ -1,24 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
+import { AssignmentService } from '../../services/assignment.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatBadgeModule } from '@angular/material/badge';
 import { UserDto } from '../../models/user.dto';
 import { ChangePasswordDto } from '../../models/change-password.dto';
+import { AssignmentResponseCompDto } from '../../models/assignment-response-comp.dto';
 import { MatLabel } from "@angular/material/form-field";
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, MatToolbarModule, MatButtonModule, MatMenuModule, MatIconModule, MatLabel, FormsModule, MatInputModule],
+  imports: [RouterLink, RouterLinkActive, MatToolbarModule, MatButtonModule, MatMenuModule, MatIconModule, MatLabel, FormsModule, MatInputModule, MatBadgeModule, DatePipe],
   standalone: true,
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   dropDownOpened = false;
 
   user?: UserDto;
@@ -30,7 +35,27 @@ export class NavbarComponent {
   passwordError = false;
   changingPassword = false;
 
-  constructor(private router: Router, private authService: AuthService) { }
+  upcomingAssignments: AssignmentResponseCompDto[] = [];
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private assignmentService: AssignmentService,
+  ) { }
+
+  ngOnInit(): void {
+    this.loadUpcomingAssignments();
+  }
+
+  loadUpcomingAssignments(): void {
+    this.assignmentService.getUpcomingAssignments().subscribe({
+      next: (res) => {
+        this.upcomingAssignments = res.data ?? [];
+      },
+      error: (err) => console.error(err),
+    });
+  }
 
   toggleDropdown() {
     this.dropDownOpened = !this.dropDownOpened;
@@ -41,7 +66,10 @@ export class NavbarComponent {
       next: (res) => {
         this.user = res.data;
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        console.error(err);
+        this.notificationService.error('Could not load your profile');
+      }
     });
   }
 
@@ -74,7 +102,7 @@ export class NavbarComponent {
 
     this.authService.changePassword(dto).subscribe({
       next: () => {
-        alert('Password changed successfully.');
+        this.notificationService.success('Password changed successfully.');
         this.logout();
       },
       error: (err) => {
