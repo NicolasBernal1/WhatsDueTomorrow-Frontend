@@ -259,88 +259,233 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
     });
   });
 
-  describe('F25 Calculadora y simulador de calificaciones', () => {
-    it('debe abrir el modal de evaluación en modo creación', () => {
-      component.openEvaluationModal();
-      expect(component.showEvaluationModal).toBeTrue();
-      expect(component.selectedEvaluation).toBeNull();
+  describe('F25 — Calculadora y simulador de calificaciones (Caminos Básicos Tabla 37)', () => {
+    describe('Carga de Calificaciones (P1: 1 → 2 → 3 → 4 → 22)', () => {
+      it('[P1] debe asignar evaluationError y detener loadingEvaluations si getEvaluationsBySubject falla', () => {
+        evaluationServiceMock.getEvaluationsBySubject.and.returnValue(
+          throwError(() => new Error('Error al conectar con backend')),
+        );
+
+        component.loadEvaluations(10);
+
+        expect(component.evaluationError).toBe(
+          'Error al cargar las calificaciones de la asignatura',
+        );
+        expect(component.loadingEvaluations).toBeFalse();
+      });
     });
 
-    it('debe abrir el modal de evaluación en modo edición con la evaluación seleccionada', () => {
-      component.openEvaluationModal(mockEvaluations[0]);
-      expect(component.showEvaluationModal).toBeTrue();
-      expect(component.selectedEvaluation).toEqual(mockEvaluations[0]);
+    describe('Gestión y Cierre del Modal (P2: 1 → 2 → 3 → 5 → 6 → 21 → 22)', () => {
+      it('[P2] debe abrir en creación, edición y cerrar modal limpiando selectedEvaluation', () => {
+        // Modo creación
+        component.openEvaluationModal();
+        expect(component.showEvaluationModal).toBeTrue();
+        expect(component.selectedEvaluation).toBeNull();
+
+        // Modo edición
+        component.openEvaluationModal(mockEvaluations[0]);
+        expect(component.showEvaluationModal).toBeTrue();
+        expect(component.selectedEvaluation).toEqual(mockEvaluations[0]);
+
+        // Cierre
+        component.closeEvaluationModal();
+        expect(component.showEvaluationModal).toBeFalse();
+        expect(component.selectedEvaluation).toBeNull();
+      });
     });
 
-    it('debe cerrar el modal de evaluación y reiniciar la selección', () => {
-      component.openEvaluationModal(mockEvaluations[0]);
-      component.closeEvaluationModal();
-      expect(component.showEvaluationModal).toBeFalse();
-      expect(component.selectedEvaluation).toBeNull();
+    describe('Simulación Interactiva Reactiva (P3, P4, P5)', () => {
+      it('[P3: 1 → 2 → 3 → 5 → 6 → 7 → 8 → 22] simulación interactiva con peso agotado (remainingWeight <= 0)', () => {
+        const zeroRemainingSummary: GradeSummary = {
+          ...mockSummary,
+          remainingWeight: 0,
+          totalWeight: 100,
+        };
+        component.gradeSummary = zeroRemainingSummary;
+        evaluationServiceMock.simulateLocally.and.returnValue({
+          requiredForTarget: null,
+          isTargetAttainable: false,
+          hypotheticalFinalGrade: null,
+          hypotheticalStatus: null,
+        });
+
+        component.onSimulationChange();
+
+        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+          zeroRemainingSummary,
+          component.hypotheticalScore,
+          3.0,
+        );
+        expect(component.simResult?.requiredForTarget).toBeNull();
+        expect(component.simResult?.isTargetAttainable).toBeFalse();
+      });
+
+      it('[P4: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 22] simulación con remainingWeight > 0 sin nota hipotética', () => {
+        component.gradeSummary = mockSummary;
+        component.hypotheticalScore = null;
+        component.targetGoal = 3.0;
+        evaluationServiceMock.simulateLocally.and.returnValue({
+          requiredForTarget: 2.57,
+          isTargetAttainable: true,
+          hypotheticalFinalGrade: null,
+          hypotheticalStatus: null,
+        });
+
+        component.onSimulationChange();
+
+        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+          mockSummary,
+          null,
+          3.0,
+        );
+        expect(component.simResult?.requiredForTarget).toBe(2.57);
+        expect(component.simResult?.hypotheticalFinalGrade).toBeNull();
+      });
+
+      it('[P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 11 → 22] simulación reactiva completa con nota hipotética y meta', () => {
+        component.gradeSummary = mockSummary;
+        component.hypotheticalScore = 4.0;
+        component.targetGoal = 3.5;
+        evaluationServiceMock.simulateLocally.and.returnValue({
+          requiredForTarget: 3.29,
+          isTargetAttainable: true,
+          hypotheticalFinalGrade: 3.86,
+          hypotheticalStatus: 'Aprobando',
+        });
+
+        component.onSimulationChange();
+
+        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+          mockSummary,
+          4.0,
+          3.5,
+        );
+        expect(component.simResult?.hypotheticalFinalGrade).toBe(3.86);
+        expect(component.simResult?.hypotheticalStatus).toBe('Aprobando');
+      });
+
+      it('guardia onSimulationChange: no debe ejecutar simulación si gradeSummary es null', () => {
+        component.gradeSummary = null;
+        evaluationServiceMock.simulateLocally.calls.reset();
+
+        component.onSimulationChange();
+
+        expect(evaluationServiceMock.simulateLocally).not.toHaveBeenCalled();
+      });
     });
 
-    it('debe recargar las evaluaciones y cerrar el modal tras guardar una evaluación', () => {
-      spyOn(component, 'loadEvaluations');
-      component.openEvaluationModal();
-      component.onEvaluationSaved();
+    describe('Sincronización al Guardar en Modal (P7 / P9)', () => {
+      it('[P7 / P9] debe recargar las evaluaciones y cerrar el modal tras emitir guardado exitoso', () => {
+        spyOn(component, 'loadEvaluations');
+        component.openEvaluationModal();
+        component.onEvaluationSaved();
 
-      expect(component.loadEvaluations).toHaveBeenCalledWith(10);
-      expect(component.showEvaluationModal).toBeFalse();
+        expect(component.loadEvaluations).toHaveBeenCalledWith(10);
+        expect(component.showEvaluationModal).toBeFalse();
+      });
     });
 
-    it('debe solicitar confirmación y eliminar la evaluación si el usuario confirma', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      evaluationServiceMock.deleteEvaluation.and.returnValue(
-        of({
-          status: 200,
-          message: 'deleted',
-          data: {
-            evaluations: [],
-            summary: {
-              totalWeight: 0,
-              remainingWeight: 100,
-              currentContribution: 0,
-              currentAverage: 0,
-              requiredGrade: 3.0,
-              isPassing: false,
-              isAttainable: true,
-              status: 'Sin calificaciones',
-              weightExceeded: false,
-              passingGrade: 3.0,
-              maxGrade: 5.0,
+    describe('Eliminación de Evaluación (P10, P11, P12)', () => {
+      it('[P10: 1 → 2 → 3 → 5 → 6 → 15 → 16 → 22] click en eliminar con confirm() cancelado por el usuario', () => {
+        spyOn(window, 'confirm').and.returnValue(false);
+
+        component.deleteEvaluation(mockEvaluations[0]);
+
+        expect(window.confirm).toHaveBeenCalled();
+        expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
+      });
+
+      it('[P11: 1 → 2 → 3 → 5 → 6 → 15 → 23 → 24 → 22] confirmación aceptada pero error HTTP en deleteEvaluation', () => {
+        spyOn(window, 'confirm').and.returnValue(true);
+        spyOn(console, 'error');
+        evaluationServiceMock.deleteEvaluation.and.returnValue(
+          throwError(() => new Error('Error al eliminar en servidor')),
+        );
+
+        component.deleteEvaluation(mockEvaluations[0]);
+
+        expect(window.confirm).toHaveBeenCalled();
+        expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
+        expect(console.error).toHaveBeenCalled();
+      });
+
+      it('[P12: 1 → 2 → 3 → 5 → 6 → 15 → 23 → 25 → 22] confirmación aceptada y éxito HTTP con res.data actualizado', () => {
+        spyOn(window, 'confirm').and.returnValue(true);
+        const updatedEvaluations: Evaluation[] = [];
+        const updatedSummary: GradeSummary = {
+          ...mockSummary,
+          totalWeight: 0,
+          remainingWeight: 100,
+          currentContribution: 0,
+          status: 'Sin calificaciones',
+        };
+        evaluationServiceMock.deleteEvaluation.and.returnValue(
+          of({
+            status: 200,
+            message: 'deleted',
+            data: {
+              evaluations: updatedEvaluations,
+              summary: updatedSummary,
             },
-          },
-        }),
-      );
+          }),
+        );
+        spyOn(component, 'onSimulationChange');
 
-      component.deleteEvaluation(mockEvaluations[0]);
+        component.deleteEvaluation(mockEvaluations[0]);
 
-      expect(window.confirm).toHaveBeenCalled();
-      expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
-      expect(component.evaluations.length).toBe(0);
-      expect(component.gradeSummary?.status).toBe('Sin calificaciones');
+        expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
+        expect(component.evaluations).toEqual(updatedEvaluations);
+        expect(component.gradeSummary).toEqual(updatedSummary);
+        expect(component.onSimulationChange).toHaveBeenCalled();
+      });
+
+      it('[P12] confirmación aceptada y éxito HTTP cuando res.data es null invoca loadEvaluations como respaldo', () => {
+        spyOn(window, 'confirm').and.returnValue(true);
+        evaluationServiceMock.deleteEvaluation.and.returnValue(
+          of({
+            status: 200,
+            message: 'deleted',
+            data: null as any,
+          }),
+        );
+        spyOn(component, 'loadEvaluations');
+        spyOn(component, 'onSimulationChange');
+
+        component.deleteEvaluation(mockEvaluations[0]);
+
+        expect(component.loadEvaluations).toHaveBeenCalledWith(10);
+        expect(component.onSimulationChange).toHaveBeenCalled();
+      });
+
+      it('guardia deleteEvaluation: no debe realizar acciones si subject es undefined', () => {
+        component.subject = undefined;
+        spyOn(window, 'confirm');
+
+        component.deleteEvaluation(mockEvaluations[0]);
+
+        expect(window.confirm).not.toHaveBeenCalled();
+        expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
+      });
     });
 
-    it('NO debe eliminar la evaluación si el usuario cancela la confirmación', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+    describe('Auditoría QA y Caracterización de Defectos (Metricas_Software_F21_F26.docx)', () => {
+      it('[DEF-QA-F25-03] Comportamiento caracterizado: Permisividad de notas fuera de rango [0.0, 5.0] en onSimulationChange', () => {
+        component.gradeSummary = mockSummary;
+        // Usuario ingresa una nota de 9.5 en el simulador
+        component.hypotheticalScore = 9.5;
+        component.targetGoal = 3.0;
 
-      component.deleteEvaluation(mockEvaluations[0]);
+        component.onSimulationChange();
 
-      expect(window.confirm).toHaveBeenCalled();
-      expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
-    });
-
-    it('debe recalcular simulación reactiva al invocar onSimulationChange', () => {
-      component.hypotheticalScore = 4.0;
-      component.targetGoal = 3.5;
-      component.onSimulationChange();
-
-      expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
-        mockSummary,
-        4.0,
-        3.5,
-      );
-      expect(component.simResult?.hypotheticalFinalGrade).toBe(3.86);
+        // Verificación de defecto QA DEF-QA-F25-03:
+        // Se documenta que el componente frontend traslada el valor 9.5 directamente a simulateLocally
+        // sin bloquearlo o marcarlo como inválido en la vista
+        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+          mockSummary,
+          9.5,
+          3.0,
+        );
+      });
     });
   });
 });
