@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavbarComponent } from './navbar.component';
 import { AuthService } from '../../services/auth.service';
 import { UrgentAlertService } from '../../services/urgent-alert.service';
+import { NotificationService } from '../../services/notification.service';
+import { AssignmentService } from '../../services/assignment.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -12,11 +14,30 @@ describe('NavbarComponent', () => {
   let fixture: ComponentFixture<NavbarComponent>;
   let authServiceMock: jasmine.SpyObj<AuthService>;
   let urgentAlertServiceMock: jasmine.SpyObj<UrgentAlertService>;
+  let notificationServiceMock: jasmine.SpyObj<NotificationService>;
+  let assignmentServiceMock: jasmine.SpyObj<AssignmentService>;
   let router: Router;
 
   beforeEach(async () => {
-    authServiceMock = jasmine.createSpyObj('AuthService', ['logout', 'deleteAccount']);
+    authServiceMock = jasmine.createSpyObj('AuthService', [
+      'logout',
+      'deleteAccount',
+      'getProfile',
+      'updateProfile',
+      'changePassword',
+    ]);
     urgentAlertServiceMock = jasmine.createSpyObj('UrgentAlertService', ['start']);
+    notificationServiceMock = jasmine.createSpyObj('NotificationService', [
+      'showInfo',
+      'error',
+      'success',
+    ]);
+    assignmentServiceMock = jasmine.createSpyObj('AssignmentService', [
+      'getUpcomingAssignments',
+    ]);
+    assignmentServiceMock.getUpcomingAssignments.and.returnValue(
+      of({ status: 200, message: 'OK', data: [] }),
+    );
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
@@ -24,6 +45,8 @@ describe('NavbarComponent', () => {
         provideRouter([]),
         { provide: AuthService, useValue: authServiceMock },
         { provide: UrgentAlertService, useValue: urgentAlertServiceMock },
+        { provide: NotificationService, useValue: notificationServiceMock },
+        { provide: AssignmentService, useValue: assignmentServiceMock },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

@@ -11,8 +11,14 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
   let originalNotification: any;
 
   beforeEach(() => {
-    assignmentServiceMock = jasmine.createSpyObj('AssignmentService', ['getAllAssignments']);
+    assignmentServiceMock = jasmine.createSpyObj('AssignmentService', [
+      'getAllAssignments',
+      'getUrgentAssignments',
+    ]);
     assignmentServiceMock.getAllAssignments.and.returnValue(
+      of({ status: 200, message: 'OK', data: [] })
+    );
+    assignmentServiceMock.getUrgentAssignments.and.returnValue(
       of({ status: 200, message: 'OK', data: [] })
     );
 

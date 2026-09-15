@@ -51,14 +51,14 @@ export class AddSubjectModalComponent implements OnInit{
     }
 
     const formValue = this.addSubjectForm.value;
-    const credits = parseInt(formValue.credits, 10);
+    const credits = Number.parseInt(formValue.credits, 10);
 
     if (this.subject) {
       const updateDto: updateSubjectDto = {
         name: formValue.name,
         professor: formValue.professor,
         color: formValue.color,
-        credits: isNaN(credits) ? 3 : credits
+        credits: Number.isNaN(credits) ? 3 : credits
       };
 
       this.subjectService.editSubject(this.subject.id, updateDto).subscribe({
@@ -76,7 +76,7 @@ export class AddSubjectModalComponent implements OnInit{
       name: formValue.name,
       professor: formValue.professor,
       color: formValue.color,
-      credits: isNaN(credits) ? 3 : credits
+      credits: Number.isNaN(credits) ? 3 : credits
     };
 
     this.subjectService.addSubject(addDto).subscribe({
