@@ -75,6 +75,62 @@ describe('AssignmentService', () => {
     });
   });
 
+  // ─── getUpcomingAssignments ──────────────────────────────────────────────────
+
+  describe('getUpcomingAssignments', () => {
+    it('should GET the upcoming assignments for the logged-in user', () => {
+      const mockResponse = { status: 200, data: [{ id: 1, title: 'Tarea urgente', description: '', dueDate: '2025-06-01', subjectId: 10, subjectName: 'Math' }] };
+
+      service.getUpcomingAssignments().subscribe(res => {
+        expect(res.data?.length).toBe(1);
+        expect(res.data?.[0].title).toBe('Tarea urgente');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/assignments/upcoming`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should return an empty list when nothing is due soon', () => {
+      const mockResponse = { status: 200, message: 'No upcoming assignments', data: [] };
+
+      service.getUpcomingAssignments().subscribe(res => {
+        expect(res.data).toEqual([]);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/assignments/upcoming`);
+      req.flush(mockResponse);
+    });
+  });
+
+  // ─── getUrgentAssignments ────────────────────────────────────────────────────
+
+  describe('getUrgentAssignments', () => {
+    it('should GET the urgent assignments for the logged-in user', () => {
+      const mockResponse = { status: 200, data: [{ id: 2, title: 'Entrega crítica', description: '', dueDate: '2025-06-01', subjectId: 11, subjectName: 'Física' }] };
+
+      service.getUrgentAssignments().subscribe(res => {
+        expect(res.data?.length).toBe(1);
+        expect(res.data?.[0].title).toBe('Entrega crítica');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/assignments/urgent`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should return an empty list when there are no urgent assignments', () => {
+      const mockResponse = { status: 200, data: [] };
+
+      service.getUrgentAssignments().subscribe(res => {
+        expect(res.data).toEqual([]);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/assignments/urgent`);
+      req.flush(mockResponse);
+    });
+  });
+
   // ─── deleteAssignment ─────────────────────────────────────────────────────────
 
   describe('deleteAssignment', () => {
@@ -91,22 +147,20 @@ describe('AssignmentService', () => {
     });
   });
 
-  // ─── F21: getUrgentAssignments ─────────────────────────────────────────────
+  // ─── editAssignment ───────────────────────────────────────────────────────────
 
-  describe('getUrgentAssignments (F21 — Radar de Entregas Urgentes)', () => {
-    it('should GET urgent assignments from /assignments/urgent', () => {
-      const mockResponse = {
-        status: 200,
-        data: [{ id: 1, title: 'Tarea Urgente', description: '', dueDate: '2026-09-15T00:00:00Z', subjectId: 10, subjectName: 'V&V' }]
-      };
+  describe('editAssignment', () => {
+    it('should PATCH the assignment data to the correct endpoint', () => {
+      const dto = { title: 'Tarea editada' };
+      const mockResponse = { status: 200, message: 'Assignment updated successfully' };
 
-      service.getUrgentAssignments().subscribe(res => {
-        expect(res.data?.length).toBe(1);
-        expect(res.data?.[0].title).toBe('Tarea Urgente');
+      service.editAssignment(dto, 42).subscribe(res => {
+        expect(res.status).toBe(200);
       });
 
-      const req = httpMock.expectOne(`${apiUrl}/assignments/urgent`);
-      expect(req.request.method).toBe('GET');
+      const req = httpMock.expectOne(`${apiUrl}/assignments/42`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(dto);
       req.flush(mockResponse);
     });
   });
