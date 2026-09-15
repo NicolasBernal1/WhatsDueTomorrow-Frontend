@@ -133,6 +133,103 @@ describe('NavbarComponent', () => {
     });
   });
 
+  describe('profile editing', () => {
+    beforeEach(() => {
+      component.user = { id: 1, name: 'Ana', email: 'ana@test.com' };
+    });
+
+    it('startEditingProfile should enter edit mode pre-filled with the current user data', () => {
+      component.startEditingProfile();
+
+      expect(component.editingProfile).toBeTrue();
+      expect(component.editName).toBe('Ana');
+      expect(component.editEmail).toBe('ana@test.com');
+    });
+
+    it('cancelEditingProfile should exit edit mode without saving', () => {
+      component.editingProfile = true;
+
+      component.cancelEditingProfile();
+
+      expect(component.editingProfile).toBeFalse();
+      expect(authServiceMock.updateProfile).not.toHaveBeenCalled();
+    });
+
+    it('saveProfile should do nothing when editName is empty', () => {
+      component.editName = '';
+      component.editEmail = 'ana@test.com';
+
+      component.saveProfile();
+
+      expect(authServiceMock.updateProfile).not.toHaveBeenCalled();
+    });
+
+    it('saveProfile should do nothing when editEmail is empty', () => {
+      component.editName = 'Ana';
+      component.editEmail = '';
+
+      component.saveProfile();
+
+      expect(authServiceMock.updateProfile).not.toHaveBeenCalled();
+    });
+
+    it('saveProfile should update the user and exit edit mode on success', () => {
+      const updatedUser = { id: 1, name: 'Ana Nueva', email: 'ananueva@test.com' };
+      component.editName = 'Ana Nueva';
+      component.editEmail = 'ananueva@test.com';
+      component.editingProfile = true;
+      authServiceMock.updateProfile.and.returnValue(of({ status: 200, message: 'ok', data: updatedUser }));
+
+      component.saveProfile();
+
+      expect(authServiceMock.updateProfile).toHaveBeenCalledWith({ name: 'Ana Nueva', email: 'ananueva@test.com' });
+      expect(component.user).toEqual(updatedUser);
+      expect(component.editingProfile).toBeFalse();
+      expect(component.savingProfile).toBeFalse();
+      expect(notificationServiceMock.success).toHaveBeenCalledWith('Profile updated successfully.');
+    });
+
+    it('saveProfile should notify "already in use" on 409', () => {
+      component.editName = 'Ana';
+      component.editEmail = 'existente@test.com';
+      authServiceMock.updateProfile.and.returnValue(throwError(() => ({ status: 409 })));
+
+      component.saveProfile();
+
+      expect(notificationServiceMock.error).toHaveBeenCalledWith('That email is already in use');
+      expect(component.savingProfile).toBeFalse();
+    });
+
+    it('saveProfile should notify a generic error on any other failure', () => {
+      component.editName = 'Ana';
+      component.editEmail = 'ana@test.com';
+      authServiceMock.updateProfile.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.saveProfile();
+
+      expect(notificationServiceMock.error).toHaveBeenCalledWith('Could not update your profile');
+      expect(component.savingProfile).toBeFalse();
+    });
+  });
+
+  describe('resetPasswordState', () => {
+    it('should reset all password-related fields to their initial values', () => {
+      component.password = 'algo';
+      component.newPassword = 'otra_cosa';
+      component.passwordVerified = true;
+      component.passwordError = true;
+      component.changingPassword = true;
+
+      component.resetPasswordState();
+
+      expect(component.password).toBe('');
+      expect(component.newPassword).toBe('');
+      expect(component.passwordVerified).toBeFalse();
+      expect(component.passwordError).toBeFalse();
+      expect(component.changingPassword).toBeFalse();
+    });
+  });
+
   describe('verifyPassword', () => {
     it('should do nothing when the password field is empty', () => {
       component.password = '';
