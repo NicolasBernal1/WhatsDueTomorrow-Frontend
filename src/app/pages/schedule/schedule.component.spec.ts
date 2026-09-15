@@ -455,4 +455,155 @@ describe('ScheduleComponent', () => {
 
   });
 
+  // =========================================================================
+  // F23 — Sincronización y exportación de calendario .ics (Tabla 17 de DIAGRAMAS.docx)
+  // =========================================================================
+  describe('F23 — Sincronización y exportación de calendario .ics (Caminos Básicos Tabla 17)', () => {
+
+    // Camino P1: 1-2-18
+    it('Camino P1 (1-2-18): debe permanecer en estado de reposo sin emitir peticiones de calendario al no interactuar', () => {
+      expect(component.subscriptionUrl).toBe('');
+      expect(component.calendarMessage).toBe('');
+      expect(calendarServiceMock.createSubscription).not.toHaveBeenCalled();
+      expect(calendarServiceMock.download).not.toHaveBeenCalled();
+    });
+
+    // Camino P2: 1-2-3-4-5-8-2-18
+    it('Camino P2 (1-2-3-4-5-8-2-18): debe asignar mensaje de error cuando createSubscription falla por error HTTP', () => {
+      calendarServiceMock.createSubscription.and.returnValue(
+        throwError(() => new Error('HTTP 500 Server Error'))
+      );
+
+      component.createCalendarSubscription();
+
+      expect(calendarServiceMock.createSubscription).toHaveBeenCalled();
+      expect(component.calendarMessage).toBe('Unable to create the subscription link.');
+    });
+
+    // Camino P3: 1-2-3-4-6-7-8-2-18 (Vacío)
+    it('Camino P3 (1-2-3-4-6-7-8-2-18 Vacío): debe asignar mensaje de fallo cuando el backend retorna webcalUrl vacía o nula', () => {
+      calendarServiceMock.createSubscription.and.returnValue(
+        of({
+          status: 200,
+          message: 'Success',
+          data: { webcalUrl: '' }
+        })
+      );
+
+      component.createCalendarSubscription();
+
+      expect(component.subscriptionUrl).toBe('');
+      expect(component.calendarMessage).toBe('Unable to create the subscription link.');
+    });
+
+    // Camino P4: 1-2-3-4-6-7-8-2-18 (Válido)
+    it('Camino P4 (1-2-3-4-6-7-8-2-18 Válido): debe asignar subscriptionUrl y mensaje de éxito cuando se genera enlace webcal válido', () => {
+      const validUrl = 'webcal://localhost:3000/calendar/feed/abc123token.ics';
+      calendarServiceMock.createSubscription.and.returnValue(
+        of({
+          status: 200,
+          message: 'Success',
+          data: { webcalUrl: validUrl }
+        })
+      );
+
+      component.createCalendarSubscription();
+
+      expect(component.subscriptionUrl).toBe(validUrl);
+      expect(component.calendarMessage).toBe('Your subscription link is ready.');
+    });
+
+    // Camino P5: 1-2-9-2-18
+    it('Camino P5 (1-2-9-2-18): debe abortar tempranamente si se invoca copySubscriptionUrl con subscriptionUrl vacío', () => {
+      component.subscriptionUrl = '';
+      if (navigator.clipboard) {
+        spyOn(navigator.clipboard, 'writeText');
+      }
+
+      component.copySubscriptionUrl();
+
+      if (navigator.clipboard) {
+        expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
+      }
+      expect(component.calendarMessage).toBe('');
+    });
+
+    // Camino P6: 1-2-9-10-11-12-2-18 (Resolve)
+    it('Camino P6 (1-2-9-10-11-12-2-18 Resolve): debe copiar enlace y notificar éxito cuando navigator.clipboard resuelve', async () => {
+      component.subscriptionUrl = 'webcal://localhost:3000/calendar/feed/abc123token.ics';
+      const writeSpy = spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+
+      component.copySubscriptionUrl();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(writeSpy).toHaveBeenCalledWith('webcal://localhost:3000/calendar/feed/abc123token.ics');
+      expect(component.calendarMessage).toBe('Subscription link copied. Open it from your calendar app.');
+    });
+
+    // Camino P7: 1-2-9-10-11-12-2-18 (Reject)
+    it('Camino P7 (1-2-9-10-11-12-2-18 Reject): debe solicitar copia manual cuando la promesa de navigator.clipboard es rechazada', async () => {
+      component.subscriptionUrl = 'webcal://localhost:3000/calendar/feed/abc123token.ics';
+      spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject(new Error('Permission denied')));
+
+      component.copySubscriptionUrl();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(component.calendarMessage).toBe('Copy the subscription link manually.');
+    });
+
+    // Camino P8: 1-2-13-14-15-17-2-18
+    it('Camino P8 (1-2-13-14-15-17-2-18): debe asignar mensaje de error cuando downloadCalendar falla por error HTTP', () => {
+      calendarServiceMock.download.and.returnValue(
+        throwError(() => new Error('HTTP 500 Network error'))
+      );
+
+      component.downloadCalendar();
+
+      expect(calendarServiceMock.download).toHaveBeenCalled();
+      expect(component.calendarMessage).toBe('Unable to download the calendar file.');
+    });
+
+    // Camino P9: 1-2-13-14-16-17-2-18
+    it('Camino P9 (1-2-13-14-16-17-2-18): debe descargar archivo whats-due-tomorrow.ics mediante enlace temporal al recibir Blob', () => {
+      const mockBlob = new Blob(['BEGIN:VCALENDAR\nEND:VCALENDAR'], { type: 'text/calendar' });
+      calendarServiceMock.download.and.returnValue(of(mockBlob));
+
+      spyOn(URL, 'createObjectURL').and.returnValue('blob:http://localhost/fake-uuid');
+      spyOn(URL, 'revokeObjectURL');
+      const clickSpy = jasmine.createSpy('click');
+      const mockAnchor = {
+        href: '',
+        download: '',
+        click: clickSpy,
+      };
+      spyOn(document, 'createElement').and.callFake((tagName: string) => {
+        if (tagName === 'a') return mockAnchor as any;
+        return document.createElement(tagName);
+      });
+
+      component.downloadCalendar();
+
+      expect(URL.createObjectURL).toHaveBeenCalledWith(mockBlob);
+      expect(mockAnchor.download).toBe('whats-due-tomorrow.ics');
+      expect(mockAnchor.href).toBe('blob:http://localhost/fake-uuid');
+      expect(clickSpy).toHaveBeenCalled();
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/fake-uuid');
+    });
+
+    // Defecto QA DEF-QA-F23-03
+    it('[DEF-QA-F23-03] debe gestionar de forma resiliente la ausencia de soporte de Clipboard API en entornos no seguros', () => {
+      const originalClipboard = navigator.clipboard;
+      try {
+        Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
+        component.subscriptionUrl = 'webcal://localhost:3000/calendar/feed/abc123token.ics';
+
+        expect(() => component.copySubscriptionUrl()).not.toThrow();
+        expect(component.calendarMessage).toBe('Copy the subscription link manually.');
+      } finally {
+        Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, configurable: true });
+      }
+    });
+
+  });
+
 });
