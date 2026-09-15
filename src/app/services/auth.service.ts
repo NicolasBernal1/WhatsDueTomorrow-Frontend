@@ -57,4 +57,8 @@ export class AuthService {
   getProfile(): Observable<BaseResponseDto<UserDto>> {
     return this.http.get<BaseResponseDto<UserDto>>(`${this.apiUrl}/users/profile`);
   }
+
+  updateProfile(data: Partial<UserDto>): Observable<BaseResponseDto<UserDto>> {
+    return this.http.patch<BaseResponseDto<UserDto>>(`${this.apiUrl}/users/profile`, data);
+  }
 }
