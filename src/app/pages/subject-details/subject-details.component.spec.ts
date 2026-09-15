@@ -5,7 +5,7 @@ import { AssignmentService } from '../../services/assignment.service';
 import { NoteService } from '../../services/note.service';
 import { EvaluationService } from '../../services/evaluation.service';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Note } from '../../models/note.model';
 import { Evaluation, GradeSummary } from '../../models/evaluation.model';
@@ -147,7 +147,32 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
     expect(component.gradeSummary?.status).toBe('Aprobando');
   });
 
-  describe('F24 Bitácora de apuntes', () => {
+  describe('F24 Bitácora de apuntes y recursos rápidos por asignatura (Tabla 25)', () => {
+    // Camino P1: 1-2-3-4-6-7-22
+    it('Camino P1 (1-2-3-4-6-7-22): debe asignar noteError y finalizar loadingNotes cuando getNotesBySubject falla', () => {
+      noteServiceMock.getNotesBySubject.and.returnValue(
+        throwError(() => new Error('Error HTTP 500 al cargar notas')),
+      );
+
+      component.loadNotes(10);
+
+      expect(component.noteError).toBe('Error al cargar los apuntes de la asignatura');
+      expect(component.loadingNotes).toBeFalse();
+    });
+
+    // Camino P2: 1-2-3-5-6-7-22
+    it('Camino P2 (1-2-3-5-6-7-22): debe asignar la lista de notas y limpiar loadingNotes en consulta exitosa', () => {
+      noteServiceMock.getNotesBySubject.and.returnValue(
+        of({ status: 200, message: 'ok', data: mockNotes }),
+      );
+
+      component.loadNotes(10);
+
+      expect(component.notes).toEqual(mockNotes);
+      expect(component.loadingNotes).toBeFalse();
+      expect(component.noteError).toBe('');
+    });
+
     it('debe abrir el modal de nota en modo creación', () => {
       component.openNoteModal();
       expect(component.showNoteModal).toBeTrue();
@@ -176,7 +201,34 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
       expect(component.showNoteModal).toBeFalse();
     });
 
-    it('debe solicitar confirmación y eliminar la nota si el usuario confirma', () => {
+    // Camino P9: 1-2-3-5-6-7-10-11-6-7-22
+    it('Camino P9 (1-2-3-5-6-7-10-11-6-7-22): NO debe eliminar la nota si el usuario cancela la confirmación', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+
+      component.deleteNote(mockNotes[0]);
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(noteServiceMock.deleteNote).not.toHaveBeenCalled();
+    });
+
+    // Camino P10: 1-2-3-5-6-7-10-11-12-6-7-22
+    it('Camino P10 (1-2-3-5-6-7-10-11-12-6-7-22): debe capturar el error de eliminación en consola y no recargar la lista', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      noteServiceMock.deleteNote.and.returnValue(
+        throwError(() => new Error('Error al borrar nota')),
+      );
+      spyOn(console, 'error');
+      spyOn(component, 'loadNotes');
+
+      component.deleteNote(mockNotes[0]);
+
+      expect(noteServiceMock.deleteNote).toHaveBeenCalledWith(10, 1);
+      expect(console.error).toHaveBeenCalled();
+      expect(component.loadNotes).not.toHaveBeenCalled();
+    });
+
+    // Camino P11: 1-2-3-5-6-7-10-11-12-2-3-5-6-7-22
+    it('Camino P11 (1-2-3-5-6-7-10-11-12-2-3-5-6-7-22): debe solicitar confirmación y recargar la lista si DELETE responde 200 OK', () => {
       spyOn(window, 'confirm').and.returnValue(true);
       noteServiceMock.deleteNote.and.returnValue(
         of({ status: 200, message: 'deleted', data: null }),
@@ -190,13 +242,20 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
       expect(component.loadNotes).toHaveBeenCalledWith(10);
     });
 
-    it('NO debe eliminar la nota si el usuario cancela la confirmación', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+    // Verificación de Defecto QA DEF-QA-F24-02
+    it('[DEF-QA-F24-02] debe documentar que la interfaz no despliega retroalimentación visual al fallar la eliminación en backend', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      noteServiceMock.deleteNote.and.returnValue(
+        throwError(() => new Error('Error de red en servidor')),
+      );
+      component.noteError = '';
 
       component.deleteNote(mockNotes[0]);
 
-      expect(window.confirm).toHaveBeenCalled();
-      expect(noteServiceMock.deleteNote).not.toHaveBeenCalled();
+      // Verificación del defecto QA DEF-QA-F24-02:
+      // Se documenta que al fallar la eliminación, deleteNote captura el error únicamente en consola
+      // sin asignar noteError, manteniendo noteError como cadena vacía ('').
+      expect(component.noteError).toBe('');
     });
   });
 

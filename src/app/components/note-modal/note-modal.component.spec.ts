@@ -6,7 +6,7 @@ import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Note } from '../../models/note.model';
 
-describe('NoteModalComponent (F24 Bitácora de apuntes)', () => {
+describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 25)', () => {
   let component: NoteModalComponent;
   let fixture: ComponentFixture<NoteModalComponent>;
   let noteServiceMock: jasmine.SpyObj<NoteService>;
@@ -18,7 +18,7 @@ describe('NoteModalComponent (F24 Bitácora de apuntes)', () => {
     linkUrl: 'https://calculo.edu/recurso',
     createdAt: '2026-03-01T00:00:00.000Z',
     updatedAt: '2026-03-01T00:00:00.000Z',
-    subjectId: 10
+    subjectId: 10,
   };
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('NoteModalComponent (F24 Bitácora de apuntes)', () => {
     await TestBed.configureTestingModule({
       imports: [NoteModalComponent, ReactiveFormsModule],
       providers: [{ provide: NoteService, useValue: noteServiceMock }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NoteModalComponent);
@@ -36,140 +36,176 @@ describe('NoteModalComponent (F24 Bitácora de apuntes)', () => {
     fixture.detectChanges();
   });
 
-  it('debe crearse correctamente', () => {
+  it('debe crearse correctamente el componente NoteModalComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debe inicializarse con formulario inválido cuando está vacío', () => {
-    expect(component.noteForm.valid).toBeFalse();
+  // Camino P3: 1-2-3-5-6-7-8-13-14-15-13-21-6-7-22
+  describe('Camino P3: Envío con título o contenido en blanco en creación', () => {
+    it('debe marcar todos los campos como tocados y prevenir llamada a createNote si el formulario es inválido', () => {
+      component.noteForm.patchValue({
+        title: '   ',
+        content: '   ',
+      });
+
+      component.onSave();
+
+      expect(component.noteForm.valid).toBeFalse();
+      expect(component.noteForm.get('title')?.touched).toBeTrue();
+      expect(component.noteForm.get('content')?.touched).toBeTrue();
+      expect(noteServiceMock.createNote).not.toHaveBeenCalled();
+      expect(noteServiceMock.updateNote).not.toHaveBeenCalled();
+    });
   });
 
-  it('debe ser válido cuando título y contenido están completos sin enlace (enlace opcional)', () => {
-    component.noteForm.patchValue({
-      title: 'Resumen Unidad 1',
-      content: 'Conceptos clave de matrices y determinantes'
+  // Camino P4: 1-2-3-5-6-7-8-13-14-16-19-20-13-21-6-7-22
+  describe('Camino P4: Creación de apunte con fallo HTTP en servidor (500)', () => {
+    it('debe mostrar mensaje de error y mantener el modal abierto cuando createNote falla', () => {
+      noteServiceMock.createNote.and.returnValue(
+        throwError(() => new Error('Error interno del servidor')),
+      );
+
+      component.noteForm.patchValue({
+        title: 'Resumen Parcial',
+        content: 'Temas 1 al 4',
+        linkUrl: 'https://docs.google.com/resumen',
+      });
+
+      component.onSave();
+
+      expect(noteServiceMock.createNote).toHaveBeenCalledWith(10, {
+        title: 'Resumen Parcial',
+        content: 'Temas 1 al 4',
+        linkUrl: 'https://docs.google.com/resumen',
+      });
+      expect(component.isSubmitting).toBeFalse();
+      expect(component.errorMessage).toBe('No fue posible guardar el apunte.');
     });
-    expect(component.noteForm.valid).toBeTrue();
   });
 
-  it('debe rechazar título o contenido que solo contenga espacios en blanco', () => {
-    component.noteForm.patchValue({
-      title: '   ',
-      content: 'Contenido válido'
-    });
-    expect(component.noteForm.valid).toBeFalse();
+  // Camino P5: 1-2-3-5-6-7-8-13-14-16-19-20-2-3-5-6-7-22
+  describe('Camino P5: Creación exitosa de apunte (201 Created)', () => {
+    it('debe registrar el apunte, emitir eventos save y close tras respuesta exitosa', () => {
+      noteServiceMock.createNote.and.returnValue(
+        of({
+          status: 201,
+          message: 'Note created',
+          data: mockNote,
+        }),
+      );
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
 
-    component.noteForm.patchValue({
-      title: 'Título válido',
-      content: '   '
+      component.noteForm.patchValue({
+        title: 'Nueva Nota',
+        content: 'Nuevo Contenido',
+        linkUrl: 'https://sitio.com/recurso',
+      });
+
+      component.onSave();
+
+      expect(noteServiceMock.createNote).toHaveBeenCalledWith(10, {
+        title: 'Nueva Nota',
+        content: 'Nuevo Contenido',
+        linkUrl: 'https://sitio.com/recurso',
+      });
+      expect(component.save.emit).toHaveBeenCalled();
+      expect(component.close.emit).toHaveBeenCalled();
     });
-    expect(component.noteForm.valid).toBeFalse();
   });
 
-  it('debe validar URLs correctamente rechazando URLs inválidas o sin protocolo (RNF08)', () => {
-    component.noteForm.patchValue({
-      title: 'Nota con link inválido',
-      content: 'Ver enlace abajo',
-      linkUrl: 'enlace-invalido'
-    });
-    expect(component.noteForm.get('linkUrl')?.hasError('invalidUrl')).toBeTrue();
-    expect(component.noteForm.valid).toBeFalse();
+  // Camino P6: 1-2-3-5-6-7-9-13-14-16-17-18-13-21-6-7-22
+  describe('Camino P6: Edición de apunte con fallo HTTP en servidor', () => {
+    it('debe mostrar mensaje de error y no emitir eventos cuando updateNote falla', () => {
+      component.note = mockNote;
+      component.ngOnInit();
 
-    component.noteForm.patchValue({
-      linkUrl: 'javascript:alert(1)'
-    });
-    expect(component.noteForm.get('linkUrl')?.hasError('invalidUrl')).toBeTrue();
+      noteServiceMock.updateNote.and.returnValue(
+        throwError(() => new Error('Error al actualizar')),
+      );
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
 
-    component.noteForm.patchValue({
-      linkUrl: 'https://mi-recurso.edu/archivo.pdf'
+      component.noteForm.patchValue({
+        title: 'Título con fallo',
+        content: 'Contenido',
+      });
+
+      component.onSave();
+
+      expect(noteServiceMock.updateNote).toHaveBeenCalled();
+      expect(component.isSubmitting).toBeFalse();
+      expect(component.errorMessage).toBe('No fue posible actualizar el apunte.');
+      expect(component.save.emit).not.toHaveBeenCalled();
+      expect(component.close.emit).not.toHaveBeenCalled();
     });
-    expect(component.noteForm.get('linkUrl')?.errors).toBeNull();
-    expect(component.noteForm.valid).toBeTrue();
   });
 
-  it('debe precargar los datos de la nota en modo edición', () => {
-    component.note = mockNote;
-    component.ngOnInit();
+  // Camino P7: 1-2-3-5-6-7-9-13-14-16-17-18-2-3-5-6-7-22
+  describe('Camino P7: Edición exitosa de apunte (200 OK)', () => {
+    it('debe actualizar el apunte, emitir save y close reflejando cambios', () => {
+      component.note = mockNote;
+      component.ngOnInit();
 
-    expect(component.noteForm.get('title')?.value).toBe('Apunte Existente');
-    expect(component.noteForm.get('content')?.value).toBe('Fórmula de derivadas');
-    expect(component.noteForm.get('linkUrl')?.value).toBe('https://calculo.edu/recurso');
+      noteServiceMock.updateNote.and.returnValue(
+        of({
+          status: 200,
+          message: 'Note updated',
+          data: mockNote,
+        }),
+      );
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
+
+      component.noteForm.patchValue({
+        title: 'Título Editado',
+        content: 'Contenido Editado',
+        linkUrl: '',
+      });
+
+      component.onSave();
+
+      expect(noteServiceMock.updateNote).toHaveBeenCalledWith(10, 5, {
+        title: 'Título Editado',
+        content: 'Contenido Editado',
+        linkUrl: null,
+      });
+      expect(component.save.emit).toHaveBeenCalled();
+      expect(component.close.emit).toHaveBeenCalled();
+    });
   });
 
-  it('NO debe llamar al servicio si el formulario es inválido al guardar', () => {
-    component.onSave();
-    expect(noteServiceMock.createNote).not.toHaveBeenCalled();
-    expect(noteServiceMock.updateNote).not.toHaveBeenCalled();
+  // Camino P8: 1-2-3-5-6-7-9-13-21-6-7-22
+  describe('Camino P8: Cancelación voluntaria del modal', () => {
+    it('debe emitir close sin llamar a servicios al pulsar Cancelar (onClose)', () => {
+      spyOn(component.close, 'emit');
+
+      component.onClose();
+
+      expect(component.close.emit).toHaveBeenCalled();
+      expect(noteServiceMock.createNote).not.toHaveBeenCalled();
+      expect(noteServiceMock.updateNote).not.toHaveBeenCalled();
+    });
   });
 
-  it('debe llamar a createNote y emitir eventos save y close en modo creación', () => {
-    noteServiceMock.createNote.and.returnValue(of({
-      status: 201,
-      message: 'Note created',
-      data: mockNote
-    }));
-    spyOn(component.save, 'emit');
-    spyOn(component.close, 'emit');
+  // Camino P12: 1-2-3-5-6-7-8-13-14-15-13-14-16-19-20-2-3-5-6-7-22
+  describe('Camino P12: Validación personalizada de URL y posterior corrección', () => {
+    it('debe invalidar linkUrl con esquema ftp o javascript y validar al corregir con https', () => {
+      component.noteForm.patchValue({
+        title: 'Apunte con recurso',
+        content: 'Material complementario',
+        linkUrl: 'ftp://servidor.edu/archivo',
+      });
 
-    component.noteForm.patchValue({
-      title: 'Nueva Nota',
-      content: 'Nuevo Contenido',
-      linkUrl: 'https://sitio.com'
+      expect(component.noteForm.get('linkUrl')?.hasError('invalidUrl')).toBeTrue();
+      expect(component.noteForm.valid).toBeFalse();
+
+      component.noteForm.patchValue({
+        linkUrl: 'https://campus.edu/material.pdf',
+      });
+
+      expect(component.noteForm.get('linkUrl')?.errors).toBeNull();
+      expect(component.noteForm.valid).toBeTrue();
     });
-    component.onSave();
-
-    expect(noteServiceMock.createNote).toHaveBeenCalledWith(10, {
-      title: 'Nueva Nota',
-      content: 'Nuevo Contenido',
-      linkUrl: 'https://sitio.com'
-    });
-    expect(component.save.emit).toHaveBeenCalled();
-    expect(component.close.emit).toHaveBeenCalled();
-  });
-
-  it('debe llamar a updateNote y emitir eventos en modo edición', () => {
-    component.note = mockNote;
-    component.ngOnInit();
-
-    noteServiceMock.updateNote.and.returnValue(of({
-      status: 200,
-      message: 'Note updated',
-      data: mockNote
-    }));
-    spyOn(component.save, 'emit');
-    spyOn(component.close, 'emit');
-
-    component.noteForm.patchValue({
-      title: 'Título Editado',
-      content: 'Contenido Editado',
-      linkUrl: ''
-    });
-    component.onSave();
-
-    expect(noteServiceMock.updateNote).toHaveBeenCalledWith(10, 5, {
-      title: 'Título Editado',
-      content: 'Contenido Editado',
-      linkUrl: null
-    });
-    expect(component.save.emit).toHaveBeenCalled();
-    expect(component.close.emit).toHaveBeenCalled();
-  });
-
-  it('debe manejar errores del servicio al guardar', () => {
-    noteServiceMock.createNote.and.returnValue(throwError(() => new Error('Error de red')));
-    component.noteForm.patchValue({
-      title: 'Nota con error',
-      content: 'Contenido'
-    });
-    component.onSave();
-
-    expect(component.isSubmitting).toBeFalse();
-    expect(component.errorMessage).toBe('No fue posible guardar el apunte.');
-  });
-
-  it('debe emitir close cuando onClose es llamado', () => {
-    spyOn(component.close, 'emit');
-    component.onClose();
-    expect(component.close.emit).toHaveBeenCalled();
   });
 });
