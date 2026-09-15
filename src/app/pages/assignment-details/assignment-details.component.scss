@@ -1,0 +1,15 @@
+.assignment-details { min-height: calc(100vh - 64px); padding: 32px; background: #f4f7fb; box-sizing: border-box; }
+.back-button { color: #005a9c; margin: 0 auto 12px; display: flex; max-width: 850px; }
+.assignment-header, .subtasks-section { max-width: 850px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 24px; }
+.assignment-header { border-left: 6px solid #1e88e5; h1 { margin: 4px 0 10px; color: #263238; } p { color: #475569; } }
+.subject-name { margin: 0; color: #005a9c !important; font-size: .9rem; font-weight: 600; }
+.progress-label { display: flex; justify-content: space-between; margin-top: 22px; color: #12395b; strong { color: #006d3c; } }
+.completion-tip { margin: 14px 0 0; color: #137333 !important; font-weight: 500; }
+.subtasks-section { margin-top: 22px; h2 { margin-top: 0; color: #263238; } }
+.new-subtask { display: flex; gap: 12px; input { flex: 1; border: 1px solid #94a3b8; border-radius: 6px; padding: 10px 12px; font: inherit; } }
+.subtasks-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.subtask-item { padding: 8px 10px; display: flex; align-items: center; gap: 8px; .subtask-title { flex: 1; color: #263238; } &.completed .subtask-title { color: #64748b; text-decoration: line-through; } }
+.subtask-actions { display: flex; align-items: center; }
+.edit-input { flex: 1; border: 1px solid #0078d4; border-radius: 4px; padding: 7px; font: inherit; }
+.empty { color: #64748b; margin: 20px 0 4px; }.error { color: #b3261e; font-weight: 500; }.subtasks-section mat-progress-spinner { display: block; margin: 24px auto; }
+@media (max-width: 640px) { .assignment-details { padding: 20px 12px; } .subtask-actions { gap: 0; } .new-subtask { flex-direction: column; } }

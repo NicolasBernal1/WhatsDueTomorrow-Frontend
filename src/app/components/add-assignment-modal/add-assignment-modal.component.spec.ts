@@ -85,7 +85,11 @@ describe('AddAssignmentModalComponent', () => {
     component.onSave();
 
     expect(assignmentServiceMock.addAssignment).toHaveBeenCalledWith(
-      component.addAssignmentForm.value,
+      jasmine.objectContaining({
+        title: 'Tarea 1',
+        description: 'desc',
+        reminderMinutes: null
+      }),
       10
     );
     expect(component.save.emit).toHaveBeenCalled();

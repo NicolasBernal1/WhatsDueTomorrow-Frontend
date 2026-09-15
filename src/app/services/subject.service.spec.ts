@@ -27,7 +27,7 @@ describe('SubjectService', () => {
 
   describe('getSubjects', () => {
     it('should GET the list of subjects', () => {
-      const mockResponse = { status: 200, data: [{ id: 1, name: 'Math', professor: 'Dr. Smith', color: '#ff0000' }] };
+      const mockResponse = { status: 200, data: [{ id: 1, name: 'Math', professor: 'Dr. Smith', color: '#ff0000', credits: 3 }] };
 
       service.getSubjects().subscribe(res => {
         expect(res.data?.length).toBe(1);
@@ -44,7 +44,7 @@ describe('SubjectService', () => {
 
   describe('getSubjectById', () => {
     it('should GET a specific subject by id', () => {
-      const mockResponse = { status: 200, data: { id: 5, name: 'Physics', professor: 'Dr. Jones', color: '#0000ff' } };
+      const mockResponse = { status: 200, data: { id: 5, name: 'Physics', professor: 'Dr. Jones', color: '#0000ff', credits: 4 } };
 
       service.getSubjectById(5).subscribe(res => {
         expect(res.data?.id).toBe(5);
@@ -61,7 +61,7 @@ describe('SubjectService', () => {
 
   describe('addSubject', () => {
     it('should POST the new subject data', () => {
-      const dto = { name: 'Chemistry', professor: 'Dr. Brown', color: '#00ff00' };
+      const dto = { name: 'Chemistry', professor: 'Dr. Brown', color: '#00ff00', credits: 3 };
       const mockResponse = { status: 201 };
 
       service.addSubject(dto).subscribe(res => {
@@ -120,6 +120,36 @@ describe('SubjectService', () => {
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/classes/7`);
       expect(req.request.method).toBe('DELETE');
+      req.flush(mockResponse);
+    });
+  });
+
+  // ─── getAcademicLoadSummary (F26-F29) ──────────────────────────────────────────
+
+  describe('getAcademicLoadSummary', () => {
+    it('should GET the academic load summary', () => {
+      const mockResponse = {
+        status: 200,
+        message: 'Resumen de carga académica obtenido con éxito',
+        data: {
+          totalCredits: 15,
+          status: 'balanceada' as const,
+          statusLabel: 'Carga balanceada',
+          weeklyPresentialHours: 8,
+          weeklyAutonomousHours: 16,
+          subjectsCount: 5,
+          classesCount: 4,
+        },
+      };
+
+      service.getAcademicLoadSummary().subscribe(res => {
+        expect(res.data?.totalCredits).toBe(15);
+        expect(res.data?.status).toBe('balanceada');
+        expect(res.data?.weeklyAutonomousHours).toBe(16);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/subjects/academic-load`);
+      expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
   });

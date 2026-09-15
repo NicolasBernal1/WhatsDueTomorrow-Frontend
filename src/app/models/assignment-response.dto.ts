@@ -4,4 +4,5 @@ export interface AssignmentResponseDto {
   description?: string;
   dueDate: string;
   subjectId: number;
+  reminderMinutes?: number | null;
 }

@@ -1,6 +1,6 @@
-<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-backdrop" (click)="onClose()" role="button" tabindex="0" (keydown.enter)="onClose()"></div>
 
-<div class="modal" (click)="$event.stopImmediatePropagation()">
+<div class="modal" (click)="$event.stopImmediatePropagation()" role="button" tabindex="0" (keydown.enter)="$event.stopImmediatePropagation()">
  <h2>{{ subject ? 'Edit Subject' : 'Add New Subject' }}</h2>
 
   <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()" class="form-content">
@@ -26,6 +26,17 @@
       }
     </mat-form-field>
 
+    <mat-form-field appearance="outline">
+      <mat-label>Créditos Académicos (1 - 12)</mat-label>
+      <input matInput type="number" formControlName="credits" min="1" max="12" step="1" placeholder="3" />
+      @if (credits?.touched && credits?.hasError('required')) {
+        <mat-error>Los créditos son obligatorios</mat-error>
+      }
+      @if (credits?.touched && (credits?.hasError('min') || credits?.hasError('max') || credits?.hasError('pattern'))) {
+        <mat-error>Los créditos deben ser un entero entre 1 y 12</mat-error>
+      }
+    </mat-form-field>
+
     <div class="color-picker">
       <p>Select a color:</p>
       <div class="color-options">
@@ -34,7 +45,10 @@
             class="color-selector"
             [style.background]="color"
             [class.selected]="addSubjectForm.value.color === color"
-            (click)="selectColor(color)">
+            (click)="selectColor(color)"
+            role="button" 
+            tabindex="0" 
+            (keydown.enter)="selectColor(color)">
           </div>
         }
       </div>

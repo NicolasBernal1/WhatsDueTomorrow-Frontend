@@ -7,6 +7,8 @@ import { guestGuard } from './guards/guest.guard';
 import { SubjectsComponent } from './pages/subjects/subjects.component';
 import { SubjectDetailsComponent } from './pages/subject-details/subject-details.component';
 import { AssignmentsComponent } from './pages/assignments/assignments.component';
+import { UrgentRadarComponent } from './pages/urgent-radar/urgent-radar.component';
+import { AssignmentDetailsComponent } from './pages/assignment-details/assignment-details.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
@@ -14,6 +16,8 @@ export const routes: Routes = [
   { path: 'schedule', component: ScheduleComponent, canActivate: [authGuard] },
   { path: 'subjects', component: SubjectsComponent, canActivate: [authGuard] },
   { path: 'assignments', component: AssignmentsComponent, canActivate: [authGuard] },
+  { path: 'assignments/:id', component: AssignmentDetailsComponent, canActivate: [authGuard] },
+  { path: 'urgent-radar', component: UrgentRadarComponent, canActivate: [authGuard] },
   { path: 'subjects/:id', component: SubjectDetailsComponent, canActivate: [authGuard] },
   { path: '', redirectTo: 'schedule', pathMatch: 'full' },
   { path: '**', redirectTo: 'schedule' }
