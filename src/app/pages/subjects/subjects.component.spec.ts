@@ -268,9 +268,9 @@ describe('SubjectsComponent', () => {
 
   });
 
-  // ─── Gestión de créditos y semáforo de carga semanal (HU26 / RF26-RF29 / RNF10-RNF11) ───
+  // ─── Gestión de créditos y semáforo de carga semanal (F26 — Caminos Básicos Tabla 48) ───
 
-  describe('Semáforo de carga académica y horas de estudio (HU26 / RF26-RF29)', () => {
+  describe('F26 — Semáforo de carga académica y gestión de créditos (Tabla 48)', () => {
 
     beforeEach(() => {
       subjectServiceMock.getSubjects.and.returnValue(
@@ -278,17 +278,20 @@ describe('SubjectsComponent', () => {
       );
     });
 
-    it('17. debe cargar y almacenar el resumen de carga académica en ngOnInit', () => {
-      component.ngOnInit();
-      expect(subjectServiceMock.getAcademicLoadSummary).toHaveBeenCalled();
-      expect(component.academicLoad).toBeTruthy();
-      expect(component.academicLoad?.totalCredits).toBe(15);
-      expect(component.academicLoad?.status).toBe('balanceada');
-      expect(component.academicLoad?.weeklyAutonomousHours).toBe(16);
+    it('[P1: 1 → 2 → 3 → 4 → 22] debe manejar error HTTP en getAcademicLoadSummary asignando academicLoad = null y logging en consola', () => {
+      spyOn(console, 'error');
+      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+        throwError(() => new Error('Error al conectar')),
+      );
+
+      component.loadAcademicLoad();
+
+      expect(console.error).toHaveBeenCalled();
+      expect(component.academicLoad).toBeNull();
       expect(component.loadingLoad).toBeFalse();
     });
 
-    it('18. debe clasificar como carga baja cuando los créditos son menores a 12', () => {
+    it('[P2: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 22] debe clasificar como carga baja cuando totalCredits < 12', () => {
       subjectServiceMock.getAcademicLoadSummary.and.returnValue(
         of({
           status: 200,
@@ -314,7 +317,33 @@ describe('SubjectsComponent', () => {
       expect(component.getLoadStatusDescription('baja')).toContain('< 12 créditos');
     });
 
-    it('19. debe clasificar como sobrecarga cuando los créditos son mayores a 18', () => {
+    it('[P3: 1 → 2 → 3 → 5 → 6 → 8 → 10 → 9 → 22] debe clasificar como carga balanceada cuando 12 <= totalCredits <= 18', () => {
+      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+        of({
+          status: 200,
+          message: 'ok',
+          data: {
+            totalCredits: 15,
+            status: 'balanceada' as const,
+            statusLabel: 'Carga balanceada',
+            weeklyPresentialHours: 8,
+            weeklyAutonomousHours: 16,
+            subjectsCount: 5,
+            classesCount: 4,
+          },
+        }),
+      );
+
+      component.loadAcademicLoad();
+
+      expect(component.academicLoad?.status).toBe('balanceada');
+      expect(component.academicLoad?.statusLabel).toBe('Carga balanceada');
+      expect(component.getLoadStatusIcon('balanceada')).toBe('check_circle');
+      expect(component.getLoadStatusText('balanceada')).toBe('Carga balanceada');
+      expect(component.getLoadStatusDescription('balanceada')).toContain('12 a 18 créditos');
+    });
+
+    it('[P4: 1 → 2 → 3 → 5 → 6 → 8 → 11 → 9 → 22] debe clasificar como sobrecarga cuando totalCredits > 18', () => {
       subjectServiceMock.getAcademicLoadSummary.and.returnValue(
         of({
           status: 200,
@@ -340,7 +369,79 @@ describe('SubjectsComponent', () => {
       expect(component.getLoadStatusDescription('sobrecarga')).toContain('> 18 créditos');
     });
 
-    it('20. debe calcular las horas autónomas como el doble de las horas presenciales (factor 2:1)', () => {
+    it('[P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 21 → 22] usuario abre modal y cancela/cierra sin alterar catálogo', () => {
+      // Modal crear
+      component.addSubjectModal();
+      expect(component.showAddModal).toBeTrue();
+      component.closeAddSubjectModal();
+      expect(component.showAddModal).toBeFalse();
+
+      // Modal editar
+      component.selectedSubject = subjectMock;
+      component.editSubject();
+      expect(component.showEditModal).toBeTrue();
+      component.closeEditModal();
+      expect(component.showEditModal).toBeFalse();
+      expect(component.selectedSubject).toBeNull();
+    });
+
+    it('[P7: 12 → 14 → 16 → 18 → 20 → 22] debe actualizar reactivamente la carga académica al editar asignatura (onSubjectSaved)', () => {
+      spyOn(component, 'loadAcademicLoad');
+      component.onSubjectSaved();
+      expect(component.loadAcademicLoad).toHaveBeenCalled();
+      expect(component.showEditModal).toBeFalse();
+    });
+
+    it('[P9: 12 → 14 → 17 → 18 → 20 → 22] debe actualizar reactivamente la carga académica al crear asignatura (saveSubject)', () => {
+      spyOn(component, 'loadAcademicLoad');
+      component.saveSubject();
+      expect(component.loadAcademicLoad).toHaveBeenCalled();
+      expect(component.showAddModal).toBeFalse();
+    });
+
+    it('[P10: 15 → 23 → 22] usuario cancela en confirm() dialog de eliminación sin alterar estado', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.selectedSubject = subjectMock;
+
+      component.deleteSubject();
+
+      expect(window.confirm).toHaveBeenCalledWith('Delete subject?');
+      expect(subjectServiceMock.deleteSubject).not.toHaveBeenCalled();
+      expect(component.selectedSubject).toBeNull();
+    });
+
+    it('[P11: 15 → 24 → 25 → 26 → 22] confirmación aceptada pero error HTTP en deleteSubject captura en consola', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(console, 'error');
+      subjectServiceMock.deleteSubject.and.returnValue(
+        throwError(() => new Error('Error al eliminar materia')),
+      );
+      component.selectedSubject = subjectMock;
+      component.contextMenuVisible = true;
+
+      component.deleteSubject();
+
+      expect(console.error).toHaveBeenCalled();
+      expect(component.contextMenuVisible).toBeTrue();
+    });
+
+    it('[P12: 15 → 24 → 25 → 27 → 22] confirmación aceptada y éxito HTTP en deleteSubject actualiza catálogo y semáforo', () => {
+      spyOn(component, 'loadAcademicLoad');
+      spyOn(window, 'confirm').and.returnValue(true);
+      subjectServiceMock.deleteSubject.and.returnValue(
+        of({ status: 200, message: 'Subject deleted successfully', data: null }),
+      );
+      component.selectedSubject = subjectMock;
+
+      component.deleteSubject();
+
+      expect(subjectServiceMock.deleteSubject).toHaveBeenCalledWith(subjectMock.id);
+      expect(component.loadAcademicLoad).toHaveBeenCalled();
+      expect(component.contextMenuVisible).toBeFalse();
+      expect(component.selectedSubject).toBeNull();
+    });
+
+    it('debe calcular las horas autónomas como el doble de las horas presenciales (factor 2:1)', () => {
       subjectServiceMock.getAcademicLoadSummary.and.returnValue(
         of({
           status: 200,
@@ -364,52 +465,65 @@ describe('SubjectsComponent', () => {
       );
     });
 
-    it('21. debe actualizar reactivamente la carga académica al crear asignatura (saveSubject)', () => {
-      spyOn(component, 'loadAcademicLoad');
-      component.saveSubject();
-      expect(component.loadAcademicLoad).toHaveBeenCalled();
-    });
-
-    it('22. debe actualizar reactivamente la carga académica al editar asignatura (onSubjectSaved)', () => {
-      spyOn(component, 'loadAcademicLoad');
-      component.onSubjectSaved();
-      expect(component.loadAcademicLoad).toHaveBeenCalled();
-    });
-
-    it('23. debe actualizar reactivamente la carga académica al eliminar asignatura (deleteSubject)', () => {
-      spyOn(component, 'loadAcademicLoad');
-      spyOn(window, 'confirm').and.returnValue(true);
-      subjectServiceMock.deleteSubject.and.returnValue(
-        of({ status: 200, message: 'ok', data: null }),
-      );
-      component.selectedSubject = subjectMock;
-
-      component.deleteSubject();
-
-      expect(component.loadAcademicLoad).toHaveBeenCalled();
-    });
-
-    it('24. debe manejar el error al cargar el resumen sin romper el componente', () => {
-      spyOn(console, 'error');
-      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
-        throwError(() => new Error('Error al conectar')),
-      );
-
-      component.loadAcademicLoad();
-
-      expect(console.error).toHaveBeenCalled();
-      expect(component.loadingLoad).toBeFalse();
-    });
-
-    it('25. debe proveer textos e iconos accesibles (RNF10) para cada estado', () => {
-      expect(component.getLoadStatusIcon('balanceada')).toBe('check_circle');
-      expect(component.getLoadStatusText('balanceada')).toBe('Carga balanceada');
-      expect(component.getLoadStatusDescription('balanceada')).toContain('12 a 18 créditos');
-
+    it('debe proveer textos e iconos accesibles por defecto ante estados indefinidos', () => {
       expect(component.getLoadStatusIcon(undefined)).toBe('help_outline');
       expect(component.getLoadStatusText(undefined)).toBe('Carga no calculada');
+      expect(component.getLoadStatusDescription(undefined)).toBe('');
     });
 
+    describe('Auditoría QA y Caracterización de Defectos (Metricas_Software_F21_F26.docx)', () => {
+      it('[DEF-QA-F26-02] Comportamiento caracterizado: Frontend refleja asignaturas duplicadas inflando el semáforo a sobrecarga', () => {
+        // Asignaturas duplicadas recibidas en el resumen de carga
+        subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+          of({
+            status: 200,
+            message: 'ok',
+            data: {
+              totalCredits: 20, // 2 materias "Cálculo" duplicadas con 10 créditos c/u
+              status: 'sobrecarga' as const,
+              statusLabel: 'Sobrecarga',
+              weeklyPresentialHours: 10,
+              weeklyAutonomousHours: 20,
+              subjectsCount: 2,
+              classesCount: 4,
+            },
+          }),
+        );
+
+        component.loadAcademicLoad();
+
+        // Verificación de defecto QA DEF-QA-F26-02:
+        // Se documenta que el semáforo de carga entra en estado de sobrecarga debido a registros duplicados
+        expect(component.academicLoad?.totalCredits).toBe(20);
+        expect(component.academicLoad?.status).toBe('sobrecarga');
+        expect(component.getLoadStatusIcon('sobrecarga')).toBe('warning');
+      });
+
+      it('[DEF-QA-F26-03] Comportamiento caracterizado: Frontend despliega horas calculadas con suma lineal en clases solapadas', () => {
+        subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+          of({
+            status: 200,
+            message: 'ok',
+            data: {
+              totalCredits: 8,
+              status: 'baja' as const,
+              statusLabel: 'Carga baja',
+              weeklyPresentialHours: 4, // 2 clases simultáneas sumadas linealmente (2h + 2h = 4h)
+              weeklyAutonomousHours: 8, // 4h * 2 = 8h
+              subjectsCount: 2,
+              classesCount: 2,
+            },
+          }),
+        );
+
+        component.loadAcademicLoad();
+
+        // Verificación de defecto QA DEF-QA-F26-03:
+        // Se documenta que el frontend refleja la suma lineal sin advertencia de solapamiento horario
+        expect(component.academicLoad?.weeklyPresentialHours).toBe(4);
+        expect(component.academicLoad?.weeklyAutonomousHours).toBe(8);
+      });
+    });
   });
 
 });
