@@ -51,6 +51,7 @@ describe('AddSubjectModalComponent', () => {
         name: 'validación',
         professor: 'Gabriel',
         color: '#0078d4',
+        credits: 3,
       });
       subjectServiceMock.addSubject.and.returnValue(
         of({ status: 201, message: 'Subject created successfully', data: null }),
@@ -61,7 +62,12 @@ describe('AddSubjectModalComponent', () => {
       component.onSave();
 
       expect(subjectServiceMock.addSubject).toHaveBeenCalledWith(
-        component.addSubjectForm.value,
+        jasmine.objectContaining({
+          name: 'validación',
+          professor: 'Gabriel',
+          color: '#0078d4',
+          credits: 3,
+        }),
       );
       expect(component.save.emit).toHaveBeenCalled();
       expect(component.close.emit).toHaveBeenCalled();
@@ -76,6 +82,7 @@ describe('AddSubjectModalComponent', () => {
         name: 'validación',
         professor: 'Gabriel',
         color: '#0078d4',
+        credits: 3,
       });
       subjectServiceMock.addSubject.and.returnValue(
         throwError(() => new Error('server error')),
@@ -85,6 +92,43 @@ describe('AddSubjectModalComponent', () => {
       component.onSave();
 
       expect(console.error).toHaveBeenCalled();
+    });
+
+    // Validaciones de créditos (RF26)
+    it('3.1 debe tener 3 créditos por defecto al inicializar', () => {
+      component.ngOnInit();
+      expect(component.addSubjectForm.get('credits')?.value).toBe(3);
+      expect(component.addSubjectForm.get('credits')?.valid).toBeTrue();
+    });
+
+    it('3.2 debe invalidar créditos menores a 1', () => {
+      component.ngOnInit();
+      component.addSubjectForm.patchValue({ credits: 0 });
+      expect(component.addSubjectForm.get('credits')?.invalid).toBeTrue();
+      expect(component.addSubjectForm.get('credits')?.hasError('min')).toBeTrue();
+    });
+
+    it('3.3 debe invalidar créditos mayores a 12', () => {
+      component.ngOnInit();
+      component.addSubjectForm.patchValue({ credits: 13 });
+      expect(component.addSubjectForm.get('credits')?.invalid).toBeTrue();
+      expect(component.addSubjectForm.get('credits')?.hasError('max')).toBeTrue();
+    });
+
+    it('3.4 debe invalidar créditos decimales', () => {
+      component.ngOnInit();
+      component.addSubjectForm.patchValue({ credits: '3.5' });
+      expect(component.addSubjectForm.get('credits')?.invalid).toBeTrue();
+      expect(component.addSubjectForm.get('credits')?.hasError('pattern')).toBeTrue();
+    });
+
+    it('3.5 debe aceptar límites exactos de créditos (1 y 12)', () => {
+      component.ngOnInit();
+      component.addSubjectForm.patchValue({ credits: 1 });
+      expect(component.addSubjectForm.get('credits')?.valid).toBeTrue();
+
+      component.addSubjectForm.patchValue({ credits: 12 });
+      expect(component.addSubjectForm.get('credits')?.valid).toBeTrue();
     });
 
   });
@@ -99,6 +143,7 @@ describe('AddSubjectModalComponent', () => {
       name: 'validación',
       professor: 'Gabriel',
       color: '#0078d4',
+      credits: 4,
     };
 
     beforeEach(() => {
@@ -123,6 +168,8 @@ describe('AddSubjectModalComponent', () => {
     it('5. debe actualizar la asignatura correctamente cuando el formulario es válido', () => {
 
       component.ngOnInit();
+      expect(component.addSubjectForm.get('credits')?.value).toBe(4);
+
       subjectServiceMock.editSubject.and.returnValue(
         of({ status: 200, message: 'Subject updated successfully', data: null }),
       );
@@ -133,7 +180,12 @@ describe('AddSubjectModalComponent', () => {
 
       expect(subjectServiceMock.editSubject).toHaveBeenCalledWith(
         subjectMock.id,
-        component.addSubjectForm.value,
+        jasmine.objectContaining({
+          name: 'validación',
+          professor: 'Gabriel',
+          color: '#0078d4',
+          credits: 4,
+        }),
       );
       expect(component.save.emit).toHaveBeenCalled();
       expect(component.close.emit).toHaveBeenCalled();

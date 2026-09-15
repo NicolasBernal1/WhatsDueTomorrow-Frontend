@@ -3,4 +3,5 @@ export interface SubjectResponseDto {
   name: string;
   professor: string;
   color: string;
+  credits: number;
 }

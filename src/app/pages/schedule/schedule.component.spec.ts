@@ -368,7 +368,8 @@ describe('ScheduleComponent', () => {
         id: overrides.id + 100,
         name: `subject-${overrides.id}`,
         professor: 'gabriel',
-        color: '#0078d4'
+        color: '#0078d4',
+        credits: 3
       }
     });
 

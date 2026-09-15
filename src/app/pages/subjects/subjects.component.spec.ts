@@ -20,8 +20,24 @@ describe('SubjectsComponent', () => {
   };
 
   beforeEach(async () => {
-    subjectServiceMock = jasmine.createSpyObj('SubjectService', ['getSubjects', 'deleteSubject']);
+    subjectServiceMock = jasmine.createSpyObj('SubjectService', ['getSubjects', 'deleteSubject', 'getAcademicLoadSummary']);
     routerMock = jasmine.createSpyObj('Router', ['navigate']);
+
+    subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+      of({
+        status: 200,
+        message: 'ok',
+        data: {
+          totalCredits: 15,
+          status: 'balanceada' as const,
+          statusLabel: 'Carga balanceada',
+          weeklyPresentialHours: 8,
+          weeklyAutonomousHours: 16,
+          subjectsCount: 5,
+          classesCount: 4,
+        },
+      }),
+    );
 
     await TestBed.configureTestingModule({
       imports: [SubjectsComponent],
@@ -248,6 +264,150 @@ describe('SubjectsComponent', () => {
       component.onSubjectSaved();
       expect(component.showEditModal).toBeFalse();
       expect(component.loadSubjects).toHaveBeenCalled();
+    });
+
+  });
+
+  // ─── Gestión de créditos y semáforo de carga semanal (HU26 / RF26-RF29 / RNF10-RNF11) ───
+
+  describe('Semáforo de carga académica y horas de estudio (HU26 / RF26-RF29)', () => {
+
+    beforeEach(() => {
+      subjectServiceMock.getSubjects.and.returnValue(
+        of({ status: 200, message: 'ok', data: [] }),
+      );
+    });
+
+    it('17. debe cargar y almacenar el resumen de carga académica en ngOnInit', () => {
+      component.ngOnInit();
+      expect(subjectServiceMock.getAcademicLoadSummary).toHaveBeenCalled();
+      expect(component.academicLoad).toBeTruthy();
+      expect(component.academicLoad?.totalCredits).toBe(15);
+      expect(component.academicLoad?.status).toBe('balanceada');
+      expect(component.academicLoad?.weeklyAutonomousHours).toBe(16);
+      expect(component.loadingLoad).toBeFalse();
+    });
+
+    it('18. debe clasificar como carga baja cuando los créditos son menores a 12', () => {
+      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+        of({
+          status: 200,
+          message: 'ok',
+          data: {
+            totalCredits: 9,
+            status: 'baja' as const,
+            statusLabel: 'Carga baja',
+            weeklyPresentialHours: 6,
+            weeklyAutonomousHours: 12,
+            subjectsCount: 3,
+            classesCount: 3,
+          },
+        }),
+      );
+
+      component.loadAcademicLoad();
+
+      expect(component.academicLoad?.status).toBe('baja');
+      expect(component.academicLoad?.statusLabel).toBe('Carga baja');
+      expect(component.getLoadStatusIcon('baja')).toBe('trending_down');
+      expect(component.getLoadStatusText('baja')).toBe('Carga baja');
+      expect(component.getLoadStatusDescription('baja')).toContain('< 12 créditos');
+    });
+
+    it('19. debe clasificar como sobrecarga cuando los créditos son mayores a 18', () => {
+      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+        of({
+          status: 200,
+          message: 'ok',
+          data: {
+            totalCredits: 21,
+            status: 'sobrecarga' as const,
+            statusLabel: 'Sobrecarga',
+            weeklyPresentialHours: 14,
+            weeklyAutonomousHours: 28,
+            subjectsCount: 7,
+            classesCount: 7,
+          },
+        }),
+      );
+
+      component.loadAcademicLoad();
+
+      expect(component.academicLoad?.status).toBe('sobrecarga');
+      expect(component.academicLoad?.statusLabel).toBe('Sobrecarga');
+      expect(component.getLoadStatusIcon('sobrecarga')).toBe('warning');
+      expect(component.getLoadStatusText('sobrecarga')).toBe('Sobrecarga');
+      expect(component.getLoadStatusDescription('sobrecarga')).toContain('> 18 créditos');
+    });
+
+    it('20. debe calcular las horas autónomas como el doble de las horas presenciales (factor 2:1)', () => {
+      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+        of({
+          status: 200,
+          message: 'ok',
+          data: {
+            totalCredits: 12,
+            status: 'balanceada' as const,
+            statusLabel: 'Carga balanceada',
+            weeklyPresentialHours: 8,
+            weeklyAutonomousHours: 16,
+            subjectsCount: 4,
+            classesCount: 4,
+          },
+        }),
+      );
+
+      component.loadAcademicLoad();
+
+      expect(component.academicLoad?.weeklyAutonomousHours).toBe(
+        component.academicLoad!.weeklyPresentialHours * 2,
+      );
+    });
+
+    it('21. debe actualizar reactivamente la carga académica al crear asignatura (saveSubject)', () => {
+      spyOn(component, 'loadAcademicLoad');
+      component.saveSubject();
+      expect(component.loadAcademicLoad).toHaveBeenCalled();
+    });
+
+    it('22. debe actualizar reactivamente la carga académica al editar asignatura (onSubjectSaved)', () => {
+      spyOn(component, 'loadAcademicLoad');
+      component.onSubjectSaved();
+      expect(component.loadAcademicLoad).toHaveBeenCalled();
+    });
+
+    it('23. debe actualizar reactivamente la carga académica al eliminar asignatura (deleteSubject)', () => {
+      spyOn(component, 'loadAcademicLoad');
+      spyOn(window, 'confirm').and.returnValue(true);
+      subjectServiceMock.deleteSubject.and.returnValue(
+        of({ status: 200, message: 'ok', data: null }),
+      );
+      component.selectedSubject = subjectMock;
+
+      component.deleteSubject();
+
+      expect(component.loadAcademicLoad).toHaveBeenCalled();
+    });
+
+    it('24. debe manejar el error al cargar el resumen sin romper el componente', () => {
+      spyOn(console, 'error');
+      subjectServiceMock.getAcademicLoadSummary.and.returnValue(
+        throwError(() => new Error('Error al conectar')),
+      );
+
+      component.loadAcademicLoad();
+
+      expect(console.error).toHaveBeenCalled();
+      expect(component.loadingLoad).toBeFalse();
+    });
+
+    it('25. debe proveer textos e iconos accesibles (RNF10) para cada estado', () => {
+      expect(component.getLoadStatusIcon('balanceada')).toBe('check_circle');
+      expect(component.getLoadStatusText('balanceada')).toBe('Carga balanceada');
+      expect(component.getLoadStatusDescription('balanceada')).toContain('12 a 18 créditos');
+
+      expect(component.getLoadStatusIcon(undefined)).toBe('help_outline');
+      expect(component.getLoadStatusText(undefined)).toBe('Carga no calculada');
     });
 
   });

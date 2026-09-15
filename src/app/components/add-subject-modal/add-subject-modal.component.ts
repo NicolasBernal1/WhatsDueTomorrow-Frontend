@@ -28,7 +28,8 @@ export class AddSubjectModalComponent implements OnInit{
     this.addSubjectForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/)]],
       professor: ['', [Validators.required, Validators.pattern(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/)]],
-      color: [this.colors[0]]
+      color: [this.colors[0]],
+      credits: [3, [Validators.required, Validators.min(1), Validators.max(12), Validators.pattern(/^[0-9]+$/)]]
     })
   }
 
@@ -37,7 +38,8 @@ export class AddSubjectModalComponent implements OnInit{
       this.addSubjectForm.patchValue({
         name: this.subject.name,
         professor: this.subject.professor,
-        color: this.subject.color
+        color: this.subject.color,
+        credits: this.subject.credits ?? 3
       });
     }
   }
@@ -48,8 +50,16 @@ export class AddSubjectModalComponent implements OnInit{
       return;
     }
 
+    const formValue = this.addSubjectForm.value;
+    const credits = parseInt(formValue.credits, 10);
+
     if (this.subject) {
-      const updateDto = this.addSubjectForm.value as updateSubjectDto;
+      const updateDto: updateSubjectDto = {
+        name: formValue.name,
+        professor: formValue.professor,
+        color: formValue.color,
+        credits: isNaN(credits) ? 3 : credits
+      };
 
       this.subjectService.editSubject(this.subject.id, updateDto).subscribe({
         next: () => {
@@ -62,7 +72,14 @@ export class AddSubjectModalComponent implements OnInit{
       return;
     }
 
-    this.subjectService.addSubject(this.addSubjectForm.value as AddSubjectDto).subscribe({
+    const addDto: AddSubjectDto = {
+      name: formValue.name,
+      professor: formValue.professor,
+      color: formValue.color,
+      credits: isNaN(credits) ? 3 : credits
+    };
+
+    this.subjectService.addSubject(addDto).subscribe({
       next: (res) => {
         this.save.emit();
         this.close.emit();
@@ -87,5 +104,9 @@ export class AddSubjectModalComponent implements OnInit{
 
   get professor(){
     return this.addSubjectForm.get('professor');
+  }
+
+  get credits(){
+    return this.addSubjectForm.get('credits');
   }
 }

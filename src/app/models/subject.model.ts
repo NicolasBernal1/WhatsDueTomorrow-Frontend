@@ -7,6 +7,7 @@ export interface Subject {
   name: string;
   professor: string;
   color: string;
+  credits: number;
   user: User;
   assignments: Assignment[];
   subjectClasses: SubjectClass[];

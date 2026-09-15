@@ -10,6 +10,78 @@
   <button mat-flat-button color="primary" (click)="addSubjectModal()">+ Add Subject</button>
 </div>
 
+  <!-- F26-F29 / RNF10-RNF11: Semáforo de Carga Semanal y Estimación de Horas -->
+  @if (academicLoad) {
+    <section class="academic-load-section" role="region" aria-label="Semáforo de carga académica semanal">
+      <div class="load-card" [ngClass]="'status-' + academicLoad.status">
+        <div class="load-header">
+          <div class="load-title-group">
+            <span class="load-kicker">Carga Académica Semanal</span>
+            <div class="status-indicator">
+              <mat-icon class="status-icon">{{ getLoadStatusIcon(academicLoad.status) }}</mat-icon>
+              <span class="status-text">{{ getLoadStatusText(academicLoad.status) }}</span>
+            </div>
+          </div>
+
+          <!-- Semáforo visual con las 3 zonas (RNF10: sin depender solo del color) -->
+          <div class="traffic-light-bar" role="group" aria-label="Nivel de carga del semáforo">
+            <div class="traffic-step step-baja" [class.active]="academicLoad.status === 'baja'">
+              <span class="step-dot"></span>
+              <span class="step-label">Baja (&lt;12)</span>
+            </div>
+            <div class="traffic-step step-balanceada" [class.active]="academicLoad.status === 'balanceada'">
+              <span class="step-dot"></span>
+              <span class="step-label">Balanceada (12-18)</span>
+            </div>
+            <div class="traffic-step step-sobrecarga" [class.active]="academicLoad.status === 'sobrecarga'">
+              <span class="step-dot"></span>
+              <span class="step-label">Sobrecarga (&gt;18)</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="load-description">
+          {{ getLoadStatusDescription(academicLoad.status) }}
+        </p>
+
+        <div class="load-stats-grid">
+          <div class="stat-box">
+            <div class="stat-icon-wrapper">
+              <mat-icon>school</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Créditos Totales</span>
+              <span class="stat-number">{{ academicLoad.totalCredits }} <span class="stat-unit">créditos</span></span>
+              <span class="stat-hint">{{ academicLoad.subjectsCount }} asignaturas inscritas</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-icon-wrapper">
+              <mat-icon>schedule</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Clase Semanal</span>
+              <span class="stat-number">{{ academicLoad.weeklyPresentialHours }} <span class="stat-unit">h/sem</span></span>
+              <span class="stat-hint">{{ academicLoad.classesCount }} sesiones registradas</span>
+            </div>
+          </div>
+
+          <div class="stat-box autonomous-highlight">
+            <div class="stat-icon-wrapper">
+              <mat-icon>menu_book</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Trabajo Autónomo Estimado</span>
+              <span class="stat-number">{{ academicLoad.weeklyAutonomousHours }} <span class="stat-unit">h/sem</span></span>
+              <span class="stat-hint">Fórmula: 2h de estudio autónomo por 1h de clase</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
   @if (this.loading) {
     <p class="loading">Loading Subjects...</p>
   } @else if (this.subjects.length === 0) {
@@ -19,7 +91,13 @@
       @for (sub of this.subjects; track $index) {
         <mat-card class="subject-card" [style.border-top]=" '6px solid ' + sub.color" (click)="goToSubjectDetais(sub.id)" (contextmenu)="onRightClickSubject($event, sub)">
           <div class="subject-info">
-            <h3>{{ sub.name }}</h3>
+            <div class="subject-title-row">
+              <h3>{{ sub.name }}</h3>
+              <span class="credit-badge" title="Créditos de la asignatura">
+                <mat-icon class="badge-icon">school</mat-icon>
+                {{ sub.credits || 3 }} cr.
+              </span>
+            </div>
             <p>{{ sub.professor }}</p>
           </div>
         </mat-card>

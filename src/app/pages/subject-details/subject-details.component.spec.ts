@@ -23,6 +23,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
     name: 'Cálculo Diferencial',
     professor: 'Prof. Gauss',
     color: '#3b82f6',
+    credits: 4,
   };
 
   const mockNotes: Note[] = [

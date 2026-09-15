@@ -8,6 +8,7 @@ import { SubjectResponseDto } from '../models/subject-response.dto';
 import { AddSubjectDto } from '../models/add-subject.dto';
 import { updateSubjectDto } from '../models/update-subject.dto';
 import { EditClassDto } from '../models/edit-class.dto';
+import { AcademicLoadSummaryDto } from '../models/academic-load-summary.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +50,12 @@ export class SubjectService {
   }
   //Agrego nueva funcionalidad en el frontend de buscar/filtrar asignaturas
   searchSubjects(query: string): Observable<BaseResponseDto<SubjectResponseDto[]>> {
-  return this.http.get<BaseResponseDto<SubjectResponseDto[]>>(
-    `${this.apiUrl}/subjects/search?q=${encodeURIComponent(query)}`,);
+    return this.http.get<BaseResponseDto<SubjectResponseDto[]>>(
+      `${this.apiUrl}/subjects/search?q=${encodeURIComponent(query)}`,
+    );
+  }
+
+  getAcademicLoadSummary(): Observable<BaseResponseDto<AcademicLoadSummaryDto>> {
+    return this.http.get<BaseResponseDto<AcademicLoadSummaryDto>>(`${this.apiUrl}/subjects/academic-load`);
   }
 }
