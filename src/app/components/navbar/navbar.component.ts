@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
@@ -43,6 +44,8 @@ export class NavbarComponent implements OnInit {
 
   upcomingAssignments: AssignmentResponseCompDto[] = [];
 
+  pendingDeleteConfirmation = false;
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -61,7 +64,7 @@ export class NavbarComponent implements OnInit {
       next: (res) => {
         this.upcomingAssignments = res.data ?? [];
       },
-      error: (err) => console.error(err),
+      error: (err: unknown) => this.logError('loadUpcomingAssignments', err),
     });
   }
 
@@ -71,6 +74,7 @@ export class NavbarComponent implements OnInit {
 
   loadProfile() {
     this.editingProfile = false;
+    this.pendingDeleteConfirmation = false;
 
     this.authService.getProfile().subscribe({
       next: (res) => {
@@ -78,8 +82,8 @@ export class NavbarComponent implements OnInit {
         this.editName = res.data?.name ?? '';
         this.editEmail = res.data?.email ?? '';
       },
-      error: (err) => {
-        console.error(err);
+      error: (err: unknown) => {
+        this.logError('loadProfile', err);
         this.notificationService.error('Could not load your profile');
       }
     });
@@ -107,7 +111,7 @@ export class NavbarComponent implements OnInit {
         this.savingProfile = false;
         this.notificationService.success('Profile updated successfully.');
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.savingProfile = false;
         if (err.status === 409) {
           this.notificationService.error('That email is already in use');
@@ -150,8 +154,8 @@ export class NavbarComponent implements OnInit {
         this.notificationService.success('Password changed successfully.');
         this.logout();
       },
-      error: (err) => {
-        console.error(err);
+      error: (err: unknown) => {
+        this.logError('changePassword', err);
         this.changingPassword = false;
       }
     });
@@ -162,17 +166,21 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  confirmDelete() {
-    const confirmed = confirm(
-      'Are you sure you want to delete your account? This action cannot be undone.'
-    );
+  requestDeleteAccount() {
+    this.pendingDeleteConfirmation = true;
+  }
 
-    if (confirmed) {
-      this.authService.deleteAccount().subscribe({
-        next: () => this.logout(),
-        error: (err) => console.error(err)
-      });
-    }
+  cancelDeleteAccount() {
+    this.pendingDeleteConfirmation = false;
+  }
+
+  confirmDelete() {
+    this.pendingDeleteConfirmation = false;
+
+    this.authService.deleteAccount().subscribe({
+      next: () => this.logout(),
+      error: (err: unknown) => this.logError('confirmDelete', err)
+    });
   }
 
   resetPasswordState() {
@@ -181,5 +189,14 @@ export class NavbarComponent implements OnInit {
     this.passwordVerified = false;
     this.passwordError = false;
     this.changingPassword = false;
+  }
+
+  // Antes: console.error(err) estaba repetido de forma idéntica en 4 métodos
+  // distintos (typescript:S4144 — funciones/bloques duplicados). Centralizarlo
+  // aquí también deja un único punto donde conectar un servicio de logging
+  // real (Sentry, LogRocket, etc.) el día que se necesite, sin tocar cada
+  // método uno por uno.
+  private logError(context: string, err: unknown): void {
+    console.error(`[NavbarComponent] ${context}:`, err);
   }
 }

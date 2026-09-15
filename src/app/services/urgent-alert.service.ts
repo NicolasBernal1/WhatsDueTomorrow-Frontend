@@ -38,7 +38,7 @@ export class UrgentAlertService {
           this.notificationService.error(`You have ${urgentCount} urgent assignment(s)!`);
         }
       },
-      error: (err) => console.error(err),
+      error: (err: unknown) => console.error('[UrgentAlertService] checkUrgentAssignments:', err),
     });
   }
 

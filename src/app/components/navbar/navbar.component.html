@@ -151,10 +151,20 @@
         Log Out
       </button>
 
-      <button mat-menu-item (click)="confirmDelete()">
-        <mat-icon color="warn">delete_forever</mat-icon>
-        Delete Account
-      </button>
+      @if (!pendingDeleteConfirmation) {
+        <button mat-menu-item (click)="requestDeleteAccount()">
+          <mat-icon color="warn">delete_forever</mat-icon>
+          Delete Account
+        </button>
+      } @else {
+        <div class="delete-confirm-section">
+          <p class="error-message">This action cannot be undone. Delete your account?</p>
+          <div class="edit-profile-actions">
+            <button mat-button (click)="cancelDeleteAccount()">Cancel</button>
+            <button mat-flat-button color="warn" (click)="confirmDelete()">Yes, delete</button>
+          </div>
+        </div>
+      }
 
     </div>
 

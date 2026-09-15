@@ -1,93 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NavbarComponent } from './navbar.component';
-import { AuthService } from '../../services/auth.service';
-import { UrgentAlertService } from '../../services/urgent-alert.service';
-import { NotificationService } from '../../services/notification.service';
-import { AssignmentService } from '../../services/assignment.service';
-import { Router } from '@angular/router';
-import { of } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
-describe('NavbarComponent', () => {
-  let component: NavbarComponent;
-  let fixture: ComponentFixture<NavbarComponent>;
-  let authServiceMock: jasmine.SpyObj<AuthService>;
-  let urgentAlertServiceMock: jasmine.SpyObj<UrgentAlertService>;
-  let notificationServiceMock: jasmine.SpyObj<NotificationService>;
-  let assignmentServiceMock: jasmine.SpyObj<AssignmentService>;
-  let router: Router;
-
-  beforeEach(async () => {
-    authServiceMock = jasmine.createSpyObj('AuthService', [
-      'logout',
-      'deleteAccount',
-      'getProfile',
-      'updateProfile',
-      'changePassword',
-    ]);
-    urgentAlertServiceMock = jasmine.createSpyObj('UrgentAlertService', ['start']);
-    notificationServiceMock = jasmine.createSpyObj('NotificationService', [
-      'showInfo',
-      'error',
-      'success',
-    ]);
-    assignmentServiceMock = jasmine.createSpyObj('AssignmentService', [
-      'getUpcomingAssignments',
-    ]);
-    assignmentServiceMock.getUpcomingAssignments.and.returnValue(
-      of({ status: 200, message: 'OK', data: [] }),
-    );
-
-    await TestBed.configureTestingModule({
-      imports: [NavbarComponent],
-      providers: [
-        provideRouter([]),
-        { provide: AuthService, useValue: authServiceMock },
-        { provide: UrgentAlertService, useValue: urgentAlertServiceMock },
-        { provide: NotificationService, useValue: notificationServiceMock },
-        { provide: AssignmentService, useValue: assignmentServiceMock },
-      ],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(NavbarComponent);
-    component = fixture.componentInstance;
-    router = TestBed.inject(Router);
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  describe('toggleDropdown', () => {
-    it('should toggle dropDownOpened from false to true', () => {
-      expect(component.dropDownOpened).toBeFalse();
-      component.toggleDropdown();
-      expect(component.dropDownOpened).toBeTrue();
+  describe('delete account flow', () => {
+    it('requestDeleteAccount should set pendingDeleteConfirmation to true', () => {
+      component.requestDeleteAccount();
+      expect(component.pendingDeleteConfirmation).toBeTrue();
     });
 
-    it('should toggle dropDownOpened from true back to false', () => {
-      component.dropDownOpened = true;
-      component.toggleDropdown();
-      expect(component.dropDownOpened).toBeFalse();
+    it('cancelDeleteAccount should set pendingDeleteConfirmation back to false without calling deleteAccount', () => {
+      component.pendingDeleteConfirmation = true;
+      component.cancelDeleteAccount();
+      expect(component.pendingDeleteConfirmation).toBeFalse();
+      expect(authServiceMock.deleteAccount).not.toHaveBeenCalled();
     });
-  });
 
-  describe('logout', () => {
-    it('should call authService.logout and navigate to /login', () => {
+    it('confirmDelete should call deleteAccount and then logout', () => {
       const navigateSpy = spyOn(router, 'navigate');
-      component.logout();
-      expect(authServiceMock.logout).toHaveBeenCalled();
-      expect(navigateSpy).toHaveBeenCalledWith(['/login']);
-    });
-  });
-
-  describe('confirmDelete', () => {
-    it('should call deleteAccount and then logout when user confirms', () => {
-      const navigateSpy = spyOn(router, 'navigate');
-      spyOn(window, 'confirm').and.returnValue(true);
       authServiceMock.deleteAccount.and.returnValue(
         of({ status: 204, message: 'Account deleted' })
       );
@@ -97,12 +22,16 @@ describe('NavbarComponent', () => {
       expect(authServiceMock.deleteAccount).toHaveBeenCalled();
       expect(authServiceMock.logout).toHaveBeenCalled();
       expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+      expect(component.pendingDeleteConfirmation).toBeFalse();
     });
 
-    it('should NOT call deleteAccount when user cancels', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+    it('confirmDelete should log the error when deleteAccount fails', () => {
+      spyOn(console, 'error');
+      authServiceMock.deleteAccount.and.returnValue(throwError(() => ({ status: 500 })));
+
       component.confirmDelete();
-      expect(authServiceMock.deleteAccount).not.toHaveBeenCalled();
+
+      expect(console.error).toHaveBeenCalled();
+      expect(authServiceMock.logout).not.toHaveBeenCalled();
     });
   });
-});

@@ -171,3 +171,10 @@ mat-toolbar.navbar {
   min-width: 280px !important;
   max-width: 280px !important;
 }
+.delete-confirm-section {
+  padding: 8px 20px 16px;
+
+  p {
+    margin: 0 0 10px;
+  }
+}
