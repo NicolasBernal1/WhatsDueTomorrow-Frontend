@@ -90,4 +90,24 @@ describe('AssignmentService', () => {
       req.flush(mockResponse);
     });
   });
+
+  // ─── F21: getUrgentAssignments ─────────────────────────────────────────────
+
+  describe('getUrgentAssignments (F21 — Radar de Entregas Urgentes)', () => {
+    it('should GET urgent assignments from /assignments/urgent', () => {
+      const mockResponse = {
+        status: 200,
+        data: [{ id: 1, title: 'Tarea Urgente', description: '', dueDate: '2026-09-15T00:00:00Z', subjectId: 10, subjectName: 'V&V' }]
+      };
+
+      service.getUrgentAssignments().subscribe(res => {
+        expect(res.data?.length).toBe(1);
+        expect(res.data?.[0].title).toBe('Tarea Urgente');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/assignments/urgent`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+  });
 });
