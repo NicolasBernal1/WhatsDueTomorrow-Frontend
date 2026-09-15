@@ -453,6 +453,19 @@ describe('ScheduleComponent', () => {
       expect(result?.id).toBe(1);
     });
 
+    // Camino: hay clases registradas pero ninguna coincide con un día válido
+    it('21. debe retornar null cuando hay clases pero ninguna coincide con un día de la semana', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      component.classes = [
+        buildClass({ id: 1, dayOfWeek: 'diasabsurdo', startTime: '07:00', endTime: '08:00' })
+      ];
+
+      expect(component.getNextClass()).toBeNull();
+    });
+
   });
 
   // =========================================================================

@@ -127,4 +127,19 @@ describe('AuthService', () => {
       req.flush(mockResponse);
     });
   });
+
+  describe('updateProfile', () => {
+    it('should send PATCH to /users/profile with the updated fields', () => {
+      const mockResponse = { status: 200, data: { id: 1, name: 'Nuevo Nombre', email: 'a@b.com' } };
+
+      service.updateProfile({ name: 'Nuevo Nombre' }).subscribe(res => {
+        expect(res.data?.name).toBe('Nuevo Nombre');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({ name: 'Nuevo Nombre' });
+      req.flush(mockResponse);
+    });
+  });
 });

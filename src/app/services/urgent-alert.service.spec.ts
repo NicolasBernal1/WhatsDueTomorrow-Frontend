@@ -1,12 +1,14 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { UrgentAlertService } from './urgent-alert.service';
 import { AssignmentService } from './assignment.service';
-import { of } from 'rxjs';
+import { NotificationService } from './notification.service';
+import { of, throwError } from 'rxjs';
 import { AssignmentResponseCompDto } from '../models/assignment-response-comp.dto';
 
 describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entregas)', () => {
   let service: UrgentAlertService;
   let assignmentServiceMock: jasmine.SpyObj<AssignmentService>;
+  let notificationServiceMock: jasmine.SpyObj<NotificationService>;
   let notificationConstructorSpy: jasmine.Spy;
   let originalNotification: any;
 
@@ -21,6 +23,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
     assignmentServiceMock.getUrgentAssignments.and.returnValue(
       of({ status: 200, message: 'OK', data: [] })
     );
+    notificationServiceMock = jasmine.createSpyObj('NotificationService', ['success', 'error']);
 
     // Guardar referencia original de Notification en window
     originalNotification = (window as any).Notification;
@@ -40,6 +43,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       providers: [
         UrgentAlertService,
         { provide: AssignmentService, useValue: assignmentServiceMock },
+        { provide: NotificationService, useValue: notificationServiceMock },
       ],
     });
 
@@ -71,6 +75,31 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
     });
   });
 
+  describe('checkUrgentAssignments (invocado por start)', () => {
+    it('debe notificar por NotificationService cuando hay tareas urgentes', () => {
+      assignmentServiceMock.getUrgentAssignments.and.returnValue(
+        of({ status: 200, message: 'OK', data: [{ id: 1 } as any, { id: 2 } as any] })
+      );
+
+      service.start();
+
+      expect(notificationServiceMock.error).toHaveBeenCalledWith('You have 2 urgent assignment(s)!');
+    });
+
+    it('no debe notificar cuando no hay tareas urgentes', () => {
+      service.start();
+      expect(notificationServiceMock.error).not.toHaveBeenCalled();
+    });
+
+    it('debe loguear el error sin lanzar si getUrgentAssignments falla', () => {
+      spyOn(console, 'error');
+      assignmentServiceMock.getUrgentAssignments.and.returnValue(throwError(() => new Error('boom')));
+
+      expect(() => service.start()).not.toThrow();
+      expect(console.error).toHaveBeenCalledWith('[UrgentAlertService] checkUrgentAssignments:', jasmine.any(Error));
+    });
+  });
+
   describe('start', () => {
     it('no debe iniciar monitoreo si Notification no existe en window', () => {
       delete (window as any).Notification;
@@ -92,6 +121,17 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       const secondSub = (service as any).monitoring;
       expect(firstSub).toBe(secondSub);
     });
+
+    it('no debe lanzar ni romper el monitoreo si getAllAssignments falla en el polling periódico', fakeAsync(() => {
+      assignmentServiceMock.getAllAssignments.and.returnValue(throwError(() => new Error('network down')));
+
+      expect(() => {
+        service.start();
+        tick(1);
+      }).not.toThrow();
+
+      expect((service as any).monitoring).toBeDefined();
+    }));
   });
 
   describe('notifyDueAssignments', () => {

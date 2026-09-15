@@ -20,7 +20,7 @@ describe('SubjectsComponent', () => {
   };
 
   beforeEach(async () => {
-    subjectServiceMock = jasmine.createSpyObj('SubjectService', ['getSubjects', 'deleteSubject', 'getAcademicLoadSummary']);
+    subjectServiceMock = jasmine.createSpyObj('SubjectService', ['getSubjects', 'deleteSubject', 'getAcademicLoadSummary', 'searchSubjects']);
     routerMock = jasmine.createSpyObj('Router', ['navigate']);
 
     subjectServiceMock.getAcademicLoadSummary.and.returnValue(
@@ -523,6 +523,46 @@ describe('SubjectsComponent', () => {
         expect(component.academicLoad?.weeklyPresentialHours).toBe(4);
         expect(component.academicLoad?.weeklyAutonomousHours).toBe(8);
       });
+    });
+  });
+
+  describe('onSearch', () => {
+    beforeEach(() => {
+      subjectServiceMock.getSubjects.and.returnValue(
+        of({ status: 200, message: 'ok', data: [] }),
+      );
+      spyOn(component, 'loadSubjects').and.callThrough();
+    });
+
+    it('should reload the full list when the search term is blank', () => {
+      component.searchQuery = '   ';
+
+      component.onSearch();
+
+      expect(component.loadSubjects).toHaveBeenCalled();
+      expect(subjectServiceMock.searchSubjects).not.toHaveBeenCalled();
+    });
+
+    it('should search and replace the subjects list on success', () => {
+      subjectServiceMock.searchSubjects.and.returnValue(
+        of({ status: 200, message: 'ok', data: [subjectMock] }),
+      );
+      component.searchQuery = 'cálculo';
+
+      component.onSearch();
+
+      expect(subjectServiceMock.searchSubjects).toHaveBeenCalledWith('cálculo');
+      expect(component.subjects).toEqual([subjectMock]);
+    });
+
+    it('should alert the user when the search request fails', () => {
+      spyOn(window, 'alert');
+      subjectServiceMock.searchSubjects.and.returnValue(throwError(() => new Error('boom')));
+      component.searchQuery = 'cálculo';
+
+      component.onSearch();
+
+      expect(window.alert).toHaveBeenCalledWith('Error searching subjects');
     });
   });
 
