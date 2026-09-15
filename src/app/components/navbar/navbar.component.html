@@ -5,6 +5,7 @@
     <a mat-button routerLink="/schedule" routerLinkActive="active">Schedule</a>
     <a mat-button routerLink="/subjects" routerLinkActive="active">Subjects</a>
     <a mat-button routerLink="/assignments" routerLinkActive="active">Assignments</a>
+    <a mat-button routerLink="/urgent-radar" routerLinkActive="active">Urgent radar</a>
   </span>
 
   <span class="spacer"></span>
@@ -47,17 +48,46 @@
 
   <mat-menu #profileMenu="matMenu" class="profile-menu">
 
-    <div class="profile-content" (click)="$event.stopPropagation()">
+    <div class="profile-content" (click)="$event.stopPropagation()" role="button" tabindex="0" (keydown.escape)="$event.stopPropagation()">
 
       @if (user) {
-        <div class="profile-info">
-          <mat-icon class="profile-icon">account_circle</mat-icon>
+        @if (!editingProfile) {
+          <div class="profile-info">
+            <mat-icon class="profile-icon">account_circle</mat-icon>
 
-          <div>
-            <h3>{{ user.name }}</h3>
-            <p>{{ user.email }}</p>
+            <div>
+              <h3>{{ user.name }}</h3>
+              <p>{{ user.email }}</p>
+            </div>
+
+            <button mat-icon-button (click)="startEditingProfile()" aria-label="Edit profile">
+              <mat-icon>edit</mat-icon>
+            </button>
           </div>
-        </div>
+        } @else {
+          <div class="edit-profile-section">
+            <mat-form-field appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput [(ngModel)]="editName" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" [(ngModel)]="editEmail" />
+            </mat-form-field>
+
+            <div class="edit-profile-actions">
+              <button mat-button (click)="cancelEditingProfile()">Cancel</button>
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="saveProfile()"
+                [disabled]="!editName || !editEmail || savingProfile">
+                {{ savingProfile ? 'Saving...' : 'Save' }}
+              </button>
+            </div>
+          </div>
+        }
       }
 
       <div class="divider"></div>

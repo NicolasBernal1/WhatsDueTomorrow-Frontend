@@ -15,6 +15,7 @@ import { ChangePasswordDto } from '../../models/change-password.dto';
 import { AssignmentResponseCompDto } from '../../models/assignment-response-comp.dto';
 import { MatLabel } from "@angular/material/form-field";
 import { FormsModule } from '@angular/forms';
+import { UrgentAlertService } from '../../services/urgent-alert.service';
 
 @Component({
   selector: 'app-navbar',
@@ -27,6 +28,11 @@ export class NavbarComponent implements OnInit {
   dropDownOpened = false;
 
   user?: UserDto;
+
+  editingProfile = false;
+  editName = '';
+  editEmail = '';
+  savingProfile = false;
 
   password = '';
   newPassword = '';
@@ -42,9 +48,11 @@ export class NavbarComponent implements OnInit {
     private authService: AuthService,
     private notificationService: NotificationService,
     private assignmentService: AssignmentService,
+    private urgentAlertService: UrgentAlertService,
   ) { }
 
   ngOnInit(): void {
+    this.urgentAlertService.start();
     this.loadUpcomingAssignments();
   }
 
@@ -62,13 +70,50 @@ export class NavbarComponent implements OnInit {
   }
 
   loadProfile() {
+    this.editingProfile = false;
+
     this.authService.getProfile().subscribe({
       next: (res) => {
         this.user = res.data;
+        this.editName = res.data?.name ?? '';
+        this.editEmail = res.data?.email ?? '';
       },
       error: (err) => {
         console.error(err);
         this.notificationService.error('Could not load your profile');
+      }
+    });
+  }
+
+  startEditingProfile() {
+    this.editingProfile = true;
+    this.editName = this.user?.name ?? '';
+    this.editEmail = this.user?.email ?? '';
+  }
+
+  cancelEditingProfile() {
+    this.editingProfile = false;
+  }
+
+  saveProfile() {
+    if (!this.editName || !this.editEmail) return;
+
+    this.savingProfile = true;
+
+    this.authService.updateProfile({ name: this.editName, email: this.editEmail }).subscribe({
+      next: (res) => {
+        this.user = res.data;
+        this.editingProfile = false;
+        this.savingProfile = false;
+        this.notificationService.success('Profile updated successfully.');
+      },
+      error: (err) => {
+        this.savingProfile = false;
+        if (err.status === 409) {
+          this.notificationService.error('That email is already in use');
+        } else {
+          this.notificationService.error('Could not update your profile');
+        }
       }
     });
   }
