@@ -22,7 +22,7 @@
   </button>
 
   <mat-menu #upcomingMenu="matMenu" class="upcoming-menu">
-    <div class="upcoming-content" (click)="$event.stopPropagation()">
+    <div class="upcoming-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
       <h4>Due soon</h4>
 
       @if (upcomingAssignments.length === 0) {

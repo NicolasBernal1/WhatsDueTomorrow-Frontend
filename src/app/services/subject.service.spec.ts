@@ -153,4 +153,19 @@ describe('SubjectService', () => {
       req.flush(mockResponse);
     });
   });
+
+  describe('searchSubjects', () => {
+    it('should GET the search endpoint with the encoded query', () => {
+      const mockResponse = { status: 200, data: [{ id: 1, name: 'Cálculo', professor: 'Dr. Smith', color: '#ff0000', credits: 3 }] };
+
+      service.searchSubjects('cálculo & más').subscribe(res => {
+        expect(res.data?.length).toBe(1);
+        expect(res.data?.[0].name).toBe('Cálculo');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/subjects/search?q=${encodeURIComponent('cálculo & más')}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+  });
 });
