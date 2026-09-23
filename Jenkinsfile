@@ -25,19 +25,34 @@ pipeline {
             }
         }
 
-        stage('SonarCloud Analysis') {
+        stage('SonarCloud Analysis + Quality Gate') {
             steps {
                 withSonarQubeEnv('SonarCloud-Frontend') {
-                    sh "${SCANNER_HOME}/bin/sonar-scanner"
+                    sh """
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                          -Dsonar.qualitygate.wait=true \
+                          -Dsonar.qualitygate.timeout=300
+                    """
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage('Docker Build') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                sh 'docker build -t whatsduetomorrow-frontend:latest -f dockerfile .'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker rm -f whatsduetomorrow-frontend || true
+                    docker run -d \
+                      --name whatsduetomorrow-frontend \
+                      --network devops-net \
+                      -p 4200:4200 \
+                      whatsduetomorrow-frontend:latest
+                '''
             }
         }
     }
