@@ -21,7 +21,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'npx ng test --no-watch --no-progress --browsers=ChromeHeadless --code-coverage'
+                sh 'npx ng test --no-watch --no-progress --browsers=ChromeHeadlessCI --code-coverage'
             }
         }
 
