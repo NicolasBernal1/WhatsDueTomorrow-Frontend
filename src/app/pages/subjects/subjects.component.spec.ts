@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 
 import { SubjectsComponent } from './subjects.component';
 import { SubjectService } from '../../services/subject.service';
+import { Should } from '../../common/fluent-assertions';
 
 describe('SubjectsComponent', () => {
 
@@ -286,9 +287,9 @@ describe('SubjectsComponent', () => {
 
       component.loadAcademicLoad();
 
-      expect(console.error).toHaveBeenCalled();
-      expect(component.academicLoad).toBeNull();
-      expect(component.loadingLoad).toBeFalse();
+      Should(console.error).HaveBeenCalled();
+      Should(component.academicLoad).BeNull();
+      component.loadingLoad.Should().BeFalse();
     });
 
     it('[P2: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 22] debe clasificar como carga baja cuando totalCredits < 12', () => {
@@ -310,11 +311,11 @@ describe('SubjectsComponent', () => {
 
       component.loadAcademicLoad();
 
-      expect(component.academicLoad?.status).toBe('baja');
-      expect(component.academicLoad?.statusLabel).toBe('Carga baja');
-      expect(component.getLoadStatusIcon('baja')).toBe('trending_down');
-      expect(component.getLoadStatusText('baja')).toBe('Carga baja');
-      expect(component.getLoadStatusDescription('baja')).toContain('< 12 créditos');
+      Should(component.academicLoad?.status).Be('baja');
+      Should(component.academicLoad?.statusLabel).Be('Carga baja');
+      component.getLoadStatusIcon('baja').Should().Be('trending_down');
+      component.getLoadStatusText('baja').Should().Be('Carga baja');
+      component.getLoadStatusDescription('baja').Should().Contain('< 12 créditos');
     });
 
     it('[P3: 1 → 2 → 3 → 5 → 6 → 8 → 10 → 9 → 22] debe clasificar como carga balanceada cuando 12 <= totalCredits <= 18', () => {
@@ -336,11 +337,11 @@ describe('SubjectsComponent', () => {
 
       component.loadAcademicLoad();
 
-      expect(component.academicLoad?.status).toBe('balanceada');
-      expect(component.academicLoad?.statusLabel).toBe('Carga balanceada');
-      expect(component.getLoadStatusIcon('balanceada')).toBe('check_circle');
-      expect(component.getLoadStatusText('balanceada')).toBe('Carga balanceada');
-      expect(component.getLoadStatusDescription('balanceada')).toContain('12 a 18 créditos');
+      Should(component.academicLoad?.status).Be('balanceada');
+      Should(component.academicLoad?.statusLabel).Be('Carga balanceada');
+      component.getLoadStatusIcon('balanceada').Should().Be('check_circle');
+      component.getLoadStatusText('balanceada').Should().Be('Carga balanceada');
+      component.getLoadStatusDescription('balanceada').Should().Contain('12 a 18 créditos');
     });
 
     it('[P4: 1 → 2 → 3 → 5 → 6 → 8 → 11 → 9 → 22] debe clasificar como sobrecarga cuando totalCredits > 18', () => {
@@ -362,41 +363,41 @@ describe('SubjectsComponent', () => {
 
       component.loadAcademicLoad();
 
-      expect(component.academicLoad?.status).toBe('sobrecarga');
-      expect(component.academicLoad?.statusLabel).toBe('Sobrecarga');
-      expect(component.getLoadStatusIcon('sobrecarga')).toBe('warning');
-      expect(component.getLoadStatusText('sobrecarga')).toBe('Sobrecarga');
-      expect(component.getLoadStatusDescription('sobrecarga')).toContain('> 18 créditos');
+      Should(component.academicLoad?.status).Be('sobrecarga');
+      Should(component.academicLoad?.statusLabel).Be('Sobrecarga');
+      component.getLoadStatusIcon('sobrecarga').Should().Be('warning');
+      component.getLoadStatusText('sobrecarga').Should().Be('Sobrecarga');
+      component.getLoadStatusDescription('sobrecarga').Should().Contain('> 18 créditos');
     });
 
     it('[P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 21 → 22] usuario abre modal y cancela/cierra sin alterar catálogo', () => {
       // Modal crear
       component.addSubjectModal();
-      expect(component.showAddModal).toBeTrue();
+      component.showAddModal.Should().BeTrue();
       component.closeAddSubjectModal();
-      expect(component.showAddModal).toBeFalse();
+      component.showAddModal.Should().BeFalse();
 
       // Modal editar
       component.selectedSubject = subjectMock;
       component.editSubject();
-      expect(component.showEditModal).toBeTrue();
+      component.showEditModal.Should().BeTrue();
       component.closeEditModal();
-      expect(component.showEditModal).toBeFalse();
-      expect(component.selectedSubject).toBeNull();
+      component.showEditModal.Should().BeFalse();
+      Should(component.selectedSubject).BeNull();
     });
 
     it('[P7: 12 → 14 → 16 → 18 → 20 → 22] debe actualizar reactivamente la carga académica al editar asignatura (onSubjectSaved)', () => {
       spyOn(component, 'loadAcademicLoad');
       component.onSubjectSaved();
-      expect(component.loadAcademicLoad).toHaveBeenCalled();
-      expect(component.showEditModal).toBeFalse();
+      Should(component.loadAcademicLoad).HaveBeenCalled();
+      component.showEditModal.Should().BeFalse();
     });
 
     it('[P9: 12 → 14 → 17 → 18 → 20 → 22] debe actualizar reactivamente la carga académica al crear asignatura (saveSubject)', () => {
       spyOn(component, 'loadAcademicLoad');
       component.saveSubject();
-      expect(component.loadAcademicLoad).toHaveBeenCalled();
-      expect(component.showAddModal).toBeFalse();
+      Should(component.loadAcademicLoad).HaveBeenCalled();
+      component.showAddModal.Should().BeFalse();
     });
 
     it('[P10: 15 → 23 → 22] usuario cancela en confirm() dialog de eliminación sin alterar estado', () => {
@@ -405,9 +406,9 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(window.confirm).toHaveBeenCalledWith('Delete subject?');
-      expect(subjectServiceMock.deleteSubject).not.toHaveBeenCalled();
-      expect(component.selectedSubject).toBeNull();
+      Should(window.confirm).HaveBeenCalledWith('Delete subject?');
+      Should(subjectServiceMock.deleteSubject).NotHaveBeenCalled();
+      Should(component.selectedSubject).BeNull();
     });
 
     it('[P11: 15 → 24 → 25 → 26 → 22] confirmación aceptada pero error HTTP en deleteSubject captura en consola', () => {
@@ -421,8 +422,8 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(console.error).toHaveBeenCalled();
-      expect(component.contextMenuVisible).toBeTrue();
+      Should(console.error).HaveBeenCalled();
+      component.contextMenuVisible.Should().BeTrue();
     });
 
     it('[P12: 15 → 24 → 25 → 27 → 22] confirmación aceptada y éxito HTTP en deleteSubject actualiza catálogo y semáforo', () => {
@@ -435,10 +436,10 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(subjectServiceMock.deleteSubject).toHaveBeenCalledWith(subjectMock.id);
-      expect(component.loadAcademicLoad).toHaveBeenCalled();
-      expect(component.contextMenuVisible).toBeFalse();
-      expect(component.selectedSubject).toBeNull();
+      Should(subjectServiceMock.deleteSubject).HaveBeenCalledWith(subjectMock.id);
+      Should(component.loadAcademicLoad).HaveBeenCalled();
+      component.contextMenuVisible.Should().BeFalse();
+      Should(component.selectedSubject).BeNull();
     });
 
     it('debe calcular las horas autónomas como el doble de las horas presenciales (factor 2:1)', () => {
@@ -460,15 +461,15 @@ describe('SubjectsComponent', () => {
 
       component.loadAcademicLoad();
 
-      expect(component.academicLoad?.weeklyAutonomousHours).toBe(
+      Should(component.academicLoad?.weeklyAutonomousHours).Be(
         component.academicLoad!.weeklyPresentialHours * 2,
       );
     });
 
     it('debe proveer textos e iconos accesibles por defecto ante estados indefinidos', () => {
-      expect(component.getLoadStatusIcon(undefined)).toBe('help_outline');
-      expect(component.getLoadStatusText(undefined)).toBe('Carga no calculada');
-      expect(component.getLoadStatusDescription(undefined)).toBe('');
+      component.getLoadStatusIcon(undefined).Should().Be('help_outline');
+      component.getLoadStatusText(undefined).Should().Be('Carga no calculada');
+      component.getLoadStatusDescription(undefined).Should().Be('');
     });
 
     describe('Auditoría QA y Caracterización de Defectos (Metricas_Software_F21_F26.docx)', () => {
@@ -494,9 +495,9 @@ describe('SubjectsComponent', () => {
 
         // Verificación de defecto QA DEF-QA-F26-02:
         // Se documenta que el semáforo de carga entra en estado de sobrecarga debido a registros duplicados
-        expect(component.academicLoad?.totalCredits).toBe(20);
-        expect(component.academicLoad?.status).toBe('sobrecarga');
-        expect(component.getLoadStatusIcon('sobrecarga')).toBe('warning');
+        Should(component.academicLoad?.totalCredits).Be(20);
+        Should(component.academicLoad?.status).Be('sobrecarga');
+        component.getLoadStatusIcon('sobrecarga').Should().Be('warning');
       });
 
       it('[DEF-QA-F26-03] Comportamiento caracterizado: Frontend despliega horas calculadas con suma lineal en clases solapadas', () => {
@@ -520,8 +521,8 @@ describe('SubjectsComponent', () => {
 
         // Verificación de defecto QA DEF-QA-F26-03:
         // Se documenta que el frontend refleja la suma lineal sin advertencia de solapamiento horario
-        expect(component.academicLoad?.weeklyPresentialHours).toBe(4);
-        expect(component.academicLoad?.weeklyAutonomousHours).toBe(8);
+        Should(component.academicLoad?.weeklyPresentialHours).Be(4);
+        Should(component.academicLoad?.weeklyAutonomousHours).Be(8);
       });
     });
   });

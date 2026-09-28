@@ -3,6 +3,7 @@ import { of, throwError } from 'rxjs';
 
 import { AddSubjectModalComponent } from './add-subject-modal.component';
 import { SubjectService } from '../../services/subject.service';
+import { Should } from '../../common/fluent-assertions';
 
 describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)', () => {
 
@@ -25,14 +26,14 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
   });
 
   it('debe crearse correctamente', () => {
-    expect(component).toBeTruthy();
+    Should(component).NotBeNull();
   });
 
   describe('Cierre del Modal (P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 21 → 22)', () => {
     it('[P5] debe emitir el evento close al invocar onClose()', () => {
       spyOn(component.close, 'emit');
       component.onClose();
-      expect(component.close.emit).toHaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
   });
 
@@ -44,59 +45,59 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
       component.onSave();
 
-      expect(component.addSubjectForm.invalid).toBeTrue();
-      expect(component.addSubjectForm.markAllAsTouched).toHaveBeenCalled();
-      expect(subjectServiceMock.addSubject).not.toHaveBeenCalled();
-      expect(subjectServiceMock.editSubject).not.toHaveBeenCalled();
+      component.addSubjectForm.invalid.Should().BeTrue();
+      Should(component.addSubjectForm.markAllAsTouched).HaveBeenCalled();
+      Should(subjectServiceMock.addSubject).NotHaveBeenCalled();
+      Should(subjectServiceMock.editSubject).NotHaveBeenCalled();
     });
 
     it('[P6] debe asignar 3 créditos por defecto al inicializar', () => {
       component.ngOnInit();
-      expect(component.addSubjectForm.get('credits')?.value).toBe(3);
-      expect(component.addSubjectForm.get('credits')?.valid).toBeTrue();
+      component.addSubjectForm.get('credits')?.value.Should().Be(3);
+      component.addSubjectForm.get('credits')?.valid.Should().BeTrue();
     });
 
     it('[P6] debe rechazar créditos menores a 1 (ej: 0)', () => {
       component.ngOnInit();
       component.addSubjectForm.patchValue({ credits: 0 });
-      expect(component.addSubjectForm.get('credits')?.invalid).toBeTrue();
-      expect(component.addSubjectForm.get('credits')?.hasError('min')).toBeTrue();
+      component.addSubjectForm.get('credits')?.invalid.Should().BeTrue();
+      component.addSubjectForm.get('credits')?.hasError('min').Should().BeTrue();
     });
 
     it('[P6] debe rechazar créditos mayores a 12 (ej: 13)', () => {
       component.ngOnInit();
       component.addSubjectForm.patchValue({ credits: 13 });
-      expect(component.addSubjectForm.get('credits')?.invalid).toBeTrue();
-      expect(component.addSubjectForm.get('credits')?.hasError('max')).toBeTrue();
+      component.addSubjectForm.get('credits')?.invalid.Should().BeTrue();
+      component.addSubjectForm.get('credits')?.hasError('max').Should().BeTrue();
     });
 
     it('[P6] debe rechazar créditos decimales (ej: 3.5)', () => {
       component.ngOnInit();
       component.addSubjectForm.patchValue({ credits: '3.5' });
-      expect(component.addSubjectForm.get('credits')?.invalid).toBeTrue();
-      expect(component.addSubjectForm.get('credits')?.hasError('pattern')).toBeTrue();
+      component.addSubjectForm.get('credits')?.invalid.Should().BeTrue();
+      component.addSubjectForm.get('credits')?.hasError('pattern').Should().BeTrue();
     });
 
     it('[P6] debe aceptar los límites exactos de créditos (1 y 12)', () => {
       component.ngOnInit();
       component.addSubjectForm.patchValue({ credits: 1 });
-      expect(component.addSubjectForm.get('credits')?.valid).toBeTrue();
+      component.addSubjectForm.get('credits')?.valid.Should().BeTrue();
 
       component.addSubjectForm.patchValue({ credits: 12 });
-      expect(component.addSubjectForm.get('credits')?.valid).toBeTrue();
+      component.addSubjectForm.get('credits')?.valid.Should().BeTrue();
     });
 
     it('[P6] debe exponer getters para name, professor y credits', () => {
       component.ngOnInit();
-      expect(component.name).toBeTruthy();
-      expect(component.professor).toBeTruthy();
-      expect(component.credits).toBeTruthy();
+      Should(component.name).NotBeNull();
+      Should(component.professor).NotBeNull();
+      Should(component.credits).NotBeNull();
     });
 
     it('[P6] debe permitir seleccionar color con selectColor', () => {
       component.ngOnInit();
       component.selectColor('#ffc107');
-      expect(component.addSubjectForm.get('color')?.value).toBe('#ffc107');
+      component.addSubjectForm.get('color')?.value.Should().Be('#ffc107');
     });
   });
 
@@ -115,7 +116,7 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
     it('[P7: 12 → 14 → 16 → 18 → 20 → 22] debe actualizar la asignatura y emitir save y close cuando la petición es exitosa', () => {
       component.ngOnInit();
-      expect(component.addSubjectForm.get('credits')?.value).toBe(4);
+      component.addSubjectForm.get('credits')?.value.Should().Be(4);
 
       subjectServiceMock.editSubject.and.returnValue(
         of({ status: 200, message: 'Subject updated successfully', data: null }),
@@ -125,7 +126,7 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
       component.onSave();
 
-      expect(subjectServiceMock.editSubject).toHaveBeenCalledWith(
+      Should(subjectServiceMock.editSubject).HaveBeenCalledWith(
         subjectMock.id,
         jasmine.objectContaining({
           name: 'validación',
@@ -134,8 +135,8 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
           credits: 4,
         }),
       );
-      expect(component.save.emit).toHaveBeenCalled();
-      expect(component.close.emit).toHaveBeenCalled();
+      Should(component.save.emit).HaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
 
     it('[P8: 12 → 14 → 16 → 18 → 19 → 22] debe manejar error HTTP en editSubject registrando en consola sin emitir eventos', () => {
@@ -149,9 +150,9 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
       component.onSave();
 
-      expect(console.error).toHaveBeenCalled();
-      expect(component.save.emit).not.toHaveBeenCalled();
-      expect(component.close.emit).not.toHaveBeenCalled();
+      Should(console.error).HaveBeenCalled();
+      Should(component.save.emit).NotHaveBeenCalled();
+      Should(component.close.emit).NotHaveBeenCalled();
     });
   });
 
@@ -172,7 +173,7 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
       component.onSave();
 
-      expect(subjectServiceMock.addSubject).toHaveBeenCalledWith(
+      Should(subjectServiceMock.addSubject).HaveBeenCalledWith(
         jasmine.objectContaining({
           name: 'validación',
           professor: 'Gabriel',
@@ -180,8 +181,8 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
           credits: 3,
         }),
       );
-      expect(component.save.emit).toHaveBeenCalled();
-      expect(component.close.emit).toHaveBeenCalled();
+      Should(component.save.emit).HaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
 
     it('[P9] debe manejar error HTTP en addSubject registrando en consola', () => {
@@ -199,7 +200,7 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
       component.onSave();
 
-      expect(console.error).toHaveBeenCalled();
+      Should(console.error).HaveBeenCalled();
     });
   });
 
@@ -215,9 +216,9 @@ describe('AddSubjectModalComponent (F26 — Caminos Básicos Frontend Tabla 48)'
 
       // Verificación de defecto QA DEF-QA-F26-01:
       // Se documenta que el patrón /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/ no restringe longitud coherente ni caracteres extraños
-      expect(component.addSubjectForm.get('name')?.valid).toBeTrue();
-      expect(component.addSubjectForm.get('professor')?.valid).toBeTrue();
-      expect(component.addSubjectForm.valid).toBeTrue();
+      component.addSubjectForm.get('name')?.valid.Should().BeTrue();
+      component.addSubjectForm.get('professor')?.valid.Should().BeTrue();
+      component.addSubjectForm.valid.Should().BeTrue();
     });
   });
 

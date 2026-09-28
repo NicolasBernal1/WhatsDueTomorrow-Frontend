@@ -269,10 +269,10 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.loadEvaluations(10);
 
-        expect(component.evaluationError).toBe(
+        component.evaluationError.Should().Be(
           'Error al cargar las calificaciones de la asignatura',
         );
-        expect(component.loadingEvaluations).toBeFalse();
+        component.loadingEvaluations.Should().BeFalse();
       });
     });
 
@@ -280,18 +280,18 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
       it('[P2] debe abrir en creación, edición y cerrar modal limpiando selectedEvaluation', () => {
         // Modo creación
         component.openEvaluationModal();
-        expect(component.showEvaluationModal).toBeTrue();
-        expect(component.selectedEvaluation).toBeNull();
+        component.showEvaluationModal.Should().BeTrue();
+        Should(component.selectedEvaluation).BeNull();
 
         // Modo edición
         component.openEvaluationModal(mockEvaluations[0]);
-        expect(component.showEvaluationModal).toBeTrue();
-        expect(component.selectedEvaluation).toEqual(mockEvaluations[0]);
+        component.showEvaluationModal.Should().BeTrue();
+        Should(component.selectedEvaluation).BeEquivalentTo(mockEvaluations[0]);
 
         // Cierre
         component.closeEvaluationModal();
-        expect(component.showEvaluationModal).toBeFalse();
-        expect(component.selectedEvaluation).toBeNull();
+        component.showEvaluationModal.Should().BeFalse();
+        Should(component.selectedEvaluation).BeNull();
       });
     });
 
@@ -312,13 +312,13 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           zeroRemainingSummary,
           component.hypotheticalScore,
           3.0,
         );
-        expect(component.simResult?.requiredForTarget).toBeNull();
-        expect(component.simResult?.isTargetAttainable).toBeFalse();
+        Should(component.simResult?.requiredForTarget).BeNull();
+        component.simResult?.isTargetAttainable.Should().BeFalse();
       });
 
       it('[P4: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 22] simulación con remainingWeight > 0 sin nota hipotética', () => {
@@ -334,13 +334,13 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           mockSummary,
           null,
           3.0,
         );
-        expect(component.simResult?.requiredForTarget).toBe(2.57);
-        expect(component.simResult?.hypotheticalFinalGrade).toBeNull();
+        Should(component.simResult?.requiredForTarget).Be(2.57);
+        Should(component.simResult?.hypotheticalFinalGrade).BeNull();
       });
 
       it('[P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 11 → 22] simulación reactiva completa con nota hipotética y meta', () => {
@@ -356,13 +356,13 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           mockSummary,
           4.0,
           3.5,
         );
-        expect(component.simResult?.hypotheticalFinalGrade).toBe(3.86);
-        expect(component.simResult?.hypotheticalStatus).toBe('Aprobando');
+        Should(component.simResult?.hypotheticalFinalGrade).Be(3.86);
+        Should(component.simResult?.hypotheticalStatus).Be('Aprobando');
       });
 
       it('guardia onSimulationChange: no debe ejecutar simulación si gradeSummary es null', () => {
@@ -371,7 +371,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).not.toHaveBeenCalled();
+        Should(evaluationServiceMock.simulateLocally).NotHaveBeenCalled();
       });
     });
 
@@ -381,8 +381,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
         component.openEvaluationModal();
         component.onEvaluationSaved();
 
-        expect(component.loadEvaluations).toHaveBeenCalledWith(10);
-        expect(component.showEvaluationModal).toBeFalse();
+        Should(component.loadEvaluations).HaveBeenCalledWith(10);
+        component.showEvaluationModal.Should().BeFalse();
       });
     });
 
@@ -392,8 +392,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(window.confirm).toHaveBeenCalled();
-        expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
+        Should(window.confirm).HaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).NotHaveBeenCalled();
       });
 
       it('[P11: 1 → 2 → 3 → 5 → 6 → 15 → 23 → 24 → 22] confirmación aceptada pero error HTTP en deleteEvaluation', () => {
@@ -405,9 +405,9 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(window.confirm).toHaveBeenCalled();
-        expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
-        expect(console.error).toHaveBeenCalled();
+        Should(window.confirm).HaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).HaveBeenCalledWith(10, 1);
+        Should(console.error).HaveBeenCalled();
       });
 
       it('[P12: 1 → 2 → 3 → 5 → 6 → 15 → 23 → 25 → 22] confirmación aceptada y éxito HTTP con res.data actualizado', () => {
@@ -434,10 +434,10 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
-        expect(component.evaluations).toEqual(updatedEvaluations);
-        expect(component.gradeSummary).toEqual(updatedSummary);
-        expect(component.onSimulationChange).toHaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).HaveBeenCalledWith(10, 1);
+        component.evaluations.Should().BeEquivalentTo(updatedEvaluations);
+        Should(component.gradeSummary).BeEquivalentTo(updatedSummary);
+        Should(component.onSimulationChange).HaveBeenCalled();
       });
 
       it('[P12] confirmación aceptada y éxito HTTP cuando res.data es null invoca loadEvaluations como respaldo', () => {
@@ -454,8 +454,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(component.loadEvaluations).toHaveBeenCalledWith(10);
-        expect(component.onSimulationChange).toHaveBeenCalled();
+        Should(component.loadEvaluations).HaveBeenCalledWith(10);
+        Should(component.onSimulationChange).HaveBeenCalled();
       });
 
       it('guardia deleteEvaluation: no debe realizar acciones si subject es undefined', () => {
@@ -464,8 +464,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(window.confirm).not.toHaveBeenCalled();
-        expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
+        Should(window.confirm).NotHaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).NotHaveBeenCalled();
       });
     });
 
@@ -481,7 +481,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
         // Verificación de defecto QA DEF-QA-F25-03:
         // Se documenta que el componente frontend traslada el valor 9.5 directamente a simulateLocally
         // sin bloquearlo o marcarlo como inválido en la vista
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           mockSummary,
           9.5,
           3.0,

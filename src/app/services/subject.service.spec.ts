@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SubjectService } from './subject.service';
 import { environment } from '../../environments/environment';
+import { Should } from '../common/fluent-assertions';
 
 describe('SubjectService', () => {
   let service: SubjectService;
@@ -20,7 +21,7 @@ describe('SubjectService', () => {
   afterEach(() => httpMock.verify());
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    Should(service).NotBeNull();
   });
 
   // ─── getSubjects ──────────────────────────────────────────────────────────────
@@ -30,12 +31,12 @@ describe('SubjectService', () => {
       const mockResponse = { status: 200, data: [{ id: 1, name: 'Math', professor: 'Dr. Smith', color: '#ff0000', credits: 3 }] };
 
       service.getSubjects().subscribe(res => {
-        expect(res.data?.length).toBe(1);
-        expect(res.data?.[0].name).toBe('Math');
+        Should(res.data?.length).Be(1);
+        Should(res.data?.[0].name).Be('Math');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush(mockResponse);
     });
   });
@@ -47,12 +48,12 @@ describe('SubjectService', () => {
       const mockResponse = { status: 200, data: { id: 5, name: 'Physics', professor: 'Dr. Jones', color: '#0000ff', credits: 4 } };
 
       service.getSubjectById(5).subscribe(res => {
-        expect(res.data?.id).toBe(5);
-        expect(res.data?.name).toBe('Physics');
+        Should(res.data?.id).Be(5);
+        Should(res.data?.name).Be('Physics');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/5`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush(mockResponse);
     });
   });
@@ -65,12 +66,12 @@ describe('SubjectService', () => {
       const mockResponse = { status: 201 };
 
       service.addSubject(dto).subscribe(res => {
-        expect(res.status).toBe(201);
+        res.status.Should().Be(201);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(dto);
+      req.request.method.Should().Be('POST');
+      req.request.body.Should().BeEquivalentTo(dto);
       req.flush(mockResponse);
     });
   });
@@ -82,11 +83,11 @@ describe('SubjectService', () => {
       const mockResponse = { status: 200 };
 
       service.deleteSubject(3).subscribe(res => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/3`);
-      expect(req.request.method).toBe('DELETE');
+      req.request.method.Should().Be('DELETE');
       req.flush(mockResponse);
     });
   });
@@ -98,12 +99,12 @@ describe('SubjectService', () => {
       const mockResponse = { status: 200, data: [{ id: 1, dayOfWeek: 'Monday', startTime: '08:00', endTime: '10:00', subjectId: 1, subjectName: 'Math', color: '#ff0000' }] };
 
       service.getClass().subscribe(res => {
-        expect(res.data?.length).toBe(1);
-        expect(res.data?.[0].dayOfWeek).toBe('Monday');
+        Should(res.data?.length).Be(1);
+        Should(res.data?.[0].dayOfWeek).Be('Monday');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/classes`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush(mockResponse);
     });
   });
@@ -115,11 +116,11 @@ describe('SubjectService', () => {
       const mockResponse = { status: 200 };
 
       service.deleteClass(7).subscribe(res => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/classes/7`);
-      expect(req.request.method).toBe('DELETE');
+      req.request.method.Should().Be('DELETE');
       req.flush(mockResponse);
     });
   });
@@ -143,13 +144,13 @@ describe('SubjectService', () => {
       };
 
       service.getAcademicLoadSummary().subscribe(res => {
-        expect(res.data?.totalCredits).toBe(15);
-        expect(res.data?.status).toBe('balanceada');
-        expect(res.data?.weeklyAutonomousHours).toBe(16);
+        Should(res.data?.totalCredits).Be(15);
+        Should(res.data?.status).Be('balanceada');
+        Should(res.data?.weeklyAutonomousHours).Be(16);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/academic-load`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush(mockResponse);
     });
   });
@@ -159,12 +160,12 @@ describe('SubjectService', () => {
       const mockResponse = { status: 200, data: [{ id: 1, name: 'Cálculo', professor: 'Dr. Smith', color: '#ff0000', credits: 3 }] };
 
       service.searchSubjects('cálculo & más').subscribe(res => {
-        expect(res.data?.length).toBe(1);
-        expect(res.data?.[0].name).toBe('Cálculo');
+        Should(res.data?.length).Be(1);
+        Should(res.data?.[0].name).Be('Cálculo');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/search?q=${encodeURIComponent('cálculo & más')}`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush(mockResponse);
     });
   });
