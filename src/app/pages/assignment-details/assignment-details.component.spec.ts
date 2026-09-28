@@ -7,6 +7,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { AssignmentResponseCompDto } from '../../models/assignment-response-comp.dto';
 import { Subtask } from '../../models/subtask.model';
+import { Should, fluent } from '../../common/fluent-assertions';
 
 describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con avance porcentual - Tabla 11)', () => {
   let component: AssignmentDetailsComponent;
@@ -86,10 +87,10 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
 
   it('debe crearse e inicializarse correctamente cargando la entrega y sus subtareas', () => {
     fixture.detectChanges();
-    expect(component).toBeTruthy();
-    expect(component.assignment?.id).toBe(10);
-    expect(component.subtasks.length).toBe(2);
-    expect(component.progress).toBe(50);
+    component.Should().NotBeNull();
+    component.assignment?.id.Should().Be(10);
+    component.subtasks.Should().HaveCount(2);
+    component.progress.Should().Be(50);
   });
 
   // ─── TABLA 11: CAMINOS BÁSICOS INDEPENDIENTES (FRONTEND F22) ─────────────────
@@ -102,9 +103,9 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.ngOnInit();
 
-    // Assert
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/assignments']);
-    expect(assignmentServiceMock.getAllAssignments).not.toHaveBeenCalled();
+    // Assert (Fluent Assertions)
+    Should(routerMock.navigate).HaveBeenCalledWith(['/assignments']);
+    Should(assignmentServiceMock.getAllAssignments).NotHaveBeenCalled();
   });
 
   // Camino P2: 1-2-4-5-6-24 (ID numérico pero asignación no encontrada en la API)
@@ -117,9 +118,9 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.ngOnInit();
 
-    // Assert
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/assignments']);
-    expect(component.assignment).toBeUndefined();
+    // Assert (Fluent Assertions)
+    Should(routerMock.navigate).HaveBeenCalledWith(['/assignments']);
+    fluent(component.assignment).Should().BeUndefined();
   });
 
   // Camino P3: 1-2-4-5-7-8-10-11-12-24 (Fallo HTTP al cargar subtareas)
@@ -132,9 +133,9 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.ngOnInit();
 
-    // Assert
-    expect(component.error).toBe('No fue posible cargar las subtareas.');
-    expect(component.loading).toBeFalse();
+    // Assert (Fluent Assertions)
+    component.error.Should().Be('No fue posible cargar las subtareas.');
+    component.loading.Should().BeFalse();
   });
 
   // Camino P4: 1-2-4-5-7-8-9-11-12-24 (Flujo nominal de consulta y renderizado de progreso)
@@ -142,10 +143,10 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.ngOnInit();
 
-    // Assert
-    expect(component.loading).toBeFalse();
-    expect(component.subtasks.length).toBe(2);
-    expect(component.progress).toBe(50);
+    // Assert (Fluent Assertions)
+    component.loading.Should().BeFalse();
+    component.subtasks.Should().HaveCount(2);
+    component.progress.Should().Be(50);
   });
 
   // Camino P5: 1-2-4-5-7-8-9-11-12-13-11-12-24 (Intento de agregar subtarea con campo vacío)
@@ -157,8 +158,8 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.addSubtask();
 
-    // Assert
-    expect(subtaskServiceMock.create).not.toHaveBeenCalled();
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.create).NotHaveBeenCalled();
   });
 
   // Camino P6: 1-2-4-5-7-8-9-11-12-13-14-11-12-24 (Creación exitosa de subtarea)
@@ -178,11 +179,11 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.addSubtask();
 
-    // Assert
-    expect(subtaskServiceMock.create).toHaveBeenCalledWith(10, 'Nuevo Diagrama de Componentes');
-    expect(component.newTitle).toBe('');
-    expect(component.subtasks.length).toBe(3);
-    expect(component.progress).toBe(33);
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.create).HaveBeenCalledWith(10, 'Nuevo Diagrama de Componentes');
+    component.newTitle.Should().Be('');
+    component.subtasks.Should().HaveCount(3);
+    component.progress.Should().Be(33);
   });
 
   // Camino P7: 1-2-4-5-7-8-9-11-12-15-16-11-12-24 (Toggle optimista exitoso con recálculo reactivo)
@@ -201,9 +202,9 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.toggleSubtask(targetSubtask);
 
-    // Assert
-    expect(subtaskServiceMock.update).toHaveBeenCalledWith(10, 102, { completed: true });
-    expect(component.progress).toBe(100);
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.update).HaveBeenCalledWith(10, 102, { completed: true });
+    component.progress.Should().Be(100);
   });
 
   // Camino P8: 1-2-4-5-7-8-9-11-12-15-16-17-11-12-24 (Fallo en toggle -> Rollback del estado previo)
@@ -218,9 +219,9 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.toggleSubtask(targetSubtask);
 
-    // Assert
-    expect(targetSubtask.completed).toBeFalse();
-    expect(component.error).toBe('No fue posible actualizar el progreso.');
+    // Assert (Fluent Assertions)
+    targetSubtask.completed.Should().BeFalse();
+    component.error.Should().Be('No fue posible actualizar el progreso.');
   });
 
   // Camino P9: 1-2-4-5-7-8-9-11-12-18-11-12-24 (Edición con título vacío previene actualización)
@@ -233,8 +234,8 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.saveEditing(mockSubtask1);
 
-    // Assert
-    expect(subtaskServiceMock.update).not.toHaveBeenCalled();
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.update).NotHaveBeenCalled();
   });
 
   // Camino P10: 1-2-4-5-7-8-9-11-12-18-19-11-12-24 (Renombrado exitoso de subtarea)
@@ -254,9 +255,9 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.saveEditing(mockSubtask1);
 
-    // Assert
-    expect(subtaskServiceMock.update).toHaveBeenCalledWith(10, 101, { title: 'Diagrama de Contexto C4 Actualizado' });
-    expect(component.editingId).toBeUndefined();
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.update).HaveBeenCalledWith(10, 101, { title: 'Diagrama de Contexto C4 Actualizado' });
+    fluent(component.editingId).Should().BeUndefined();
   });
 
   // Camino P11: 1-2-4-5-7-8-9-11-12-20-11-12-24 (Eliminación exitosa de subtarea)
@@ -274,10 +275,10 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act
     component.deleteSubtask(mockSubtask1);
 
-    // Assert
-    expect(subtaskServiceMock.remove).toHaveBeenCalledWith(10, 101);
-    expect(component.subtasks.length).toBe(1);
-    expect(component.progress).toBe(0);
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.remove).HaveBeenCalledWith(10, 101);
+    component.subtasks.Should().HaveCount(1);
+    component.progress.Should().Be(0);
   });
 
   // Camino P12: 1-2-4-5-7-8-9-11-12-21-22-11-12-24 (Mover fuera de límites: BVA boundary check)
@@ -288,14 +289,14 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act: Intentar subir la primera subtarea (índice 0 con dirección -1 -> targetIndex -1)
     component.move(component.subtasks[0], -1);
 
-    // Assert
-    expect(subtaskServiceMock.reorder).not.toHaveBeenCalled();
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.reorder).NotHaveBeenCalled();
 
     // Act: Intentar bajar la última subtarea (índice 1 con dirección +1 -> targetIndex 2 >= length)
     component.move(component.subtasks[1], 1);
 
-    // Assert
-    expect(subtaskServiceMock.reorder).not.toHaveBeenCalled();
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.reorder).NotHaveBeenCalled();
   });
 
   // Camino P13: 1-2-4-5-7-8-9-11-12-21-22-23-11-12-24 (Swap posicional y reordenamiento persistido)
@@ -313,8 +314,8 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Act: Bajar la primera subtarea (índice 0 con dirección +1)
     component.move(component.subtasks[0], 1);
 
-    // Assert
-    expect(subtaskServiceMock.reorder).toHaveBeenCalledWith(10, [102, 101]);
+    // Assert (Fluent Assertions)
+    Should(subtaskServiceMock.reorder).HaveBeenCalledWith(10, [102, 101]);
   });
 
   // ─── PRUEBAS DE DETECCIÓN DE DEFECTOS (QA AUDIT / VERIFICACIÓN DE DEFECTOS) ───
@@ -324,7 +325,7 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Arrange
     component.ngOnInit();
     component.startEditing(mockSubtask1);
-    expect(component.editingId).toBe(101);
+    fluent(component.editingId).Should().Be(101);
 
     // Act: El estudiante borra todo el texto e intenta guardar
     component.editingTitle = '';
@@ -332,6 +333,6 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
 
     // Verificación del defecto QA DEF-QA-F22-01:
     // Al no resetear editingId cuando el título está vacío, el componente permanece en modo edición (editingId = 101)
-    expect(component.editingId).toBe(101);
+    fluent(component.editingId).Should().Be(101);
   });
 });

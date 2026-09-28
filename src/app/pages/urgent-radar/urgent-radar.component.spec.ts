@@ -5,6 +5,7 @@ import { UrgentAlertService } from '../../services/urgent-alert.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { AssignmentResponseCompDto } from '../../models/assignment-response-comp.dto';
+import { Should, fluent } from '../../common/fluent-assertions';
 
 describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', () => {
   let component: UrgentRadarComponent;
@@ -48,8 +49,8 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
 
   it('debe inicializarse correctamente y activar el servicio de alertas (UrgentAlertService.start)', () => {
     fixture.detectChanges();
-    expect(component).toBeTruthy();
-    expect(urgentAlertServiceMock.start).toHaveBeenCalled();
+    component.Should().NotBeNull();
+    Should(urgentAlertServiceMock.start).HaveBeenCalled();
   });
 
   // ─── TABLA 5: CAMINOS BÁSICOS INDEPENDIENTES (CFG FRONTEND F21) ─────────────
@@ -64,10 +65,10 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Act
     (component as any).loadUrgentAssignments();
 
-    // Assert
-    expect(component.assignments).toEqual([]);
-    expect(component.urgentAssignments).toEqual([]);
-    expect(component.loading).toBeFalse();
+    // Assert (Fluent Assertions)
+    component.assignments.Should().BeEmpty();
+    component.urgentAssignments.Should().BeEmpty();
+    component.loading.Should().BeFalse();
   });
 
   // Camino P2: 1-2-3-9-10-14-15-16-19-9-10-11-12-13-15-16-20 (Reintento interactivo exitoso tras error inicial)
@@ -77,7 +78,7 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
       throwError(() => new Error('Fallo de conexión inicial'))
     );
     (component as any).loadUrgentAssignments();
-    expect(component.assignments.length).toBe(0);
+    component.assignments.Should().BeEmpty();
 
     // Act - Segundo intento exitoso (Reintentar)
     assignmentServiceMock.getUrgentAssignments.and.returnValue(
@@ -85,10 +86,10 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     );
     (component as any).loadUrgentAssignments();
 
-    // Assert
-    expect(component.assignments.length).toBe(1);
-    expect(component.urgentAssignments.length).toBe(1);
-    expect(component.loading).toBeFalse();
+    // Assert (Fluent Assertions)
+    component.assignments.Should().HaveCount(1);
+    component.urgentAssignments.Should().HaveCount(1);
+    component.loading.Should().BeFalse();
   });
 
   // Camino P3: 1-2-3-9-10-11-12-15-16-20 (Caso borde: lista vacía de urgencias)
@@ -101,10 +102,10 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Act
     (component as any).loadUrgentAssignments();
 
-    // Assert
-    expect(component.assignments).toEqual([]);
-    expect(component.urgentAssignments).toEqual([]);
-    expect(component.loading).toBeFalse();
+    // Assert (Fluent Assertions)
+    component.assignments.Should().BeEmpty();
+    component.urgentAssignments.Should().BeEmpty();
+    component.loading.Should().BeFalse();
   });
 
   // Camino P4: 1-2-3-9-10-11-12-13-15-16-20 (Flujo nominal con entregas urgentes activas)
@@ -113,12 +114,11 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     fixture.detectChanges();
     (component as any).loadUrgentAssignments();
 
-    // Assert
-    expect(component.assignments.length).toBe(1);
-    expect(component.urgentAssignments.length).toBe(1);
-    expect(component.urgentAssignments[0].countdown).not.toBe('Vencida');
-    expect(component.urgentAssignments[0].countdown).toContain('h');
-    expect(component.loading).toBeFalse();
+    // Assert (Fluent Assertions con encadenamiento)
+    component.assignments.Should().HaveCount(1);
+    component.urgentAssignments.Should().HaveCount(1);
+    component.urgentAssignments[0].countdown.Should().NotBe('Vencida').And.Contain('h');
+    component.loading.Should().BeFalse();
   });
 
   // Camino P5: 1-2-3-9-10-11-12-13-15-16-17-20 (Inspección de atributos de entrega urgente)
@@ -127,12 +127,12 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     fixture.detectChanges();
     (component as any).loadUrgentAssignments();
 
-    // Assert
+    // Assert (Fluent Assertions)
     const item = component.urgentAssignments[0];
-    expect(item).toBeDefined();
-    expect(item.title).toBe('Proyecto Final V&V');
-    expect(item.subjectName).toBe('Verificación y Validación');
-    expect(item.reminderMinutes).toBe(30);
+    item.Should().NotBeNull().And.BeDefined();
+    item.title.Should().Be('Proyecto Final V&V');
+    item.subjectName.Should().Be('Verificación y Validación');
+    item.reminderMinutes!.Should().Be(30);
   });
 
   // Camino P6: 1-2-3-9-10-11-12-13-15-16-18-20 (Transición de estado: habilitación de notificaciones web)
@@ -140,17 +140,17 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Caso 1: Concedido
     urgentAlertServiceMock.requestPermission.and.resolveTo('granted');
     await component.enableNotifications();
-    expect(component.notificationMessage).toBe('Las alertas web están activadas.');
+    component.notificationMessage.Should().Be('Las alertas web están activadas.');
 
     // Caso 2: No soportado
     urgentAlertServiceMock.requestPermission.and.resolveTo('unsupported');
     await component.enableNotifications();
-    expect(component.notificationMessage).toBe('Este navegador no admite alertas web.');
+    component.notificationMessage.Should().Be('Este navegador no admite alertas web.');
 
     // Caso 3: Denegado
     urgentAlertServiceMock.requestPermission.and.resolveTo('denied');
     await component.enableNotifications();
-    expect(component.notificationMessage).toBe('No se concedió permiso para mostrar alertas.');
+    component.notificationMessage.Should().Be('No se concedió permiso para mostrar alertas.');
   });
 
   // Camino P7: 1-2-3-4-5-6-3-9-10-11-12-13-15-16-20 (Entrega vencida: diffHours < 0)
@@ -166,9 +166,9 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Act
     (component as any).updateCountdowns();
 
-    // Assert: getCountdown retorna 'Vencida' y el filtro la excluye de urgentAssignments
-    expect((component as any).getCountdown(overdueAssignment.dueDate)).toBe('Vencida');
-    expect(component.urgentAssignments.length).toBe(0);
+    // Assert (Fluent Assertions)
+    fluent((component as any).getCountdown(overdueAssignment.dueDate)).Should().Be('Vencida');
+    component.urgentAssignments.Should().BeEmpty();
   });
 
   // Camino P8: 1-2-3-4-5-7-8-3-9-10-11-12-13-15-16-20 (Ventana crítica: 0 <= diffHours <= 12)
@@ -184,9 +184,9 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Act
     (component as any).updateCountdowns();
 
-    // Assert
-    expect(component.urgentAssignments.length).toBe(1);
-    expect(component.urgentAssignments[0].countdown).toMatch(/^[23]\s*h\s*\d+\s*min$/);
+    // Assert (Fluent Assertions)
+    component.urgentAssignments.Should().HaveCount(1);
+    component.urgentAssignments[0].countdown.Should().Match(/^[23]\s*h\s*\d+\s*min$/);
   });
 
   // Camino P9: 1-2-3-4-5-7-3-9-10-11-12-13-15-16-20 (Ventana urgente moderada: 12 < diffHours <= 24)
@@ -202,9 +202,9 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Act
     (component as any).updateCountdowns();
 
-    // Assert
-    expect(component.urgentAssignments.length).toBe(1);
-    expect(component.urgentAssignments[0].countdown).toMatch(/^(19|20)\s*h\s*\d+\s*min$/);
+    // Assert (Fluent Assertions)
+    component.urgentAssignments.Should().HaveCount(1);
+    component.urgentAssignments[0].countdown.Should().Match(/^(19|20)\s*h\s*\d+\s*min$/);
   });
 
   // ─── LIMPIEZA DE RECURSOS (ngOnDestroy) ──────────────────────────────────────
@@ -213,12 +213,12 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     const refreshSub = (component as any).refreshSubscription;
     const countdownSub = (component as any).countdownSubscription;
 
-    expect(refreshSub.closed).toBeFalse();
-    expect(countdownSub.closed).toBeFalse();
+    refreshSub.closed.Should().BeFalse();
+    countdownSub.closed.Should().BeFalse();
 
     component.ngOnDestroy();
 
-    expect(refreshSub.closed).toBeTrue();
-    expect(countdownSub.closed).toBeTrue();
+    refreshSub.closed.Should().BeTrue();
+    countdownSub.closed.Should().BeTrue();
   });
 });
