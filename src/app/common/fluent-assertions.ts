@@ -2,8 +2,29 @@ import * as chai from 'chai';
 
 chai.should();
 
+function registerExpectation(): void {
+  const g =
+    typeof globalThis !== 'undefined'
+      ? (globalThis as any)
+      : typeof window !== 'undefined'
+        ? (window as any)
+        : null;
+  if (g && typeof g.expect === 'function') {
+    try {
+      const exp = g.expect();
+      if (exp && typeof exp.nothing === 'function') {
+        exp.nothing();
+      }
+    } catch {
+      // outside Jasmine context or nothing() unsupported
+    }
+  }
+}
+
 export class ExceptionAssertion {
-  constructor(public error: any) {}
+  constructor(public error: any) {
+    registerExpectation();
+  }
 
   public WithMessage(expectedMessage: string): this {
     chai.expect(this.error?.message || String(this.error)).to.include(expectedMessage);
@@ -16,7 +37,20 @@ export class ExceptionAssertion {
 }
 
 export class FluentAssertion<T> {
-  constructor(private actual: T) {}
+  private readonly actual: any;
+
+  constructor(actual: T) {
+    if (actual && actual instanceof FluentAssertion) {
+      this.actual = (actual as any).actual;
+    } else {
+      this.actual = actual;
+    }
+    registerExpectation();
+  }
+
+  public Should(): this {
+    return this;
+  }
 
   public get And(): this {
     return this;
@@ -38,42 +72,42 @@ export class FluentAssertion<T> {
   }
 
   public BeNull(): this {
-    chai.expect(this.actual).to.be.null;
+    chai.assert.isNull(this.actual);
     return this;
   }
 
   public NotBeNull(): this {
-    chai.expect(this.actual).to.not.be.null;
+    chai.assert.isNotNull(this.actual);
     return this;
   }
 
   public BeDefined(): this {
-    chai.expect(this.actual).to.not.be.undefined;
+    chai.assert.isDefined(this.actual);
     return this;
   }
 
   public BeUndefined(): this {
-    chai.expect(this.actual).to.be.undefined;
+    chai.assert.isUndefined(this.actual);
     return this;
   }
 
   public BeTrue(): this {
-    chai.expect(this.actual).to.be.true;
+    chai.assert.isTrue(this.actual as unknown as boolean);
     return this;
   }
 
   public BeFalse(): this {
-    chai.expect(this.actual).to.be.false;
+    chai.assert.isFalse(this.actual as unknown as boolean);
     return this;
   }
 
   public BeEmpty(): this {
-    chai.expect(this.actual).to.be.empty;
+    chai.assert.isEmpty(this.actual as any);
     return this;
   }
 
   public NotBeEmpty(): this {
-    chai.expect(this.actual).to.not.be.empty;
+    chai.assert.isNotEmpty(this.actual as any);
     return this;
   }
 
@@ -94,13 +128,13 @@ export class FluentAssertion<T> {
 
   public StartWith(prefix: string): this {
     chai.expect(this.actual).to.be.a('string');
-    chai.expect((this.actual as unknown as string).startsWith(prefix)).to.be.true;
+    chai.assert.isTrue((this.actual as unknown as string).startsWith(prefix));
     return this;
   }
 
   public EndWith(suffix: string): this {
     chai.expect(this.actual).to.be.a('string');
-    chai.expect((this.actual as unknown as string).endsWith(suffix)).to.be.true;
+    chai.assert.isTrue((this.actual as unknown as string).endsWith(suffix));
     return this;
   }
 
@@ -185,7 +219,7 @@ export class FluentAssertion<T> {
     } catch (err) {
       thrownError = err;
     }
-    chai.expect(thrownError, 'Expected function to throw an exception').to.not.be.null;
+    chai.assert.isNotNull(thrownError, 'Expected function to throw an exception');
     if (expectedErrorOrMessage) {
       if (typeof expectedErrorOrMessage === 'string') {
         chai.expect(thrownError.message || String(thrownError)).to.include(expectedErrorOrMessage);
@@ -203,7 +237,7 @@ export class FluentAssertion<T> {
     } catch (err) {
       thrownError = err;
     }
-    chai.expect(thrownError, 'Expected async function to reject/throw an exception').to.not.be.null;
+    chai.assert.isNotNull(thrownError, 'Expected async function to reject/throw an exception');
     if (expectedErrorOrMessage) {
       if (typeof expectedErrorOrMessage === 'string') {
         chai.expect(thrownError.message || String(thrownError)).to.include(expectedErrorOrMessage);

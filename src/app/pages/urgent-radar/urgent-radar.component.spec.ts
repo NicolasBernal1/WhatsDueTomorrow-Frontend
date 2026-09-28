@@ -167,7 +167,7 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     (component as any).updateCountdowns();
 
     // Assert (Fluent Assertions)
-    fluent((component as any).getCountdown(overdueAssignment.dueDate)).Should().Be('Vencida');
+    Should((component as any).getCountdown(overdueAssignment.dueDate)).Be('Vencida');
     component.urgentAssignments.Should().BeEmpty();
   });
 

@@ -246,6 +246,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
     // Verificación de Defecto QA DEF-QA-F24-02
     it('[DEF-QA-F24-02] debe documentar que la interfaz no despliega retroalimentación visual al fallar la eliminación en backend', () => {
       spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(console, 'error');
       noteServiceMock.deleteNote.and.returnValue(
         throwError(() => new Error('Error de red en servidor')),
       );

@@ -120,7 +120,7 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
 
     // Assert (Fluent Assertions)
     Should(routerMock.navigate).HaveBeenCalledWith(['/assignments']);
-    fluent(component.assignment).Should().BeUndefined();
+    Should(component.assignment).BeUndefined();
   });
 
   // Camino P3: 1-2-4-5-7-8-10-11-12-24 (Fallo HTTP al cargar subtareas)
@@ -257,7 +257,7 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
 
     // Assert (Fluent Assertions)
     Should(subtaskServiceMock.update).HaveBeenCalledWith(10, 101, { title: 'Diagrama de Contexto C4 Actualizado' });
-    fluent(component.editingId).Should().BeUndefined();
+    Should(component.editingId).BeUndefined();
   });
 
   // Camino P11: 1-2-4-5-7-8-9-11-12-20-11-12-24 (Eliminación exitosa de subtarea)
@@ -325,7 +325,7 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     // Arrange
     component.ngOnInit();
     component.startEditing(mockSubtask1);
-    fluent(component.editingId).Should().Be(101);
+    Should(component.editingId).Be(101);
 
     // Act: El estudiante borra todo el texto e intenta guardar
     component.editingTitle = '';
@@ -333,6 +333,6 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
 
     // Verificación del defecto QA DEF-QA-F22-01:
     // Al no resetear editingId cuando el título está vacío, el componente permanece en modo edición (editingId = 101)
-    fluent(component.editingId).Should().Be(101);
+    Should(component.editingId).Be(101);
   });
 });

@@ -105,13 +105,13 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
     it('no debe iniciar monitoreo si Notification no existe en window', () => {
       delete (window as any).Notification;
       service.start();
-      fluent((service as any).monitoring).Should().BeUndefined();
+      Should((service as any).monitoring).BeUndefined();
     });
 
     it('debe iniciar la suscripción periódica y consultar getAllAssignments', fakeAsync(() => {
       service.start();
       tick(1);
-      fluent((service as any).monitoring).Should().NotBeNull().And.BeDefined();
+      Should((service as any).monitoring).NotBeNull().And.BeDefined();
       Should(assignmentServiceMock.getAllAssignments).HaveBeenCalled();
     }));
 
@@ -131,7 +131,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
         tick(1);
       }).not.toThrow();
 
-      fluent((service as any).monitoring).Should().NotBeNull().And.BeDefined();
+      Should((service as any).monitoring).NotBeNull().And.BeDefined();
     }));
   });
 
@@ -171,7 +171,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       });
 
       const key = `urgent-alert-501-${new Date(sampleAssignment.dueDate).getTime()}`;
-      fluent(localStorage.getItem(key)).Should().Be('sent');
+      Should(localStorage.getItem(key)).Be('sent');
     });
 
     it('no debe duplicar notificación si la clave ya se encuentra registrada en localStorage', () => {
