@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Note } from '../../models/note.model';
+import { Should } from '../../common/fluent-assertions';
 
 describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 25)', () => {
   let component: NoteModalComponent;
@@ -37,7 +38,7 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
   });
 
   it('debe crearse correctamente el componente NoteModalComponent', () => {
-    expect(component).toBeTruthy();
+    component.Should().NotBeNull().And.BeDefined();
   });
 
   // Camino P3: 1-2-3-5-6-7-8-13-14-15-13-21-6-7-22
@@ -50,11 +51,11 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       component.onSave();
 
-      expect(component.noteForm.valid).toBeFalse();
-      expect(component.noteForm.get('title')?.touched).toBeTrue();
-      expect(component.noteForm.get('content')?.touched).toBeTrue();
-      expect(noteServiceMock.createNote).not.toHaveBeenCalled();
-      expect(noteServiceMock.updateNote).not.toHaveBeenCalled();
+      component.noteForm.valid.Should().BeFalse();
+      component.noteForm.get('title')?.touched.Should().BeTrue();
+      component.noteForm.get('content')?.touched.Should().BeTrue();
+      Should(noteServiceMock.createNote).NotHaveBeenCalled();
+      Should(noteServiceMock.updateNote).NotHaveBeenCalled();
     });
   });
 
@@ -73,13 +74,13 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       component.onSave();
 
-      expect(noteServiceMock.createNote).toHaveBeenCalledWith(10, {
+      Should(noteServiceMock.createNote).HaveBeenCalledWith(10, {
         title: 'Resumen Parcial',
         content: 'Temas 1 al 4',
         linkUrl: 'https://docs.google.com/resumen',
       });
-      expect(component.isSubmitting).toBeFalse();
-      expect(component.errorMessage).toBe('No fue posible guardar el apunte.');
+      component.isSubmitting.Should().BeFalse();
+      component.errorMessage.Should().Be('No fue posible guardar el apunte.');
     });
   });
 
@@ -104,13 +105,13 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       component.onSave();
 
-      expect(noteServiceMock.createNote).toHaveBeenCalledWith(10, {
+      Should(noteServiceMock.createNote).HaveBeenCalledWith(10, {
         title: 'Nueva Nota',
         content: 'Nuevo Contenido',
         linkUrl: 'https://sitio.com/recurso',
       });
-      expect(component.save.emit).toHaveBeenCalled();
-      expect(component.close.emit).toHaveBeenCalled();
+      Should(component.save.emit).HaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
   });
 
@@ -133,11 +134,11 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       component.onSave();
 
-      expect(noteServiceMock.updateNote).toHaveBeenCalled();
-      expect(component.isSubmitting).toBeFalse();
-      expect(component.errorMessage).toBe('No fue posible actualizar el apunte.');
-      expect(component.save.emit).not.toHaveBeenCalled();
-      expect(component.close.emit).not.toHaveBeenCalled();
+      Should(noteServiceMock.updateNote).HaveBeenCalled();
+      component.isSubmitting.Should().BeFalse();
+      component.errorMessage.Should().Be('No fue posible actualizar el apunte.');
+      Should(component.save.emit).NotHaveBeenCalled();
+      Should(component.close.emit).NotHaveBeenCalled();
     });
   });
 
@@ -165,13 +166,13 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       component.onSave();
 
-      expect(noteServiceMock.updateNote).toHaveBeenCalledWith(10, 5, {
+      Should(noteServiceMock.updateNote).HaveBeenCalledWith(10, 5, {
         title: 'Título Editado',
         content: 'Contenido Editado',
         linkUrl: null,
       });
-      expect(component.save.emit).toHaveBeenCalled();
-      expect(component.close.emit).toHaveBeenCalled();
+      Should(component.save.emit).HaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
   });
 
@@ -182,9 +183,9 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       component.onClose();
 
-      expect(component.close.emit).toHaveBeenCalled();
-      expect(noteServiceMock.createNote).not.toHaveBeenCalled();
-      expect(noteServiceMock.updateNote).not.toHaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
+      Should(noteServiceMock.createNote).NotHaveBeenCalled();
+      Should(noteServiceMock.updateNote).NotHaveBeenCalled();
     });
   });
 
@@ -197,15 +198,15 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
         linkUrl: 'ftp://servidor.edu/archivo',
       });
 
-      expect(component.noteForm.get('linkUrl')?.hasError('invalidUrl')).toBeTrue();
-      expect(component.noteForm.valid).toBeFalse();
+      component.noteForm.get('linkUrl')?.hasError('invalidUrl').Should().BeTrue();
+      component.noteForm.valid.Should().BeFalse();
 
       component.noteForm.patchValue({
         linkUrl: 'https://campus.edu/material.pdf',
       });
 
-      expect(component.noteForm.get('linkUrl')?.errors).toBeNull();
-      expect(component.noteForm.valid).toBeTrue();
+      Should(component.noteForm.get('linkUrl')?.errors).BeNull();
+      component.noteForm.valid.Should().BeTrue();
     });
   });
 });

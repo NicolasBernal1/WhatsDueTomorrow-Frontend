@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 import { EvaluationModalComponent } from './evaluation-modal.component';
 import { EvaluationService } from '../../services/evaluation.service';
 import { Evaluation } from '../../models/evaluation.model';
+import { Should } from '../../common/fluent-assertions';
 
 describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)', () => {
   let component: EvaluationModalComponent;
@@ -64,27 +65,27 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
   });
 
   it('debe instanciarse correctamente', () => {
-    expect(component).toBeTruthy();
+    Should(component).NotBeNull();
   });
 
   describe('Cierre y Cancelación del Modal (P2: 1 → 2 → 3 → 5 → 6 → 21 → 22)', () => {
     it('[P2] debe emitir el evento close al invocar onClose sin mutar estado', () => {
       spyOn(component.close, 'emit');
       component.onClose();
-      expect(component.close.emit).toHaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
   });
 
   describe('Validación Reactiva de Formulario (P6: 1 → 2 → 3 → 5 → 6 → 10 → 12 → 22)', () => {
     it('[P6] formulario vacío debe ser inválido e impedir llamada a servicio ejecutando markAllAsTouched()', () => {
-      expect(component.evaluationForm.valid).toBeFalse();
+      component.evaluationForm.valid.Should().BeFalse();
       spyOn(component.evaluationForm, 'markAllAsTouched');
 
       component.onSave();
 
-      expect(component.evaluationForm.markAllAsTouched).toHaveBeenCalled();
-      expect(evaluationServiceMock.createEvaluation).not.toHaveBeenCalled();
-      expect(evaluationServiceMock.updateEvaluation).not.toHaveBeenCalled();
+      Should(component.evaluationForm.markAllAsTouched).HaveBeenCalled();
+      Should(evaluationServiceMock.createEvaluation).NotHaveBeenCalled();
+      Should(evaluationServiceMock.updateEvaluation).NotHaveBeenCalled();
     });
 
     it('[P6] debe rechazar nombres vacíos o formados únicamente por espacios en blanco', () => {
@@ -93,46 +94,46 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
         weight: 20,
         score: 4.0,
       });
-      expect(component.evaluationForm.valid).toBeFalse();
-      expect(component.evaluationForm.get('name')?.hasError('required')).toBeTrue();
+      component.evaluationForm.valid.Should().BeFalse();
+      component.evaluationForm.get('name')?.hasError('required').Should().BeTrue();
     });
 
     it('[P6] debe validar rango de porcentaje ponderado (1% a 100%)', () => {
       component.evaluationForm.patchValue({ name: 'Quiz', score: 3.5 });
 
       component.evaluationForm.patchValue({ weight: 0 });
-      expect(component.evaluationForm.get('weight')?.hasError('min')).toBeTrue();
+      component.evaluationForm.get('weight')?.hasError('min').Should().BeTrue();
 
       component.evaluationForm.patchValue({ weight: 101 });
-      expect(component.evaluationForm.get('weight')?.hasError('max')).toBeTrue();
+      component.evaluationForm.get('weight')?.hasError('max').Should().BeTrue();
 
       component.evaluationForm.patchValue({ weight: 25 });
-      expect(component.evaluationForm.get('weight')?.valid).toBeTrue();
+      component.evaluationForm.get('weight')?.valid.Should().BeTrue();
     });
 
     it('[P6] debe validar rango de calificación (0.0 a 5.0)', () => {
       component.evaluationForm.patchValue({ name: 'Quiz', weight: 15 });
 
       component.evaluationForm.patchValue({ score: -0.1 });
-      expect(component.evaluationForm.get('score')?.hasError('min')).toBeTrue();
+      component.evaluationForm.get('score')?.hasError('min').Should().BeTrue();
 
       component.evaluationForm.patchValue({ score: 5.1 });
-      expect(component.evaluationForm.get('score')?.hasError('max')).toBeTrue();
+      component.evaluationForm.get('score')?.hasError('max').Should().BeTrue();
 
       component.evaluationForm.patchValue({ score: 4.0 });
-      expect(component.evaluationForm.get('score')?.valid).toBeTrue();
+      component.evaluationForm.get('score')?.valid.Should().BeTrue();
     });
 
     it('[P6] debe calcular el aporte a la nota definitiva según peso y nota ingresados', () => {
       component.evaluationForm.patchValue({ weight: 20, score: 4.5 });
-      expect(component.calculatedContribution).toBe(0.9);
+      component.calculatedContribution.Should().Be(0.9);
 
       component.evaluationForm.patchValue({ weight: 33.33, score: 3.0 });
-      expect(component.calculatedContribution).toBe(1.0);
+      component.calculatedContribution.Should().Be(1.0);
 
       // Si los campos son inválidos o NaN, debe retornar 0
       component.evaluationForm.patchValue({ weight: '', score: '' });
-      expect(component.calculatedContribution).toBe(0);
+      component.calculatedContribution.Should().Be(0);
     });
   });
 
@@ -141,9 +142,9 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       component.evaluation = mockEvaluation;
       component.ngOnInit();
 
-      expect(component.evaluationForm.get('name')?.value).toBe('Parcial 1');
-      expect(component.evaluationForm.get('weight')?.value).toBe(25);
-      expect(component.evaluationForm.get('score')?.value).toBe(4.5);
+      component.evaluationForm.get('name')?.value.Should().Be('Parcial 1');
+      component.evaluationForm.get('weight')?.value.Should().Be(25);
+      component.evaluationForm.get('score')?.value.Should().Be(4.5);
 
       evaluationServiceMock.updateEvaluation.and.returnValue(
         of(mockEvaluationResponse),
@@ -158,14 +159,14 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       });
       component.onSave();
 
-      expect(evaluationServiceMock.updateEvaluation).toHaveBeenCalledWith(10, 1, {
+      Should(evaluationServiceMock.updateEvaluation).HaveBeenCalledWith(10, 1, {
         name: 'Parcial 1 Editado',
         weight: 30,
         score: 4.8,
       });
-      expect(component.isSubmitting).toBeFalse();
-      expect(component.save.emit).toHaveBeenCalled();
-      expect(component.close.emit).toHaveBeenCalled();
+      component.isSubmitting.Should().BeFalse();
+      Should(component.save.emit).HaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
   });
 
@@ -187,10 +188,10 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       });
       component.onSave();
 
-      expect(component.isSubmitting).toBeFalse();
-      expect(component.errorMessage).toBe('No fue posible actualizar la evaluación.');
-      expect(component.save.emit).not.toHaveBeenCalled();
-      expect(component.close.emit).not.toHaveBeenCalled();
+      component.isSubmitting.Should().BeFalse();
+      component.errorMessage.Should().Be('No fue posible actualizar la evaluación.');
+      Should(component.save.emit).NotHaveBeenCalled();
+      Should(component.close.emit).NotHaveBeenCalled();
     });
   });
 
@@ -210,14 +211,14 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       });
       component.onSave();
 
-      expect(evaluationServiceMock.createEvaluation).toHaveBeenCalledWith(10, {
+      Should(evaluationServiceMock.createEvaluation).HaveBeenCalledWith(10, {
         name: 'Taller 1',
         weight: 20,
         score: 4.0,
       });
-      expect(component.isSubmitting).toBeFalse();
-      expect(component.save.emit).toHaveBeenCalled();
-      expect(component.close.emit).toHaveBeenCalled();
+      component.isSubmitting.Should().BeFalse();
+      Should(component.save.emit).HaveBeenCalled();
+      Should(component.close.emit).HaveBeenCalled();
     });
 
     it('[P9] debe manejar error HTTP en createEvaluation asignando errorMessage', () => {
@@ -234,9 +235,9 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       });
       component.onSave();
 
-      expect(component.isSubmitting).toBeFalse();
-      expect(component.errorMessage).toBe('No fue posible registrar la evaluación.');
-      expect(component.save.emit).not.toHaveBeenCalled();
+      component.isSubmitting.Should().BeFalse();
+      component.errorMessage.Should().Be('No fue posible registrar la evaluación.');
+      Should(component.save.emit).NotHaveBeenCalled();
     });
   });
 
@@ -253,8 +254,8 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
 
       // Verificación de defecto QA DEF-QA-F25-01:
       // projectedTotalWeight alcanza 110% (superando el 100% permitido), pero evaluationForm.valid sigue siendo true
-      expect(component.projectedTotalWeight).toBe(110);
-      expect(component.evaluationForm.valid).toBeTrue();
+      component.projectedTotalWeight.Should().Be(110);
+      component.evaluationForm.valid.Should().BeTrue();
     });
   });
 });

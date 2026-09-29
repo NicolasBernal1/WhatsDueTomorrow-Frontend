@@ -9,6 +9,7 @@ import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Note } from '../../models/note.model';
 import { Evaluation, GradeSummary } from '../../models/evaluation.model';
+import { Should } from '../../common/fluent-assertions';
 
 describe('SubjectDetailsComponent (F24 & F25)', () => {
   let component: SubjectDetailsComponent;
@@ -137,14 +138,14 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
   });
 
   it('debe crearse y cargar datos de asignatura, tareas, notas y evaluaciones al inicializar', () => {
-    expect(component).toBeTruthy();
-    expect(subjectServiceMock.getSubjectById).toHaveBeenCalledWith(10);
-    expect(assignmentServiceMock.getAssignmentsBySubject).toHaveBeenCalledWith(10);
-    expect(noteServiceMock.getNotesBySubject).toHaveBeenCalledWith(10);
-    expect(evaluationServiceMock.getEvaluationsBySubject).toHaveBeenCalledWith(10);
-    expect(component.notes.length).toBe(1);
-    expect(component.evaluations.length).toBe(1);
-    expect(component.gradeSummary?.status).toBe('Aprobando');
+    component.Should().NotBeNull().And.BeDefined();
+    Should(subjectServiceMock.getSubjectById).HaveBeenCalledWith(10);
+    Should(assignmentServiceMock.getAssignmentsBySubject).HaveBeenCalledWith(10);
+    Should(noteServiceMock.getNotesBySubject).HaveBeenCalledWith(10);
+    Should(evaluationServiceMock.getEvaluationsBySubject).HaveBeenCalledWith(10);
+    component.notes.length.Should().Be(1);
+    component.evaluations.length.Should().Be(1);
+    component.gradeSummary?.status.Should().Be('Aprobando');
   });
 
   describe('F24 Bitácora de apuntes y recursos rápidos por asignatura (Tabla 25)', () => {
@@ -156,8 +157,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
       component.loadNotes(10);
 
-      expect(component.noteError).toBe('Error al cargar los apuntes de la asignatura');
-      expect(component.loadingNotes).toBeFalse();
+      component.noteError.Should().Be('Error al cargar los apuntes de la asignatura');
+      component.loadingNotes.Should().BeFalse();
     });
 
     // Camino P2: 1-2-3-5-6-7-22
@@ -168,83 +169,84 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
       component.loadNotes(10);
 
-      expect(component.notes).toEqual(mockNotes);
-      expect(component.loadingNotes).toBeFalse();
-      expect(component.noteError).toBe('');
+      component.notes.Should().BeEquivalentTo(mockNotes);
+      component.loadingNotes.Should().BeFalse();
+      component.noteError.Should().Be('');
     });
 
     it('debe abrir el modal de nota en modo creación', () => {
       component.openNoteModal();
-      expect(component.showNoteModal).toBeTrue();
-      expect(component.selectedNote).toBeNull();
+      component.showNoteModal.Should().BeTrue();
+      Should(component.selectedNote).BeNull();
     });
 
     it('debe abrir el modal de nota en modo edición con la nota seleccionada', () => {
       component.editNote(mockNotes[0]);
-      expect(component.showNoteModal).toBeTrue();
-      expect(component.selectedNote).toEqual(mockNotes[0]);
+      component.showNoteModal.Should().BeTrue();
+      Should(component.selectedNote).BeEquivalentTo(mockNotes[0]);
     });
 
     it('debe cerrar el modal de nota y reiniciar la selección', () => {
       component.openNoteModal(mockNotes[0]);
       component.closeNoteModal();
-      expect(component.showNoteModal).toBeFalse();
-      expect(component.selectedNote).toBeNull();
+      component.showNoteModal.Should().BeFalse();
+      Should(component.selectedNote).BeNull();
     });
 
     it('debe recargar los apuntes y cerrar el modal tras guardar un apunte', () => {
-      spyOn(component, 'loadNotes');
+      const loadNotesSpy = spyOn(component, 'loadNotes');
       component.openNoteModal();
       component.onNoteSaved();
 
-      expect(component.loadNotes).toHaveBeenCalledWith(10);
-      expect(component.showNoteModal).toBeFalse();
+      Should(loadNotesSpy).HaveBeenCalledWith(10);
+      component.showNoteModal.Should().BeFalse();
     });
 
     // Camino P9: 1-2-3-5-6-7-10-11-6-7-22
     it('Camino P9 (1-2-3-5-6-7-10-11-6-7-22): NO debe eliminar la nota si el usuario cancela la confirmación', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+      const confirmSpy = spyOn(window, 'confirm').and.returnValue(false);
 
       component.deleteNote(mockNotes[0]);
 
-      expect(window.confirm).toHaveBeenCalled();
-      expect(noteServiceMock.deleteNote).not.toHaveBeenCalled();
+      Should(confirmSpy).HaveBeenCalled();
+      Should(noteServiceMock.deleteNote).NotHaveBeenCalled();
     });
 
     // Camino P10: 1-2-3-5-6-7-10-11-12-6-7-22
     it('Camino P10 (1-2-3-5-6-7-10-11-12-6-7-22): debe capturar el error de eliminación en consola y no recargar la lista', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
+      const confirmSpy = spyOn(window, 'confirm').and.returnValue(true);
       noteServiceMock.deleteNote.and.returnValue(
         throwError(() => new Error('Error al borrar nota')),
       );
-      spyOn(console, 'error');
-      spyOn(component, 'loadNotes');
+      const consoleErrorSpy = spyOn(console, 'error');
+      const loadNotesSpy = spyOn(component, 'loadNotes');
 
       component.deleteNote(mockNotes[0]);
 
-      expect(noteServiceMock.deleteNote).toHaveBeenCalledWith(10, 1);
-      expect(console.error).toHaveBeenCalled();
-      expect(component.loadNotes).not.toHaveBeenCalled();
+      Should(noteServiceMock.deleteNote).HaveBeenCalledWith(10, 1);
+      Should(consoleErrorSpy).HaveBeenCalled();
+      Should(loadNotesSpy).NotHaveBeenCalled();
     });
 
     // Camino P11: 1-2-3-5-6-7-10-11-12-2-3-5-6-7-22
     it('Camino P11 (1-2-3-5-6-7-10-11-12-2-3-5-6-7-22): debe solicitar confirmación y recargar la lista si DELETE responde 200 OK', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
+      const confirmSpy = spyOn(window, 'confirm').and.returnValue(true);
       noteServiceMock.deleteNote.and.returnValue(
         of({ status: 200, message: 'deleted', data: null }),
       );
-      spyOn(component, 'loadNotes');
+      const loadNotesSpy = spyOn(component, 'loadNotes');
 
       component.deleteNote(mockNotes[0]);
 
-      expect(window.confirm).toHaveBeenCalled();
-      expect(noteServiceMock.deleteNote).toHaveBeenCalledWith(10, 1);
-      expect(component.loadNotes).toHaveBeenCalledWith(10);
+      Should(confirmSpy).HaveBeenCalled();
+      Should(noteServiceMock.deleteNote).HaveBeenCalledWith(10, 1);
+      Should(loadNotesSpy).HaveBeenCalledWith(10);
     });
 
     // Verificación de Defecto QA DEF-QA-F24-02
     it('[DEF-QA-F24-02] debe documentar que la interfaz no despliega retroalimentación visual al fallar la eliminación en backend', () => {
       spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(console, 'error');
       noteServiceMock.deleteNote.and.returnValue(
         throwError(() => new Error('Error de red en servidor')),
       );
@@ -255,7 +257,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
       // Verificación del defecto QA DEF-QA-F24-02:
       // Se documenta que al fallar la eliminación, deleteNote captura el error únicamente en consola
       // sin asignar noteError, manteniendo noteError como cadena vacía ('').
-      expect(component.noteError).toBe('');
+      component.noteError.Should().Be('');
     });
   });
 
@@ -268,10 +270,10 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.loadEvaluations(10);
 
-        expect(component.evaluationError).toBe(
+        component.evaluationError.Should().Be(
           'Error al cargar las calificaciones de la asignatura',
         );
-        expect(component.loadingEvaluations).toBeFalse();
+        component.loadingEvaluations.Should().BeFalse();
       });
     });
 
@@ -279,18 +281,18 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
       it('[P2] debe abrir en creación, edición y cerrar modal limpiando selectedEvaluation', () => {
         // Modo creación
         component.openEvaluationModal();
-        expect(component.showEvaluationModal).toBeTrue();
-        expect(component.selectedEvaluation).toBeNull();
+        component.showEvaluationModal.Should().BeTrue();
+        Should(component.selectedEvaluation).BeNull();
 
         // Modo edición
         component.openEvaluationModal(mockEvaluations[0]);
-        expect(component.showEvaluationModal).toBeTrue();
-        expect(component.selectedEvaluation).toEqual(mockEvaluations[0]);
+        component.showEvaluationModal.Should().BeTrue();
+        Should(component.selectedEvaluation).BeEquivalentTo(mockEvaluations[0]);
 
         // Cierre
         component.closeEvaluationModal();
-        expect(component.showEvaluationModal).toBeFalse();
-        expect(component.selectedEvaluation).toBeNull();
+        component.showEvaluationModal.Should().BeFalse();
+        Should(component.selectedEvaluation).BeNull();
       });
     });
 
@@ -311,13 +313,13 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           zeroRemainingSummary,
           component.hypotheticalScore,
           3.0,
         );
-        expect(component.simResult?.requiredForTarget).toBeNull();
-        expect(component.simResult?.isTargetAttainable).toBeFalse();
+        Should(component.simResult?.requiredForTarget).BeNull();
+        component.simResult?.isTargetAttainable.Should().BeFalse();
       });
 
       it('[P4: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 22] simulación con remainingWeight > 0 sin nota hipotética', () => {
@@ -333,13 +335,13 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           mockSummary,
           null,
           3.0,
         );
-        expect(component.simResult?.requiredForTarget).toBe(2.57);
-        expect(component.simResult?.hypotheticalFinalGrade).toBeNull();
+        Should(component.simResult?.requiredForTarget).Be(2.57);
+        Should(component.simResult?.hypotheticalFinalGrade).BeNull();
       });
 
       it('[P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 11 → 22] simulación reactiva completa con nota hipotética y meta', () => {
@@ -355,13 +357,13 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           mockSummary,
           4.0,
           3.5,
         );
-        expect(component.simResult?.hypotheticalFinalGrade).toBe(3.86);
-        expect(component.simResult?.hypotheticalStatus).toBe('Aprobando');
+        Should(component.simResult?.hypotheticalFinalGrade).Be(3.86);
+        Should(component.simResult?.hypotheticalStatus).Be('Aprobando');
       });
 
       it('guardia onSimulationChange: no debe ejecutar simulación si gradeSummary es null', () => {
@@ -370,7 +372,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.onSimulationChange();
 
-        expect(evaluationServiceMock.simulateLocally).not.toHaveBeenCalled();
+        Should(evaluationServiceMock.simulateLocally).NotHaveBeenCalled();
       });
     });
 
@@ -380,8 +382,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
         component.openEvaluationModal();
         component.onEvaluationSaved();
 
-        expect(component.loadEvaluations).toHaveBeenCalledWith(10);
-        expect(component.showEvaluationModal).toBeFalse();
+        Should(component.loadEvaluations).HaveBeenCalledWith(10);
+        component.showEvaluationModal.Should().BeFalse();
       });
     });
 
@@ -391,8 +393,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(window.confirm).toHaveBeenCalled();
-        expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
+        Should(window.confirm).HaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).NotHaveBeenCalled();
       });
 
       it('[P11: 1 → 2 → 3 → 5 → 6 → 15 → 23 → 24 → 22] confirmación aceptada pero error HTTP en deleteEvaluation', () => {
@@ -404,9 +406,9 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(window.confirm).toHaveBeenCalled();
-        expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
-        expect(console.error).toHaveBeenCalled();
+        Should(window.confirm).HaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).HaveBeenCalledWith(10, 1);
+        Should(console.error).HaveBeenCalled();
       });
 
       it('[P12: 1 → 2 → 3 → 5 → 6 → 15 → 23 → 25 → 22] confirmación aceptada y éxito HTTP con res.data actualizado', () => {
@@ -433,10 +435,10 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(evaluationServiceMock.deleteEvaluation).toHaveBeenCalledWith(10, 1);
-        expect(component.evaluations).toEqual(updatedEvaluations);
-        expect(component.gradeSummary).toEqual(updatedSummary);
-        expect(component.onSimulationChange).toHaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).HaveBeenCalledWith(10, 1);
+        component.evaluations.Should().BeEquivalentTo(updatedEvaluations);
+        Should(component.gradeSummary).BeEquivalentTo(updatedSummary);
+        Should(component.onSimulationChange).HaveBeenCalled();
       });
 
       it('[P12] confirmación aceptada y éxito HTTP cuando res.data es null invoca loadEvaluations como respaldo', () => {
@@ -453,8 +455,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(component.loadEvaluations).toHaveBeenCalledWith(10);
-        expect(component.onSimulationChange).toHaveBeenCalled();
+        Should(component.loadEvaluations).HaveBeenCalledWith(10);
+        Should(component.onSimulationChange).HaveBeenCalled();
       });
 
       it('guardia deleteEvaluation: no debe realizar acciones si subject es undefined', () => {
@@ -463,8 +465,8 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
         component.deleteEvaluation(mockEvaluations[0]);
 
-        expect(window.confirm).not.toHaveBeenCalled();
-        expect(evaluationServiceMock.deleteEvaluation).not.toHaveBeenCalled();
+        Should(window.confirm).NotHaveBeenCalled();
+        Should(evaluationServiceMock.deleteEvaluation).NotHaveBeenCalled();
       });
     });
 
@@ -480,7 +482,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
         // Verificación de defecto QA DEF-QA-F25-03:
         // Se documenta que el componente frontend traslada el valor 9.5 directamente a simulateLocally
         // sin bloquearlo o marcarlo como inválido en la vista
-        expect(evaluationServiceMock.simulateLocally).toHaveBeenCalledWith(
+        Should(evaluationServiceMock.simulateLocally).HaveBeenCalledWith(
           mockSummary,
           9.5,
           3.0,

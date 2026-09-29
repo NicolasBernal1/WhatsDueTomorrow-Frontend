@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationService } from './notification.service';
+import { Should } from '../common/fluent-assertions';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -20,14 +21,14 @@ describe('NotificationService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    service.Should().NotBeNull().And.BeDefined();
   });
 
   describe('success', () => {
     it('should open a snackbar with the success panel class and the default duration', () => {
       service.success('Profile updated successfully.');
 
-      expect(snackBarMock.open).toHaveBeenCalledWith(
+      Should(snackBarMock.open).HaveBeenCalledWith(
         'Profile updated successfully.',
         'Close',
         {
@@ -42,7 +43,7 @@ describe('NotificationService', () => {
     it('should open a snackbar with the error panel class and the default duration', () => {
       service.error('Could not update your profile');
 
-      expect(snackBarMock.open).toHaveBeenCalledWith(
+      Should(snackBarMock.open).HaveBeenCalledWith(
         'Could not update your profile',
         'Close',
         {

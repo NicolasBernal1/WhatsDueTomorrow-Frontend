@@ -1,12 +1,15 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { UrgentAlertService } from './urgent-alert.service';
 import { AssignmentService } from './assignment.service';
-import { of } from 'rxjs';
+import { NotificationService } from './notification.service';
+import { of, throwError } from 'rxjs';
 import { AssignmentResponseCompDto } from '../models/assignment-response-comp.dto';
+import { Should, fluent } from '../common/fluent-assertions';
 
 describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entregas)', () => {
   let service: UrgentAlertService;
   let assignmentServiceMock: jasmine.SpyObj<AssignmentService>;
+  let notificationServiceMock: jasmine.SpyObj<NotificationService>;
   let notificationConstructorSpy: jasmine.Spy;
   let originalNotification: any;
 
@@ -21,6 +24,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
     assignmentServiceMock.getUrgentAssignments.and.returnValue(
       of({ status: 200, message: 'OK', data: [] })
     );
+    notificationServiceMock = jasmine.createSpyObj('NotificationService', ['success', 'error']);
 
     // Guardar referencia original de Notification en window
     originalNotification = (window as any).Notification;
@@ -40,6 +44,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       providers: [
         UrgentAlertService,
         { provide: AssignmentService, useValue: assignmentServiceMock },
+        { provide: NotificationService, useValue: notificationServiceMock },
       ],
     });
 
@@ -54,20 +59,45 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
   });
 
   it('debe crearse exitosamente', () => {
-    expect(service).toBeTruthy();
+    service.Should().NotBeNull();
   });
 
   describe('requestPermission', () => {
     it('debe retornar "unsupported" si Notification no existe en window', async () => {
       delete (window as any).Notification;
       const result = await service.requestPermission();
-      expect(result).toBe('unsupported');
+      result.Should().Be('unsupported');
     });
 
     it('debe delegar en Notification.requestPermission cuando está disponible', async () => {
       const result = await service.requestPermission();
-      expect(result).toBe('granted');
-      expect((window as any).Notification.requestPermission).toHaveBeenCalled();
+      result.Should().Be('granted');
+      Should((window as any).Notification.requestPermission).HaveBeenCalled();
+    });
+  });
+
+  describe('checkUrgentAssignments (invocado por start)', () => {
+    it('debe notificar por NotificationService cuando hay tareas urgentes', () => {
+      assignmentServiceMock.getUrgentAssignments.and.returnValue(
+        of({ status: 200, message: 'OK', data: [{ id: 1 } as any, { id: 2 } as any] })
+      );
+
+      service.start();
+
+      Should(notificationServiceMock.error).HaveBeenCalledWith('You have 2 urgent assignment(s)!');
+    });
+
+    it('no debe notificar cuando no hay tareas urgentes', () => {
+      service.start();
+      Should(notificationServiceMock.error).NotHaveBeenCalled();
+    });
+
+    it('debe loguear el error sin lanzar si getUrgentAssignments falla', () => {
+      spyOn(console, 'error');
+      assignmentServiceMock.getUrgentAssignments.and.returnValue(throwError(() => new Error('boom')));
+
+      expect(() => service.start()).not.toThrow();
+      Should(console.error).HaveBeenCalled();
     });
   });
 
@@ -75,14 +105,14 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
     it('no debe iniciar monitoreo si Notification no existe en window', () => {
       delete (window as any).Notification;
       service.start();
-      expect((service as any).monitoring).toBeUndefined();
+      Should((service as any).monitoring).BeUndefined();
     });
 
     it('debe iniciar la suscripción periódica y consultar getAllAssignments', fakeAsync(() => {
       service.start();
       tick(1);
-      expect((service as any).monitoring).toBeDefined();
-      expect(assignmentServiceMock.getAllAssignments).toHaveBeenCalled();
+      Should((service as any).monitoring).NotBeNull().And.BeDefined();
+      Should(assignmentServiceMock.getAllAssignments).HaveBeenCalled();
     }));
 
     it('no debe duplicar la suscripción si ya se encuentra monitoreando', () => {
@@ -90,8 +120,19 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       const firstSub = (service as any).monitoring;
       service.start();
       const secondSub = (service as any).monitoring;
-      expect(firstSub).toBe(secondSub);
+      firstSub.Should().Be(secondSub);
     });
+
+    it('no debe lanzar ni romper el monitoreo si getAllAssignments falla en el polling periódico', fakeAsync(() => {
+      assignmentServiceMock.getAllAssignments.and.returnValue(throwError(() => new Error('network down')));
+
+      expect(() => {
+        service.start();
+        tick(1);
+      }).not.toThrow();
+
+      Should((service as any).monitoring).NotBeNull().And.BeDefined();
+    }));
   });
 
   describe('notifyDueAssignments', () => {
@@ -109,7 +150,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
     it('no debe disparar alertas si Notification.permission no es "granted"', () => {
       (window as any).Notification.permission = 'denied';
       (service as any).notifyDueAssignments([sampleAssignment]);
-      expect(notificationConstructorSpy).not.toHaveBeenCalled();
+      Should(notificationConstructorSpy).NotHaveBeenCalled();
     });
 
     it('debe omitir entregas que no tengan configurado reminderMinutes', () => {
@@ -118,19 +159,19 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
         reminderMinutes: undefined,
       };
       (service as any).notifyDueAssignments([noReminderAssignment]);
-      expect(notificationConstructorSpy).not.toHaveBeenCalled();
+      Should(notificationConstructorSpy).NotHaveBeenCalled();
     });
 
     it('debe disparar Notification y persistir registro en localStorage para entrega activa en ventana', () => {
       (window as any).Notification.permission = 'granted';
       (service as any).notifyDueAssignments([sampleAssignment]);
 
-      expect(notificationConstructorSpy).toHaveBeenCalledWith('Entrega próxima', {
+      Should(notificationConstructorSpy).HaveBeenCalledWith('Entrega próxima', {
         body: 'Taller de Algoritmos vence pronto (Estructuras de Datos).',
       });
 
       const key = `urgent-alert-501-${new Date(sampleAssignment.dueDate).getTime()}`;
-      expect(localStorage.getItem(key)).toBe('sent');
+      Should(localStorage.getItem(key)).Be('sent');
     });
 
     it('no debe duplicar notificación si la clave ya se encuentra registrada en localStorage', () => {
@@ -139,7 +180,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       localStorage.setItem(key, 'sent');
 
       (service as any).notifyDueAssignments([sampleAssignment]);
-      expect(notificationConstructorSpy).not.toHaveBeenCalled();
+      Should(notificationConstructorSpy).NotHaveBeenCalled();
     });
 
     it('no debe disparar notificación si aún no ha comenzado la ventana de recordatorio (demasiado temprano)', () => {
@@ -152,7 +193,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       };
 
       (service as any).notifyDueAssignments([futureAssignment]);
-      expect(notificationConstructorSpy).not.toHaveBeenCalled();
+      Should(notificationConstructorSpy).NotHaveBeenCalled();
     });
 
     it('no debe disparar notificación si la fecha de vencimiento ya pasó (now >= dueAt)', () => {
@@ -165,7 +206,7 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       };
 
       (service as any).notifyDueAssignments([pastAssignment]);
-      expect(notificationConstructorSpy).not.toHaveBeenCalled();
+      Should(notificationConstructorSpy).NotHaveBeenCalled();
     });
   });
 });

@@ -4,6 +4,7 @@ import { SubjectService } from '../../services/subject.service';
 import { CalendarService } from '../../services/calendar.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { Should } from '../../common/fluent-assertions';
 
 describe('ScheduleComponent', () => {
 
@@ -453,6 +454,19 @@ describe('ScheduleComponent', () => {
       expect(result?.id).toBe(1);
     });
 
+    // Camino: hay clases registradas pero ninguna coincide con un día válido
+    it('21. debe retornar null cuando hay clases pero ninguna coincide con un día de la semana', () => {
+
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
+
+      component.classes = [
+        buildClass({ id: 1, dayOfWeek: 'diasabsurdo', startTime: '07:00', endTime: '08:00' })
+      ];
+
+      expect(component.getNextClass()).toBeNull();
+    });
+
   });
 
   // =========================================================================
@@ -462,10 +476,10 @@ describe('ScheduleComponent', () => {
 
     // Camino P1: 1-2-18
     it('Camino P1 (1-2-18): debe permanecer en estado de reposo sin emitir peticiones de calendario al no interactuar', () => {
-      expect(component.subscriptionUrl).toBe('');
-      expect(component.calendarMessage).toBe('');
-      expect(calendarServiceMock.createSubscription).not.toHaveBeenCalled();
-      expect(calendarServiceMock.download).not.toHaveBeenCalled();
+      component.subscriptionUrl.Should().Be('');
+      component.calendarMessage.Should().Be('');
+      Should(calendarServiceMock.createSubscription).NotHaveBeenCalled();
+      Should(calendarServiceMock.download).NotHaveBeenCalled();
     });
 
     // Camino P2: 1-2-3-4-5-8-2-18
@@ -476,8 +490,8 @@ describe('ScheduleComponent', () => {
 
       component.createCalendarSubscription();
 
-      expect(calendarServiceMock.createSubscription).toHaveBeenCalled();
-      expect(component.calendarMessage).toBe('Unable to create the subscription link.');
+      Should(calendarServiceMock.createSubscription).HaveBeenCalled();
+      component.calendarMessage.Should().Be('Unable to create the subscription link.');
     });
 
     // Camino P3: 1-2-3-4-6-7-8-2-18 (Vacío)
@@ -492,8 +506,8 @@ describe('ScheduleComponent', () => {
 
       component.createCalendarSubscription();
 
-      expect(component.subscriptionUrl).toBe('');
-      expect(component.calendarMessage).toBe('Unable to create the subscription link.');
+      component.subscriptionUrl.Should().Be('');
+      component.calendarMessage.Should().Be('Unable to create the subscription link.');
     });
 
     // Camino P4: 1-2-3-4-6-7-8-2-18 (Válido)
@@ -509,23 +523,24 @@ describe('ScheduleComponent', () => {
 
       component.createCalendarSubscription();
 
-      expect(component.subscriptionUrl).toBe(validUrl);
-      expect(component.calendarMessage).toBe('Your subscription link is ready.');
+      component.subscriptionUrl.Should().Be(validUrl);
+      component.calendarMessage.Should().Be('Your subscription link is ready.');
     });
 
     // Camino P5: 1-2-9-2-18
     it('Camino P5 (1-2-9-2-18): debe abortar tempranamente si se invoca copySubscriptionUrl con subscriptionUrl vacío', () => {
       component.subscriptionUrl = '';
+      let writeSpy: any = null;
       if (navigator.clipboard) {
-        spyOn(navigator.clipboard, 'writeText');
+        writeSpy = spyOn(navigator.clipboard, 'writeText');
       }
 
       component.copySubscriptionUrl();
 
-      if (navigator.clipboard) {
-        expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
+      if (writeSpy) {
+        Should(writeSpy).NotHaveBeenCalled();
       }
-      expect(component.calendarMessage).toBe('');
+      component.calendarMessage.Should().Be('');
     });
 
     // Camino P6: 1-2-9-10-11-12-2-18 (Resolve)
@@ -536,8 +551,8 @@ describe('ScheduleComponent', () => {
       component.copySubscriptionUrl();
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      expect(writeSpy).toHaveBeenCalledWith('webcal://localhost:3000/calendar/feed/abc123token.ics');
-      expect(component.calendarMessage).toBe('Subscription link copied. Open it from your calendar app.');
+      Should(writeSpy).HaveBeenCalledWith('webcal://localhost:3000/calendar/feed/abc123token.ics');
+      component.calendarMessage.Should().Be('Subscription link copied. Open it from your calendar app.');
     });
 
     // Camino P7: 1-2-9-10-11-12-2-18 (Reject)
@@ -548,7 +563,7 @@ describe('ScheduleComponent', () => {
       component.copySubscriptionUrl();
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      expect(component.calendarMessage).toBe('Copy the subscription link manually.');
+      component.calendarMessage.Should().Be('Copy the subscription link manually.');
     });
 
     // Camino P8: 1-2-13-14-15-17-2-18
@@ -559,8 +574,8 @@ describe('ScheduleComponent', () => {
 
       component.downloadCalendar();
 
-      expect(calendarServiceMock.download).toHaveBeenCalled();
-      expect(component.calendarMessage).toBe('Unable to download the calendar file.');
+      Should(calendarServiceMock.download).HaveBeenCalled();
+      component.calendarMessage.Should().Be('Unable to download the calendar file.');
     });
 
     // Camino P9: 1-2-13-14-16-17-2-18
@@ -568,8 +583,8 @@ describe('ScheduleComponent', () => {
       const mockBlob = new Blob(['BEGIN:VCALENDAR\nEND:VCALENDAR'], { type: 'text/calendar' });
       calendarServiceMock.download.and.returnValue(of(mockBlob));
 
-      spyOn(URL, 'createObjectURL').and.returnValue('blob:http://localhost/fake-uuid');
-      spyOn(URL, 'revokeObjectURL');
+      const createObjectURLSpy = spyOn(URL, 'createObjectURL').and.returnValue('blob:http://localhost/fake-uuid');
+      const revokeObjectURLSpy = spyOn(URL, 'revokeObjectURL');
       const clickSpy = jasmine.createSpy('click');
       const mockAnchor = {
         href: '',
@@ -583,11 +598,11 @@ describe('ScheduleComponent', () => {
 
       component.downloadCalendar();
 
-      expect(URL.createObjectURL).toHaveBeenCalledWith(mockBlob);
-      expect(mockAnchor.download).toBe('whats-due-tomorrow.ics');
-      expect(mockAnchor.href).toBe('blob:http://localhost/fake-uuid');
-      expect(clickSpy).toHaveBeenCalled();
-      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/fake-uuid');
+      Should(createObjectURLSpy).HaveBeenCalledWith(mockBlob);
+      mockAnchor.download.Should().Be('whats-due-tomorrow.ics');
+      mockAnchor.href.Should().Be('blob:http://localhost/fake-uuid');
+      Should(clickSpy).HaveBeenCalled();
+      Should(revokeObjectURLSpy).HaveBeenCalledWith('blob:http://localhost/fake-uuid');
     });
 
     // Defecto QA DEF-QA-F23-03
@@ -600,7 +615,7 @@ describe('ScheduleComponent', () => {
         // Verificación del defecto QA DEF-QA-F23-03:
         // En entornos sin HTTPS o sin soporte de Clipboard API, al no validar navigator.clipboard
         // se produce un TypeError al intentar invocar writeText
-        expect(() => component.copySubscriptionUrl()).toThrowError(TypeError);
+        Should(() => component.copySubscriptionUrl()).Throw(TypeError);
       } finally {
         Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, configurable: true });
       }

@@ -2,8 +2,10 @@
   <div class="header">
   <h2>Your Subjects</h2>
   <input
+    id="subject-search"
     type="text"
     placeholder="Buscar por asignatura o profesor..."
+    aria-label="Buscar por asignatura o profesor"
     [(ngModel)]="searchQuery"
     (input)="onSearch()"
   />

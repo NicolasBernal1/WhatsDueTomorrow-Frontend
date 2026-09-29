@@ -14,6 +14,7 @@ import {
   SimulationResult,
   UpdateEvaluationDto,
 } from '../models/evaluation.model';
+import { Should } from '../common/fluent-assertions';
 
 describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)', () => {
   let service: EvaluationService;
@@ -32,7 +33,7 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
   afterEach(() => httpMock.verify());
 
   it('debe crearse e instanciarse correctamente', () => {
-    expect(service).toBeTruthy();
+    Should(service).NotBeNull();
   });
 
   describe('Métodos HTTP de Persistencia en API', () => {
@@ -65,12 +66,12 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
 
     it('debe ejecutar GET /subjects/:subjectId/evaluations', () => {
       service.getEvaluationsBySubject(10).subscribe((res) => {
-        expect(res.data?.evaluations.length).toBe(1);
-        expect(res.data?.summary.status).toBe('Aprobando');
+        res.data?.evaluations.Should().HaveCount(1);
+        res.data?.summary.status.Should().Be('Aprobando');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/10/evaluations`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush({ status: 200, message: 'OK', data: mockListResponse });
     });
 
@@ -82,12 +83,12 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       };
 
       service.createEvaluation(10, dto).subscribe((res) => {
-        expect(res.status).toBe(201);
+        res.status.Should().Be(201);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/10/evaluations`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(dto);
+      req.request.method.Should().Be('POST');
+      req.request.body.Should().BeEquivalentTo(dto);
       req.flush({ status: 201, message: 'Created', data: mockListResponse });
     });
 
@@ -98,22 +99,22 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       };
 
       service.updateEvaluation(10, 1, dto).subscribe((res) => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/10/evaluations/1`);
-      expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual(dto);
+      req.request.method.Should().Be('PATCH');
+      req.request.body.Should().BeEquivalentTo(dto);
       req.flush({ status: 200, message: 'Updated', data: mockListResponse });
     });
 
     it('debe ejecutar DELETE /subjects/:subjectId/evaluations/:id', () => {
       service.deleteEvaluation(10, 1).subscribe((res) => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subjects/10/evaluations/1`);
-      expect(req.request.method).toBe('DELETE');
+      req.request.method.Should().Be('DELETE');
       req.flush({ status: 200, message: 'Deleted', data: mockListResponse });
     });
 
@@ -133,14 +134,14 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       };
 
       service.simulateGrade(10, dto).subscribe((res) => {
-        expect(res.data?.hypotheticalFinalGrade).toBe(3.86);
+        Should(res.data?.hypotheticalFinalGrade).Be(3.86);
       });
 
       const req = httpMock.expectOne(
         `${apiUrl}/subjects/10/evaluations/simulate`,
       );
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(dto);
+      req.request.method.Should().Be('POST');
+      req.request.body.Should().BeEquivalentTo(dto);
       req.flush({ status: 200, message: 'OK', data: mockSimResult });
     });
   });
@@ -148,14 +149,14 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
   describe('Cálculos Reactivos Locales (calculateSummaryLocally RNF09 < 5ms)', () => {
     it('caso sin evaluaciones: estado "Sin calificaciones", nota requerida 3.0, restante 100%', () => {
       const summary = service.calculateSummaryLocally([]);
-      expect(summary.totalWeight).toBe(0);
-      expect(summary.remainingWeight).toBe(100);
-      expect(summary.currentContribution).toBe(0);
-      expect(summary.currentAverage).toBe(0);
-      expect(summary.requiredGrade).toBe(3.0);
-      expect(summary.isAttainable).toBeTrue();
-      expect(summary.status).toBe('Sin calificaciones');
-      expect(summary.weightExceeded).toBeFalse();
+      summary.totalWeight.Should().Be(0);
+      summary.remainingWeight.Should().Be(100);
+      summary.currentContribution.Should().Be(0);
+      summary.currentAverage.Should().Be(0);
+      Should(summary.requiredGrade).Be(3.0);
+      summary.isAttainable.Should().BeTrue();
+      summary.status.Should().Be('Sin calificaciones');
+      summary.weightExceeded.Should().BeFalse();
     });
 
     it('caso contribución acumulada alcanza o supera 3.0: estado "Aprobado" y requiredGrade 0.0', () => {
@@ -165,11 +166,11 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       ];
       // 5.0*0.4 + 4.0*0.3 = 2.0 + 1.2 = 3.2 >= 3.0
       const summary = service.calculateSummaryLocally(evaluations);
-      expect(summary.currentContribution).toBe(3.2);
-      expect(summary.requiredGrade).toBe(0.0);
-      expect(summary.status).toBe('Aprobado');
-      expect(summary.isPassing).toBeTrue();
-      expect(summary.isAttainable).toBeTrue();
+      summary.currentContribution.Should().Be(3.2);
+      Should(summary.requiredGrade).Be(0.0);
+      summary.status.Should().Be('Aprobado');
+      summary.isPassing.Should().BeTrue();
+      summary.isAttainable.Should().BeTrue();
     });
 
     it('caso promedio aprobatorio con nota requerida alcanzable: estado "Aprobando"', () => {
@@ -179,11 +180,11 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       // contribution = 1.6, remaining = 60%, currentAverage = 4.0 >= 3.0
       // required: (3.0 - 1.6) / 0.6 = 1.4 / 0.6 = 2.33 <= 5.0
       const summary = service.calculateSummaryLocally(evaluations);
-      expect(summary.currentAverage).toBe(4.0);
-      expect(summary.requiredGrade).toBe(2.33);
-      expect(summary.isAttainable).toBeTrue();
-      expect(summary.status).toBe('Aprobando');
-      expect(summary.isPassing).toBeTrue();
+      summary.currentAverage.Should().Be(4.0);
+      Should(summary.requiredGrade).Be(2.33);
+      summary.isAttainable.Should().BeTrue();
+      summary.status.Should().Be('Aprobando');
+      summary.isPassing.Should().BeTrue();
     });
 
     it('caso promedio reprobatorio pero alcanzable: estado "En riesgo"', () => {
@@ -193,11 +194,11 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       // contribution = 0.4, remaining = 80%, currentAverage = 2.0 < 3.0
       // required: (3.0 - 0.4) / 0.8 = 2.6 / 0.8 = 3.25 <= 5.0
       const summary = service.calculateSummaryLocally(evaluations);
-      expect(summary.currentAverage).toBe(2.0);
-      expect(summary.requiredGrade).toBe(3.25);
-      expect(summary.isAttainable).toBeTrue();
-      expect(summary.status).toBe('En riesgo');
-      expect(summary.isPassing).toBeFalse();
+      summary.currentAverage.Should().Be(2.0);
+      Should(summary.requiredGrade).Be(3.25);
+      summary.isAttainable.Should().BeTrue();
+      summary.status.Should().Be('En riesgo');
+      summary.isPassing.Should().BeFalse();
     });
 
     it('caso nota requerida matemáticamente inalcanzable (> 5.0): estado "En riesgo"', () => {
@@ -207,10 +208,10 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       // contribution = 0.8, remaining = 20%
       // required: (3.0 - 0.8) / 0.2 = 2.2 / 0.2 = 11.0 > 5.0!
       const summary = service.calculateSummaryLocally(evaluations);
-      expect(summary.requiredGrade).toBe(11.0);
-      expect(summary.isAttainable).toBeFalse();
-      expect(summary.status).toBe('En riesgo');
-      expect(summary.isPassing).toBeFalse();
+      Should(summary.requiredGrade).Be(11.0);
+      summary.isAttainable.Should().BeFalse();
+      summary.status.Should().Be('En riesgo');
+      summary.isPassing.Should().BeFalse();
     });
 
     it('caso 100% evaluado con nota reprobada (remainingWeight <= 0): requiredGrade null y status "En riesgo"', () => {
@@ -218,10 +219,10 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
         { id: 1, name: 'Final', weight: 100, score: 2.8, createdAt: '', updatedAt: '', subjectId: 1 },
       ];
       const summary = service.calculateSummaryLocally(evaluations);
-      expect(summary.remainingWeight).toBe(0);
-      expect(summary.requiredGrade).toBeNull();
-      expect(summary.isAttainable).toBeFalse();
-      expect(summary.status).toBe('En riesgo');
+      summary.remainingWeight.Should().Be(0);
+      Should(summary.requiredGrade).BeNull();
+      summary.isAttainable.Should().BeFalse();
+      summary.status.Should().Be('En riesgo');
     });
 
     it('caso porcentaje total supera el 100%: weightExceeded true y remainingWeight negativo', () => {
@@ -230,10 +231,10 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
         { id: 2, name: 'Parcial 2', weight: 50, score: 1.0, createdAt: '', updatedAt: '', subjectId: 1 },
       ];
       const summary = service.calculateSummaryLocally(evaluations);
-      expect(summary.totalWeight).toBe(110);
-      expect(summary.remainingWeight).toBe(-10);
-      expect(summary.weightExceeded).toBeTrue();
-      expect(summary.isAttainable).toBeFalse();
+      summary.totalWeight.Should().Be(110);
+      summary.remainingWeight.Should().Be(-10);
+      summary.weightExceeded.Should().BeTrue();
+      summary.isAttainable.Should().BeFalse();
     });
   });
 
@@ -255,10 +256,10 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
 
       const res = service.simulateLocally(summary, 4.0, 3.0);
 
-      expect(res.requiredForTarget).toBeNull();
-      expect(res.isTargetAttainable).toBeFalse();
-      expect(res.hypotheticalFinalGrade).toBeNull();
-      expect(res.hypotheticalStatus).toBeNull();
+      Should(res.requiredForTarget).BeNull();
+      res.isTargetAttainable.Should().BeFalse();
+      Should(res.hypotheticalFinalGrade).BeNull();
+      Should(res.hypotheticalStatus).BeNull();
     });
 
     it('simulación con margen disponible y meta ya lograda por la nota acumulada (requiredForTarget 0.0)', () => {
@@ -278,9 +279,9 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
 
       const res = service.simulateLocally(summary, null, 3.0);
 
-      expect(res.requiredForTarget).toBe(0.0);
-      expect(res.isTargetAttainable).toBeTrue();
-      expect(res.hypotheticalFinalGrade).toBeNull();
+      Should(res.requiredForTarget).Be(0.0);
+      res.isTargetAttainable.Should().BeTrue();
+      Should(res.hypotheticalFinalGrade).BeNull();
     });
 
     it('simulación con nota hipotética ingresada que resulta en estado "En riesgo" (< 3.0)', () => {
@@ -301,10 +302,10 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       // Si saco 2.0 en el 50% restante: 1.0 + (2.0 * 50 / 100) = 2.0 < 3.0 => En riesgo
       const res = service.simulateLocally(summary, 2.0);
 
-      expect(res.requiredForTarget).toBe(4.0);
-      expect(res.isTargetAttainable).toBeTrue();
-      expect(res.hypotheticalFinalGrade).toBe(2.0);
-      expect(res.hypotheticalStatus).toBe('En riesgo');
+      Should(res.requiredForTarget).Be(4.0);
+      res.isTargetAttainable.Should().BeTrue();
+      Should(res.hypotheticalFinalGrade).Be(2.0);
+      Should(res.hypotheticalStatus).Be('En riesgo');
     });
 
     it('simulación con valor por defecto de targetGrade (3.0)', () => {
@@ -325,19 +326,19 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
       // Invocación sin especificar targetGrade -> toma default PASSING_GRADE = 3.0
       const res = service.simulateLocally(summary, 4.0);
 
-      expect(res.requiredForTarget).toBe(3.0);
-      expect(res.isTargetAttainable).toBeTrue();
+      Should(res.requiredForTarget).Be(3.0);
+      res.isTargetAttainable.Should().BeTrue();
       // 1.5 + (4.0 * 50 / 100) = 3.5 >= 3.0 => Aprobando
-      expect(res.hypotheticalFinalGrade).toBe(3.5);
-      expect(res.hypotheticalStatus).toBe('Aprobando');
+      Should(res.hypotheticalFinalGrade).Be(3.5);
+      Should(res.hypotheticalStatus).Be('Aprobando');
     });
   });
 
   describe('Función round2 (RNF09)', () => {
     it('debe redondear valores con 2 cifras decimales evitando desbordes de coma flotante', () => {
-      expect(round2(0.1 + 0.2)).toBe(0.3);
-      expect(round2(2.345)).toBe(2.35);
-      expect(round2(2.344)).toBe(2.34);
+      round2(0.1 + 0.2).Should().Be(0.3);
+      round2(2.345).Should().Be(2.35);
+      round2(2.344).Should().Be(2.34);
     });
   });
 
@@ -352,9 +353,9 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
 
       // Verificación de defecto QA DEF-QA-F25-01:
       // Se documenta que el método procesa totalWeight = 120% y remainingWeight = -20%
-      expect(summary.totalWeight).toBe(120);
-      expect(summary.remainingWeight).toBe(-20);
-      expect(summary.weightExceeded).toBeTrue();
+      summary.totalWeight.Should().Be(120);
+      summary.remainingWeight.Should().Be(-20);
+      summary.weightExceeded.Should().BeTrue();
     });
 
     it('[DEF-QA-F25-02] Comportamiento caracterizado: simulateLocally ante sobreponderación (remainingWeight < 0)', () => {
@@ -376,9 +377,10 @@ describe('EvaluationService (F25 — Métodos HTTP y Cálculos Reactivos RNF09)'
 
       // Verificación de defecto QA DEF-QA-F25-02:
       // Al ser remainingWeight <= 0, no calcula requiredForTarget ni notas hipotéticas pero no genera error
-      expect(res.requiredForTarget).toBeNull();
-      expect(res.isTargetAttainable).toBeFalse();
-      expect(res.hypotheticalFinalGrade).toBeNull();
+      Should(res.requiredForTarget).BeNull();
+      res.isTargetAttainable.Should().BeFalse();
+      Should(res.hypotheticalFinalGrade).BeNull();
     });
   });
 });
+

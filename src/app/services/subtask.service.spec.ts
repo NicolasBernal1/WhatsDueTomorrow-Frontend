@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SubtaskService } from './subtask.service';
 import { environment } from '../../environments/environment';
+import { Should } from '../common/fluent-assertions';
 
 describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
   let service: SubtaskService;
@@ -20,7 +21,7 @@ describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
   afterEach(() => httpMock.verify());
 
   it('debe crearse exitosamente', () => {
-    expect(service).toBeTruthy();
+    service.Should().NotBeNull();
   });
 
   describe('getAll', () => {
@@ -32,12 +33,12 @@ describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
       };
 
       service.getAll(10).subscribe((res) => {
-        expect(res.status).toBe(200);
-        expect(res.data?.subtasks.length).toBe(1);
+        res.status.Should().Be(200);
+        res.data?.subtasks.Should().HaveCount(1);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/assignments/10/subtasks`);
-      expect(req.request.method).toBe('GET');
+      req.request.method.Should().Be('GET');
       req.flush(mockResponse);
     });
   });
@@ -51,12 +52,12 @@ describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
       };
 
       service.create(10, 'Nueva').subscribe((res) => {
-        expect(res.status).toBe(201);
+        res.status.Should().Be(201);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/assignments/10/subtasks`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ title: 'Nueva' });
+      req.request.method.Should().Be('POST');
+      req.request.body.Should().BeEquivalentTo({ title: 'Nueva' });
       req.flush(mockResponse);
     });
   });
@@ -70,12 +71,12 @@ describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
       };
 
       service.update(10, 1, { completed: true }).subscribe((res) => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/assignments/10/subtasks/1`);
-      expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual({ completed: true });
+      req.request.method.Should().Be('PATCH');
+      req.request.body.Should().BeEquivalentTo({ completed: true });
       req.flush(mockResponse);
     });
   });
@@ -89,11 +90,11 @@ describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
       };
 
       service.remove(10, 1).subscribe((res) => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/assignments/10/subtasks/1`);
-      expect(req.request.method).toBe('DELETE');
+      req.request.method.Should().Be('DELETE');
       req.flush(mockResponse);
     });
   });
@@ -107,12 +108,12 @@ describe('SubtaskService (F22 — Servicio HTTP de Subtareas)', () => {
       };
 
       service.reorder(10, [2, 1]).subscribe((res) => {
-        expect(res.status).toBe(200);
+        res.status.Should().Be(200);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/assignments/10/subtasks/order`);
-      expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual({ orderedIds: [2, 1] });
+      req.request.method.Should().Be('PATCH');
+      req.request.body.Should().BeEquivalentTo({ orderedIds: [2, 1] });
       req.flush(mockResponse);
     });
   });
