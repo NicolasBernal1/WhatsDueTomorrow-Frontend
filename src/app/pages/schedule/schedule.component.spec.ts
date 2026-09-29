@@ -153,6 +153,23 @@ describe('ScheduleComponent', () => {
       expect(result).toEqual(classesMock[0]);
     });
 
+    it('debe conservar correctamente los datos de la clase encontrada', () => {
+      component.classes = classesMock;
+
+      const result = component.getClassesFor(
+        'monday',
+        '08:00'
+      );
+
+      expect(result).toBeTruthy();
+      expect(result?.id).toBe(classesMock[0].id);
+      expect(result?.dayOfWeek).toBe('monday');
+      expect(result?.startTime).toBe('08:00');
+      expect(result?.endTime).toBe('10:00');
+      expect(result?.subject).toBeTruthy();
+      expect(result?.subject.id).toBe(classesMock[0].subject.id);
+    });
+
   });
 
   describe('Ver detalles de asignatura desde la clase', () => {
@@ -170,6 +187,16 @@ describe('ScheduleComponent', () => {
       ]);
     });
 
+    it('debe navegar únicamente al detalle de la asignatura seleccionada', () => {
+      const subjectId = 25;
+
+      component.onClickClass(subjectId);
+
+      expect(routerMock.navigate).toHaveBeenCalledTimes(1);
+      expect(routerMock.navigate).toHaveBeenCalledWith([
+        '/subjects/25'
+      ]);
+    });
   });
 
   describe('Eliminar clase', () => {
@@ -266,6 +293,43 @@ describe('ScheduleComponent', () => {
         .toBeNull();
     });
 
+    it('debe eliminar únicamente la clase seleccionada del horario', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+
+      const otraClase = {
+        id: 2,
+        dayOfWeek: 'tuesday',
+        startTime: '10:00',
+        endTime: '12:00',
+        subject: {
+          id: 20,
+          name: 'otra materia',
+          professor: 'otro profesor',
+          color: '#ff0000'
+        }
+      } as any;
+
+      component.classes = [
+        component.selectedClass!,
+        otraClase
+      ];
+
+      subjectServiceMock.deleteClass.and.returnValue(
+        of({
+          status: 200,
+          message: 'Class deleted successfully',
+          data: null
+        })
+      );
+
+      component.deleteClass();
+
+      expect(subjectServiceMock.deleteClass).toHaveBeenCalledWith(1);
+      expect(component.classes).toContain(otraClase);
+      expect(component.classes).not.toContain(
+        jasmine.objectContaining({ id: 1 })
+      );
+    });
   });
 
   describe('Editar clase', () => {
@@ -393,7 +457,7 @@ describe('ScheduleComponent', () => {
     it('17. debe retornar la clase mas proxima de hoy cuando aun faltan por empezar', () => {
 
       jasmine.clock().install();
-      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0)); 
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
 
       const clasesHoy = [
         buildClass({ id: 2, dayOfWeek: 'monday', startTime: '14:00', endTime: '15:00' }),
@@ -428,7 +492,7 @@ describe('ScheduleComponent', () => {
     it('19. debe usar el nombre del dia para una clase que no es hoy ni mañana', () => {
 
       jasmine.clock().install();
-      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0)); 
+      jasmine.clock().mockDate(new Date(2024, 0, 1, 9, 0));
 
       const clase = buildClass({ id: 3, dayOfWeek: 'wednesday', startTime: '09:00', endTime: '10:00' });
       component.classes = [clase];
@@ -467,6 +531,41 @@ describe('ScheduleComponent', () => {
       expect(component.getNextClass()).toBeNull();
     });
 
+    it('debe ignorar las clases que ya terminaron y mostrar la siguiente disponible', () => {
+      jasmine.clock().install();
+      jasmine.clock().mockDate(
+        new Date(2024, 0, 1, 11, 0)
+      );
+
+      component.classes = [
+        buildClass({
+          id: 1,
+          dayOfWeek: 'monday',
+          startTime: '08:00',
+          endTime: '10:00'
+        }),
+        buildClass({
+          id: 2,
+          dayOfWeek: 'monday',
+          startTime: '13:00',
+          endTime: '14:00'
+        }),
+        buildClass({
+          id: 3,
+          dayOfWeek: 'monday',
+          startTime: '16:00',
+          endTime: '17:00'
+        })
+      ];
+
+      const result = component.getNextClass();
+
+      expect(result).toBeTruthy();
+      expect(result?.id).toBe(2);
+      expect(result?.startTime).toBe('13:00');
+
+      jasmine.clock().uninstall();
+    });
   });
 
   // =========================================================================

@@ -173,6 +173,31 @@ describe('AddClassModalComponent', () => {
       expect(component.close.emit).toHaveBeenCalled();
     });
 
+    it('debe emitir save y cerrar el modal después de registrar correctamente la clase', () => {
+      component.classes = [];
+
+      component.addClassForm.setValue({
+        dayOfWeek: 'monday',
+        startTime: '10:00',
+        endTime: '12:00'
+      });
+
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
+
+      component.onSave();
+
+      expect(classServiceMock.addClass).toHaveBeenCalledWith({
+        dayOfWeek: 'monday',
+        startTime: '10:00',
+        endTime: '12:00',
+        subjectId: 10
+      });
+
+      expect(component.save.emit).toHaveBeenCalled();
+      expect(component.close.emit).toHaveBeenCalled();
+    });
+
   });
 
   //Editar clase
@@ -319,6 +344,40 @@ describe('AddClassModalComponent', () => {
       expect(component.close.emit).toHaveBeenCalled();
     });
 
+    it('debe enviar la clase correcta al editarla', () => {
+      component.classToEdit = classToEdit;
+
+      component.addClassForm.setValue({
+        dayOfWeek: 'tuesday',
+        startTime: '10:00',
+        endTime: '12:00'
+      });
+
+      subjectServiceMock.editClass.and.returnValue(
+        of({
+          status: 200,
+          message: 'Class updated successfully',
+          data: null
+        })
+      );
+
+      spyOn(component.save, 'emit');
+      spyOn(component.close, 'emit');
+
+      component.onSave();
+
+      expect(subjectServiceMock.editClass).toHaveBeenCalledWith(
+        5,
+        {
+          dayOfWeek: 'tuesday',
+          startTime: '10:00',
+          endTime: '12:00'
+        }
+      );
+
+      expect(component.save.emit).toHaveBeenCalled();
+      expect(component.close.emit).toHaveBeenCalled();
+    });
   });
 
 });
