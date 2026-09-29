@@ -68,9 +68,9 @@ describe('SubjectsComponent', () => {
 
       component.ngOnInit();
 
-      expect(window.alert).toHaveBeenCalledWith('Error getting subjects');
-      expect(component.subjects).toEqual([]);
-      expect(component.loading).toBeFalse();
+      Should(window.alert).HaveBeenCalledWith('Error getting subjects');
+      Should(component.subjects).BeEquivalentTo([]);
+      component.loading.Should().BeFalse();
     });
 
     // Camino:
@@ -83,8 +83,8 @@ describe('SubjectsComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.subjects).toEqual([]);
-      expect(component.loading).toBeFalse();
+      Should(component.subjects).BeEquivalentTo([]);
+      component.loading.Should().BeFalse();
     });
 
     // Camino:
@@ -97,8 +97,8 @@ describe('SubjectsComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.subjects).toEqual([subjectMock]);
-      expect(component.loading).toBeFalse();
+      Should(component.subjects).BeEquivalentTo([subjectMock]);
+      component.loading.Should().BeFalse();
     });
 
   });
@@ -124,8 +124,8 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(subjectServiceMock.deleteSubject).not.toHaveBeenCalled();
-      expect(component.contextMenuVisible).toBeTrue();
+      Should(subjectServiceMock.deleteSubject).NotHaveBeenCalled();
+      component.contextMenuVisible.Should().BeTrue();
     });
 
     // Camino:
@@ -138,10 +138,10 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(window.confirm).toHaveBeenCalledWith('Delete subject?');
-      expect(subjectServiceMock.deleteSubject).not.toHaveBeenCalled();
-      expect(component.contextMenuVisible).toBeFalse();
-      expect(component.selectedSubject).toBeNull();
+      Should(window.confirm).HaveBeenCalledWith('Delete subject?');
+      Should(subjectServiceMock.deleteSubject).NotHaveBeenCalled();
+      component.contextMenuVisible.Should().BeFalse();
+      Should(component.selectedSubject).BeNull();
     });
 
     // Camino:
@@ -157,10 +157,10 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(subjectServiceMock.deleteSubject).toHaveBeenCalledWith(subjectMock.id);
-      expect(component.loadSubjects).toHaveBeenCalled();
-      expect(component.contextMenuVisible).toBeFalse();
-      expect(component.selectedSubject).toBeNull();
+      Should(subjectServiceMock.deleteSubject).HaveBeenCalledWith(subjectMock.id);
+      Should(component.loadSubjects).HaveBeenCalled();
+      component.contextMenuVisible.Should().BeFalse();
+      Should(component.selectedSubject).BeNull();
     });
 
     // Camino:
@@ -177,8 +177,8 @@ describe('SubjectsComponent', () => {
 
       component.deleteSubject();
 
-      expect(console.error).toHaveBeenCalled();
-      expect(component.contextMenuVisible).toBeTrue();
+      Should(console.error).HaveBeenCalled();
+      component.contextMenuVisible.Should().BeTrue();
     });
 
   });
@@ -199,25 +199,25 @@ describe('SubjectsComponent', () => {
 
     it('8. goToSubjectDetais navega a /subjects/:id', () => {
       component.goToSubjectDetais(10);
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/subjects', 10]);
+      Should(routerMock.navigate).HaveBeenCalledWith(['/subjects', 10]);
     });
 
     it('9. addSubjectModal abre el modal y bloquea el scroll', () => {
       component.addSubjectModal();
-      expect(component.showAddModal).toBeTrue();
-      expect(document.body.style.overflow).toBe('hidden');
+      component.showAddModal.Should().BeTrue();
+      document.body.style.overflow.Should().Be('hidden');
     });
 
     it('10. closeAddSubjectModal cierra el modal y libera el scroll', () => {
       component.closeAddSubjectModal();
-      expect(component.showAddModal).toBeFalse();
-      expect(document.body.style.overflow).toBe('');
+      component.showAddModal.Should().BeFalse();
+      document.body.style.overflow.Should().Be('');
     });
 
     it('11. saveSubject cierra el modal de creación y recarga la lista', () => {
       component.saveSubject();
-      expect(component.showAddModal).toBeFalse();
-      expect(component.loadSubjects).toHaveBeenCalled();
+      component.showAddModal.Should().BeFalse();
+      Should(component.loadSubjects).HaveBeenCalled();
     });
 
     it('12. onRightClickSubject abre el menú contextual con la asignatura seleccionada', () => {
@@ -225,10 +225,10 @@ describe('SubjectsComponent', () => {
 
       component.onRightClickSubject(event, subjectMock);
 
-      expect(component.selectedSubject).toEqual(subjectMock);
-      expect(component.contextMenuX).toBe(50);
-      expect(component.contextMenuY).toBe(80);
-      expect(component.contextMenuVisible).toBeTrue();
+      Should(component.selectedSubject).BeEquivalentTo(subjectMock);
+      component.contextMenuX.Should().Be(50);
+      component.contextMenuY.Should().Be(80);
+      component.contextMenuVisible.Should().BeTrue();
     });
 
     it('13. editSubject no hace nada si no hay asignatura seleccionada', () => {
@@ -236,7 +236,7 @@ describe('SubjectsComponent', () => {
 
       component.editSubject();
 
-      expect(component.showEditModal).toBeFalse();
+      component.showEditModal.Should().BeFalse();
     });
 
     it('14. editSubject abre el modal de edición si hay asignatura seleccionada', () => {
@@ -245,9 +245,9 @@ describe('SubjectsComponent', () => {
 
       component.editSubject();
 
-      expect(component.showEditModal).toBeTrue();
-      expect(component.contextMenuVisible).toBeFalse();
-      expect(document.body.style.overflow).toBe('hidden');
+      component.showEditModal.Should().BeTrue();
+      component.contextMenuVisible.Should().BeFalse();
+      document.body.style.overflow.Should().Be('hidden');
     });
 
     it('15. closeEditModal cierra el modal, limpia la selección y libera el scroll', () => {
@@ -256,15 +256,15 @@ describe('SubjectsComponent', () => {
 
       component.closeEditModal();
 
-      expect(component.showEditModal).toBeFalse();
-      expect(component.selectedSubject).toBeNull();
-      expect(document.body.style.overflow).toBe('');
+      component.showEditModal.Should().BeFalse();
+      Should(component.selectedSubject).BeNull();
+      document.body.style.overflow.Should().Be('');
     });
 
     it('16. onSubjectSaved cierra el modal de edición y recarga la lista', () => {
       component.onSubjectSaved();
-      expect(component.showEditModal).toBeFalse();
-      expect(component.loadSubjects).toHaveBeenCalled();
+      component.showEditModal.Should().BeFalse();
+      Should(component.loadSubjects).HaveBeenCalled();
     });
 
   });
@@ -540,8 +540,8 @@ describe('SubjectsComponent', () => {
 
       component.onSearch();
 
-      expect(component.loadSubjects).toHaveBeenCalled();
-      expect(subjectServiceMock.searchSubjects).not.toHaveBeenCalled();
+      Should(component.loadSubjects).HaveBeenCalled();
+      Should(subjectServiceMock.searchSubjects).NotHaveBeenCalled();
     });
 
     it('should search and replace the subjects list on success', () => {
@@ -552,8 +552,8 @@ describe('SubjectsComponent', () => {
 
       component.onSearch();
 
-      expect(subjectServiceMock.searchSubjects).toHaveBeenCalledWith('cálculo');
-      expect(component.subjects).toEqual([subjectMock]);
+      Should(subjectServiceMock.searchSubjects).HaveBeenCalledWith('cálculo');
+      Should(component.subjects).BeEquivalentTo([subjectMock]);
     });
 
     it('should alert the user when the search request fails', () => {
@@ -563,7 +563,7 @@ describe('SubjectsComponent', () => {
 
       component.onSearch();
 
-      expect(window.alert).toHaveBeenCalledWith('Error searching subjects');
+      Should(window.alert).HaveBeenCalledWith('Error searching subjects');
     });
   });
 
