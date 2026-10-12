@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>WDT_Ir a materia desde clase</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">TC_Ir_a _materia_desde_clase</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://whats-due-tomorrow-frontend.vercel.app/subjects/27<datalist><option>https://whats-due-tomorrow-frontend.vercel.app/subjects/27</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Validacion'])[2]/following::div[1]<datalist><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Validacion'])[2]/following::div[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='sunday'])[1]/following::div[22]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Validacion'])[3]/preceding::div[9]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Gabriel'])[3]/preceding::div[10]</option><option>xpath=//div[27]/div/div[2]</option><option>css=div.class-professor</option></datalist></td><td></td></tr>
+<tr><td>verifyElementPresent</td><td>class=mat-mdc-card-title<datalist><option>class="mat-mdc-card-title"</option><option>class=mat-mdc-card-title</option></datalist></td><td></td></tr>
+<tr><td>assertText</td><td>class=mat-mdc-card-title<datalist><option>class="mat-mdc-card-title"</option><option>class=mat-mdc-card-title</option></datalist></td><td>Validacion</td></tr>
+</tbody></table>
+</body>
+</html>

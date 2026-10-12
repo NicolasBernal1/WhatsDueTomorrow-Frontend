@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>WDT_Visualizar_proxima_clase</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">TC_Visualizar_proxima_clase_hay_clase</td></tr>
+</thead>
+<tbody>
+<tr><td>verifyElementPresent</td><td>class=next-class-subject<datalist><option>class="next-class-subject"</option><option>class=next-class-subject</option></datalist></td><td></td></tr>
+<tr><td>assertText</td><td>class=next-class-subject<datalist><option>class="next-class-subject"</option><option>class=next-class-subject</option></datalist></td><td>Validacion</td></tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">TC_Visualizar_proxima_clase_no_clase</td></tr>
+</thead>
+<tbody>
+<tr><td>verifyElementPresent</td><td>class=next-class-empty<datalist><option>class=next-class-empty</option></datalist></td><td></td></tr>
+<tr><td>assertText</td><td>class=next-class-empty<datalist><option>next-class-empty</option><option>class=next-class-empty</option></datalist></td><td>You do not have more classes.</td></tr>
+<tr><td></td><td><datalist></datalist></td><td></td></tr>
+</tbody></table>
+</body>
+</html>
