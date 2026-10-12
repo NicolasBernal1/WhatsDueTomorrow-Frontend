@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>WDT_Editar clase</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">TC_Editar_clase_pass</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://whats-due-tomorrow-frontend.vercel.app/schedule<datalist><option>https://whats-due-tomorrow-frontend.vercel.app/schedule</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Gabriel'])[3]/following::button[1]<datalist><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Gabriel'])[3]/following::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Validacion'])[3]/following::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Delete'])[1]/preceding::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Katalon Recorder is recording ...'])[1]/preceding::button[2]</option><option>xpath=//*/text()[normalize-space(.)='Edit']/parent::*</option><option>xpath=//div[145]/button</option><option>css=div.context-menu > button</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>id=mat-select-value-36<datalist><option>id=mat-select-value-36</option><option>xpath=//div[@id='mat-select-value-36']</option><option>xpath=//mat-select[@id='mat-select-36']/div/div</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Day'])[1]/following::div[4]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Edit Class Schedule'])[1]/following::div[9]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Start time'])[1]/preceding::div[7]</option><option>xpath=//mat-select/div/div</option><option>css=#mat-select-value-36</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>xpath=//mat-option[@id='mat-option-492']/span<datalist><option>xpath=//mat-option[@id='mat-option-492']/span</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Save'])[1]/following::span[3]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/following::span[7]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Tuesday'])[2]/preceding::span[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Wednesday'])[1]/preceding::span[2]</option><option>xpath=//*/text()[normalize-space(.)='Monday']/parent::*</option><option>xpath=//mat-option/span</option><option>css=span.mdc-list-item__primary-text</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/following::span[5]<datalist><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/following::span[5]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='End time'])[1]/following::span[10]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Katalon Recorder is recording ...'])[1]/preceding::span[4]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Stop'])[1]/preceding::span[4]</option><option>xpath=//*/text()[normalize-space(.)='Save']/parent::*</option><option>xpath=//form/div/button[2]/span[2]</option><option>css=button.mdc-button.mdc-button--unelevated.mat-mdc-unelevated-button.mat-primary.mat-mdc-button-base.cdk-focused.cdk-mouse-focused > span.mdc-button__label</option></datalist></td><td></td></tr>
+</tbody></table>
+</body>
+</html>

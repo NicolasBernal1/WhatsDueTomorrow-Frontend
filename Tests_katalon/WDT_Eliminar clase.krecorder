@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>WDT_Eliminar clase</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">TC_Eliminar_clase_pass</td></tr>
+</thead>
+<tbody>
+<tr><td>chooseOkOnNextConfirmation</td><td><datalist></datalist></td><td></td></tr>
+<tr><td>open</td><td>https://whats-due-tomorrow-frontend.vercel.app/schedule<datalist><option>https://whats-due-tomorrow-frontend.vercel.app/schedule</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Edit'])[1]/following::button[1]<datalist><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Edit'])[1]/following::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Juan'])[2]/following::button[2]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Katalon Recorder is recording ...'])[1]/preceding::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Stop'])[1]/preceding::button[1]</option><option>xpath=//*/text()[normalize-space(.)='Delete']/parent::*</option><option>xpath=//div[145]/button[2]</option></datalist></td><td></td></tr>
+<tr><td>assertConfirmation</td><td>Delete Class?<datalist><option>Delete Class?</option></datalist></td><td></td></tr>
+<tr><td>refresh</td><td><datalist></datalist></td><td></td></tr>
+<tr><td>verifyElementNotPresent</td><td>xpath=//*[contains(@class,'class-name') and normalize-space(.)='Analisis predictivo']<datalist><option>xpath=//*[contains(@class,'class-name') and normalize-space(.)='Analisis predictivo']</option></datalist></td><td></td></tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">TC_Eliminar_clase_cancel</td></tr>
+</thead>
+<tbody>
+<tr><td>chooseCancelOnNextConfirmation</td><td><datalist></datalist></td><td></td></tr>
+<tr><td>open</td><td>https://whats-due-tomorrow-frontend.vercel.app/schedule<datalist><option>https://whats-due-tomorrow-frontend.vercel.app/schedule</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Edit'])[1]/following::button[1]<datalist><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Edit'])[1]/following::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Juan'])[2]/following::button[2]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Katalon Recorder is recording ...'])[1]/preceding::button[1]</option><option>xpath=(.//*[normalize-space(text()) and normalize-space(.)='Stop'])[1]/preceding::button[1]</option><option>xpath=//*/text()[normalize-space(.)='Delete']/parent::*</option><option>xpath=//div[145]/button[2]</option></datalist></td><td></td></tr>
+<tr><td>assertConfirmation</td><td>Delete Class?<datalist><option>Delete Class?</option></datalist></td><td></td></tr>
+<tr><td>verifyElementPresent</td><td>xpath=//*[contains(@class,'class-name') and normalize-space(.)='Validacion']<datalist><option>xpath=//*[contains(@class,'class-name') and normalize-space(.)='Validacion']</option></datalist></td><td></td></tr>
+</tbody></table>
+</body>
+</html>
