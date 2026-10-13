@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCase>
+<selenese>
+	<command>open</command>
+	<target><![CDATA[https://whats-due-tomorrow-frontend.vercel.app/subjects]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=//div/button/span[4]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=//label[@id='mat-mdc-form-field-label-4']/mat-label]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>type</command>
+	<target><![CDATA[id=mat-input-4]]></target>
+	<value><![CDATA[23671243]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=(.//*[normalize-space(text()) and normalize-space(.)=concat('Professor', "'", 's Name')])[1]/following::div[2]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>type</command>
+	<target><![CDATA[id=mat-input-5]]></target>
+	<value><![CDATA[3645|9]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[id=mat-input-6]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>waitForElementPresent</command>
+	<target><![CDATA[xpath=//mat-error[contains(.,'Name must contain at least one letter')]]]></target>
+	<value><![CDATA[10000]]></value>
+</selenese>
+<selenese>
+	<command>assertText</command>
+	<target><![CDATA[xpath=//mat-error[contains(.,'Name must contain at least one letter')]]]></target>
+	<value><![CDATA[glob:*Name must contain at least one letter*]]></value>
+</selenese>
+<selenese>
+	<command>assertElementPresent</command>
+	<target><![CDATA[xpath=//mat-error[contains(.,'Professor must contain at least one letter')]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+</TestCase>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCase>
+<selenese>
+	<command>open</command>
+	<target><![CDATA[https://whats-due-tomorrow-frontend.vercel.app/subjects]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>contextMenu</command>
+	<target><![CDATA[xpath=//h3[normalize-space()='Ciencias']]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=(.//*[normalize-space(text()) and normalize-space(.)='Ciencias'])[2]/following::button[1]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[id=mat-input-1]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>type</command>
+	<target><![CDATA[id=mat-input-1]]></target>
+	<value><![CDATA[Maths]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[id=mat-input-2]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>type</command>
+	<target><![CDATA[id=mat-input-2]]></target>
+	<value><![CDATA[Sebastian]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[id=mat-input-3]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>type</command>
+	<target><![CDATA[id=mat-input-3]]></target>
+	<value><![CDATA[4]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=//div[4]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/following::span[5]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>waitForElementPresent</command>
+	<target><![CDATA[xpath=//h3[normalize-space()='Maths']]]></target>
+	<value><![CDATA[20000]]></value>
+</selenese>
+<selenese>
+	<command>assertElementPresent</command>
+	<target><![CDATA[xpath=//h3[normalize-space()='Maths']]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>assertText</command>
+	<target><![CDATA[xpath=//h3[normalize-space()='Maths']/ancestor::mat-card//p]]></target>
+	<value><![CDATA[glob:*Sebastian*]]></value>
+</selenese>
+</TestCase>
