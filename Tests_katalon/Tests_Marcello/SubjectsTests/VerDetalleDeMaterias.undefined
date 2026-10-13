@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCase>
+<selenese>
+	<command>open</command>
+	<target><![CDATA[https://whats-due-tomorrow-frontend.vercel.app/subjects/74]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=(.//*[normalize-space(text()) and normalize-space(.)='Ciencias'])[1]/following::h3[1]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>waitForElementPresent</command>
+	<target><![CDATA[css=mat-card-title]]></target>
+	<value><![CDATA[20000]]></value>
+</selenese>
+<selenese>
+	<command>assertLocation</command>
+	<target><![CDATA[glob:*/subjects/*]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>assertText</command>
+	<target><![CDATA[css=mat-card-title]]></target>
+	<value><![CDATA[glob:*Ciencias*]]></value>
+</selenese>
+<selenese>
+	<command>assertText</command>
+	<target><![CDATA[css=mat-card-subtitle]]></target>
+	<value><![CDATA[glob:*Marco*]]></value>
+</selenese>
+<selenese>
+	<command></command>
+	<target><![CDATA[]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+</TestCase>

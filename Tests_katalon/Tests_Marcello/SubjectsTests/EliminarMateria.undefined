@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCase>
+<selenese>
+	<command>open</command>
+	<target><![CDATA[https://whats-due-tomorrow-frontend.vercel.app/subjects]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>waitForElementPresent</command>
+	<target><![CDATA[xpath=//h3[normalize-space()='Matematicas']]]></target>
+	<value><![CDATA[20000]]></value>
+</selenese>
+<selenese>
+	<command>contextMenu</command>
+	<target><![CDATA[xpath=//h3[normalize-space()='Matematicas']]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>waitForElementPresent</command>
+	<target><![CDATA[css=.context-menu]]></target>
+	<value><![CDATA[10000]]></value>
+</selenese>
+<selenese>
+	<command>chooseOkOnNextConfirmation</command>
+	<target><![CDATA[]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>click</command>
+	<target><![CDATA[xpath=//*[contains(@class,'context-menu')]//button[contains(.,'Delete')]]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command>assertConfirmation</command>
+	<target><![CDATA[Delete subject?]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+<selenese>
+	<command></command>
+	<target><![CDATA[]]></target>
+	<value><![CDATA[]]></value>
+</selenese>
+</TestCase>
