@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>F01 Validación del formulario de registro</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">Untitled Test Case</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>http://localhost:4200/register<datalist><option>http://localhost:4200/register</option></datalist></td><td></td></tr>
+<tr><td>type</td><td>css=mat-card.register-card input[type='text']<datalist><option>css=mat-card.register-card input[type='text']</option></datalist></td><td>12345</td></tr>
+<tr><td>type</td><td>css=mat-card.register-card input[type='email']<datalist><option>css=mat-card.register-card input[type='email']</option></datalist></td><td>no-es-email</td></tr>
+<tr><td>click</td><td>css=mat-card h2.title<datalist><option>css=mat-card h2.title</option></datalist></td><td></td></tr>
+<tr><td>verifyText</td><td>css=mat-card mat-error<datalist><option>css=mat-card mat-error</option></datalist></td><td>regexp:.*Name must contain at least one letter.*</td></tr>
+<tr><td>assertElementPresent</td><td>css=mat-card button[type='submit'][disabled]<datalist><option>css=mat-card button[type='submit'][disabled]</option></datalist></td><td></td></tr>
+</tbody></table>
+</body>
+</html>

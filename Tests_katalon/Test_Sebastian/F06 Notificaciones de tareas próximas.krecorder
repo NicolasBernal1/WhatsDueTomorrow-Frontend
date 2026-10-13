@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>F06 Notificaciones de tareas próximas</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3" data-tags="">Untitled Test Case</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>http://localhost:4200/schedule<datalist><option>http://localhost:4200/schedule</option></datalist></td><td></td></tr>
+<tr><td>pause</td><td>2000<datalist><option>2000</option></datalist></td><td></td></tr>
+<tr><td>click</td><td>css=button[aria-label='Upcoming assignments']<datalist><option>css=button[aria-label='Upcoming assignments']</option></datalist></td><td></td></tr>
+<tr><td>pause</td><td>1000<datalist><option></option><option>1000</option></datalist></td><td></td></tr>
+<tr><td>verifyText</td><td>css=.upcoming-content h4<datalist><option></option><option>css=.upcoming-content h4</option></datalist></td><td>Due soon</td></tr>
+<tr><td>assertElementPresent</td><td>css=.upcoming-content<datalist><option>css=.upcoming-content</option></datalist></td><td></td></tr>
+</tbody></table>
+</body>
+</html>
