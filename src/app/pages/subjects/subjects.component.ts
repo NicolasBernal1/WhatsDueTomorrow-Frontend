@@ -89,8 +89,8 @@ export class SubjectsComponent implements OnInit {
     event.preventDefault();
 
     this.selectedSubject = subject;
-    this.contextMenuX = event.clientX;
-    this.contextMenuY = event.clientY;
+    this.contextMenuX = Math.min(event.clientX, window.innerWidth - 150);
+    this.contextMenuY = Math.min(event.clientY, window.innerHeight - 110);
     this.contextMenuVisible = true;
   }
 

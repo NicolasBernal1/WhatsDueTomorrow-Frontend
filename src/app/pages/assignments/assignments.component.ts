@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
   templateUrl: './assignments.component.html',
   styleUrl: './assignments.component.scss'
 })
-export class AssignmentsComponent implements OnInit{
+export class AssignmentsComponent implements OnInit {
   assignments: AssignmentResponseCompDto[] = [];
   loading = true;
   showEditModal = false;
@@ -23,10 +23,10 @@ export class AssignmentsComponent implements OnInit{
   contextMenuX = 0;
   contextMenuY = 0;
 
-  constructor(private assignmentService: AssignmentService, private router: Router){}
+  constructor(private assignmentService: AssignmentService, private router: Router) { }
 
   ngOnInit(): void {
-      this.loadAssignments();
+    this.loadAssignments();
   }
 
   loadAssignments(): void {
@@ -54,8 +54,8 @@ export class AssignmentsComponent implements OnInit{
       subjectName: assignment.subjectName
     };
 
-    this.contextMenuX = event.clientX;
-    this.contextMenuY = event.clientY;
+    this.contextMenuX = Math.min(event.clientX, window.innerWidth - 150);
+    this.contextMenuY = Math.min(event.clientY, window.innerHeight - 110);
     this.contextMenuVisible = true;
   }
 
@@ -69,7 +69,7 @@ export class AssignmentsComponent implements OnInit{
     this.showEditModal = true;
     this.closeContextMenu();
   }
-  
+
   closeContextMenu(): void {
     this.contextMenuVisible = false;
   }
@@ -83,7 +83,7 @@ export class AssignmentsComponent implements OnInit{
     this.closeEditModal();
     this.loadAssignments();
   }
-  
+
   deleteAssignment(): void {
     if (!this.selectedAssignment) return;
 

@@ -138,9 +138,17 @@
               display: inline-block;
             }
 
-            &.step-baja .step-dot { background: #1565c0; }
-            &.step-balanceada .step-dot { background: #2e7d32; }
-            &.step-sobrecarga .step-dot { background: #c62828; }
+            &.step-baja .step-dot {
+              background: #1565c0;
+            }
+
+            &.step-balanceada .step-dot {
+              background: #2e7d32;
+            }
+
+            &.step-sobrecarga .step-dot {
+              background: #c62828;
+            }
 
             &.active {
               opacity: 1;
@@ -150,19 +158,28 @@
               &.step-baja {
                 background: #1565c0;
                 color: #ffffff;
-                .step-dot { background: #ffffff; }
+
+                .step-dot {
+                  background: #ffffff;
+                }
               }
 
               &.step-balanceada {
                 background: #2e7d32;
                 color: #ffffff;
-                .step-dot { background: #ffffff; }
+
+                .step-dot {
+                  background: #ffffff;
+                }
               }
 
               &.step-sobrecarga {
                 background: #c62828;
                 color: #ffffff;
-                .step-dot { background: #ffffff; }
+
+                .step-dot {
+                  background: #ffffff;
+                }
               }
             }
           }
@@ -178,7 +195,7 @@
 
       .load-stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
         gap: 14px;
 
         .stat-box {
@@ -260,7 +277,7 @@
 
   .subjects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 24px;
   }
 
@@ -346,6 +363,37 @@
 
     &:hover {
       background: #f3f3f3;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .subjects-container {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .subjects-container {
+    padding: 16px 12px;
+
+    .header {
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .academic-load-section .load-card {
+      padding: 16px;
+    }
+
+    .academic-load-section .traffic-light-bar {
+      flex-wrap: wrap;
+      border-radius: 14px;
     }
   }
 }
