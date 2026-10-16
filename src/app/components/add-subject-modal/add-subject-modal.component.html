@@ -6,7 +6,7 @@
   <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()" class="form-content">
     <mat-form-field appearance="outline">
       <mat-label>Subject Name</mat-label>
-      <input matInput type="text" formControlName="name" placeholder="e.g. Desarrollo Web" />
+      <input matInput type="text" formControlName="name" placeholder="e.g. Web Development" />
       @if (name?.touched && name?.hasError('required')) {
         <mat-error>Name is required</mat-error>
       }
@@ -27,13 +27,13 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Créditos Académicos (1 - 12)</mat-label>
+      <mat-label>Academic Credits (1 - 12)</mat-label>
       <input matInput type="number" formControlName="credits" min="1" max="12" step="1" placeholder="3" />
       @if (credits?.touched && credits?.hasError('required')) {
-        <mat-error>Los créditos son obligatorios</mat-error>
+        <mat-error>Credits are required</mat-error>
       }
       @if (credits?.touched && (credits?.hasError('min') || credits?.hasError('max') || credits?.hasError('pattern'))) {
-        <mat-error>Los créditos deben ser un entero entre 1 y 12</mat-error>
+        <mat-error>Credits must be a whole number between 1 and 12</mat-error>
       }
     </mat-form-field>
 

@@ -135,7 +135,7 @@ export class EvaluationModalComponent implements OnInit {
           },
           error: () => {
             this.isSubmitting = false;
-            this.errorMessage = 'No fue posible actualizar la evaluación.';
+            this.errorMessage = 'Could not update the evaluation.';
           },
         });
       return;
@@ -152,7 +152,7 @@ export class EvaluationModalComponent implements OnInit {
         },
         error: () => {
           this.isSubmitting = false;
-          this.errorMessage = 'No fue posible registrar la evaluación.';
+          this.errorMessage = 'Could not register the evaluation.';
         },
       });
   }

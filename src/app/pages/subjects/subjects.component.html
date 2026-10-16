@@ -4,8 +4,8 @@
   <input
     id="subject-search"
     type="text"
-    placeholder="Buscar por asignatura o profesor..."
-    aria-label="Buscar por asignatura o profesor"
+    placeholder="Search by subject or professor..."
+    aria-label="Search by subject or professor"
     [(ngModel)]="searchQuery"
     (input)="onSearch()"
   />
@@ -14,11 +14,11 @@
 
   <!-- F26-F29 / RNF10-RNF11: Semáforo de Carga Semanal y Estimación de Horas -->
   @if (academicLoad) {
-    <section class="academic-load-section" aria-label="Semáforo de carga académica semanal">
+    <section class="academic-load-section" aria-label="Weekly academic load indicator">
       <div class="load-card" [ngClass]="'status-' + academicLoad.status">
         <div class="load-header">
           <div class="load-title-group">
-            <span class="load-kicker">Carga Académica Semanal</span>
+            <span class="load-kicker">Weekly Academic Load</span>
             <div class="status-indicator">
               <mat-icon class="status-icon">{{ getLoadStatusIcon(academicLoad.status) }}</mat-icon>
               <span class="status-text">{{ getLoadStatusText(academicLoad.status) }}</span>
@@ -26,18 +26,18 @@
           </div>
 
           <!-- Semáforo visual con las 3 zonas (RNF10: sin depender solo del color) -->
-          <div class="traffic-light-bar" role="group" aria-label="Nivel de carga del semáforo">
+          <div class="traffic-light-bar" role="group" aria-label="Load level indicator">
             <div class="traffic-step step-baja" [class.active]="academicLoad.status === 'baja'">
               <span class="step-dot"></span>
-              <span class="step-label">Baja (&lt;12)</span>
+              <span class="step-label">Low (&lt;12)</span>
             </div>
             <div class="traffic-step step-balanceada" [class.active]="academicLoad.status === 'balanceada'">
               <span class="step-dot"></span>
-              <span class="step-label">Balanceada (12-18)</span>
+              <span class="step-label">Balanced (12-18)</span>
             </div>
             <div class="traffic-step step-sobrecarga" [class.active]="academicLoad.status === 'sobrecarga'">
               <span class="step-dot"></span>
-              <span class="step-label">Sobrecarga (&gt;18)</span>
+              <span class="step-label">Overload (&gt;18)</span>
             </div>
           </div>
         </div>
@@ -52,9 +52,9 @@
               <mat-icon>school</mat-icon>
             </div>
             <div class="stat-content">
-              <span class="stat-label">Créditos Totales</span>
-              <span class="stat-number">{{ academicLoad.totalCredits }} <span class="stat-unit">créditos</span></span>
-              <span class="stat-hint">{{ academicLoad.subjectsCount }} asignaturas inscritas</span>
+              <span class="stat-label">Total Credits</span>
+              <span class="stat-number">{{ academicLoad.totalCredits }} <span class="stat-unit">credits</span></span>
+              <span class="stat-hint">{{ academicLoad.subjectsCount }} enrolled subjects</span>
             </div>
           </div>
 
@@ -63,9 +63,9 @@
               <mat-icon>schedule</mat-icon>
             </div>
             <div class="stat-content">
-              <span class="stat-label">Clase Semanal</span>
-              <span class="stat-number">{{ academicLoad.weeklyPresentialHours }} <span class="stat-unit">h/sem</span></span>
-              <span class="stat-hint">{{ academicLoad.classesCount }} sesiones registradas</span>
+              <span class="stat-label">Weekly Class Hours</span>
+              <span class="stat-number">{{ academicLoad.weeklyPresentialHours }} <span class="stat-unit">h/week</span></span>
+              <span class="stat-hint">{{ academicLoad.classesCount }} registered sessions</span>
             </div>
           </div>
 
@@ -74,9 +74,9 @@
               <mat-icon>menu_book</mat-icon>
             </div>
             <div class="stat-content">
-              <span class="stat-label">Trabajo Autónomo Estimado</span>
-              <span class="stat-number">{{ academicLoad.weeklyAutonomousHours }} <span class="stat-unit">h/sem</span></span>
-              <span class="stat-hint">Fórmula: 2h de estudio autónomo por 1h de clase</span>
+              <span class="stat-label">Estimated Independent Study</span>
+              <span class="stat-number">{{ academicLoad.weeklyAutonomousHours }} <span class="stat-unit">h/week</span></span>
+              <span class="stat-hint">Formula: 2h of independent study per 1h of class</span>
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@
           <div class="subject-info">
             <div class="subject-title-row">
               <h3>{{ sub.name }}</h3>
-              <span class="credit-badge" title="Créditos de la asignatura">
+              <span class="credit-badge" title="Subject credits">
                 <mat-icon class="badge-icon">school</mat-icon>
                 {{ sub.credits || 3 }} cr.
               </span>

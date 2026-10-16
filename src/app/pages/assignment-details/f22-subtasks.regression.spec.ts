@@ -145,7 +145,7 @@ describe('F22 Regression Suite: Desglosar tareas en subtareas con avance porcent
       // Assert: el estado debe revertirse estrictamente a false y 33%
       targetSubtask.completed.Should().BeFalse();
       component.progress.Should().Be(initialProgress);
-      component.error.Should().Be('No fue posible actualizar el progreso.');
+      component.error.Should().Be('Could not update the progress.');
     });
   });
 
@@ -220,7 +220,7 @@ describe('F22 Regression Suite: Desglosar tareas en subtareas con avance porcent
 
       // Debe haber llamado a getAll para sincronizar tras el fallo
       Should(subtaskServiceMock.getAll).HaveBeenCalled();
-      component.error.Should().Be('No fue posible cambiar el orden.');
+      component.error.Should().Be('Could not change the order.');
     });
   });
 

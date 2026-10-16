@@ -59,8 +59,8 @@ export class UrgentAlertService {
       const notificationKey = `urgent-alert-${assignment.id}-${dueAt}`;
 
       if (now >= reminderAt && now < dueAt && !localStorage.getItem(notificationKey)) {
-        new Notification('Entrega próxima', {
-          body: `${assignment.title} vence pronto (${assignment.subjectName}).`
+        new Notification('Assignment due soon', {
+          body: `${assignment.title} is due soon (${assignment.subjectName}).`
         });
         localStorage.setItem(notificationKey, 'sent');
       }

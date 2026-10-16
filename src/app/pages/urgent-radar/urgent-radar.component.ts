@@ -47,10 +47,10 @@ export class UrgentRadarComponent implements OnInit, OnDestroy {
   async enableNotifications(): Promise<void> {
     const permission = await this.urgentAlertService.requestPermission();
     this.notificationMessage = permission === 'granted'
-      ? 'Las alertas web están activadas.'
+      ? 'Web alerts are enabled.'
       : permission === 'unsupported'
-        ? 'Este navegador no admite alertas web.'
-        : 'No se concedió permiso para mostrar alertas.';
+        ? 'This browser does not support web alerts.'
+        : 'Permission to show alerts was not granted.';
   }
 
   private loadUrgentAssignments(): void {

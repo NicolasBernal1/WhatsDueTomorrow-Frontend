@@ -91,7 +91,7 @@ export class NoteModalComponent implements OnInit {
         },
         error: () => {
           this.isSubmitting = false;
-          this.errorMessage = 'No fue posible actualizar el apunte.';
+          this.errorMessage = 'Could not update the note.';
         }
       });
       return;
@@ -106,7 +106,7 @@ export class NoteModalComponent implements OnInit {
       },
       error: () => {
         this.isSubmitting = false;
-        this.errorMessage = 'No fue posible guardar el apunte.';
+        this.errorMessage = 'Could not save the note.';
       }
     });
   }

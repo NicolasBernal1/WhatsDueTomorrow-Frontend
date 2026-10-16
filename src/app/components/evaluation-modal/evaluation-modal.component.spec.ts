@@ -189,7 +189,7 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       component.onSave();
 
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible actualizar la evaluación.');
+      component.errorMessage.Should().Be('Could not update the evaluation.');
       Should(component.save.emit).NotHaveBeenCalled();
       Should(component.close.emit).NotHaveBeenCalled();
     });
@@ -236,7 +236,7 @@ describe('EvaluationModalComponent (F25 — Caminos Básicos Frontend Tabla 37)'
       component.onSave();
 
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible registrar la evaluación.');
+      component.errorMessage.Should().Be('Could not register the evaluation.');
       Should(component.save.emit).NotHaveBeenCalled();
     });
   });

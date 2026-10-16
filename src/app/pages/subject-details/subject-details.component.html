@@ -8,47 +8,47 @@
       <div class="actions">
         <button mat-flat-button color="primary" (click)="openAssignmentModal()">+ Add Assignment</button>
         <button mat-stroked-button color="accent" (click)="openClassModal()">+ Add Class</button>
-        <button mat-stroked-button color="primary" (click)="openNoteModal()">+ Agregar Apunte</button>
-        <button mat-stroked-button color="accent" (click)="openEvaluationModal()">+ Registrar Calificación</button>
+        <button mat-stroked-button color="primary" (click)="openNoteModal()">+ Add Note</button>
+        <button mat-stroked-button color="accent" (click)="openEvaluationModal()">+ Add Grade</button>
       </div>
     </mat-card>
 
     <!-- F25: Calculadora y simulador de calificaciones por asignatura -->
     <div class="calculator-section">
       <div class="section-title-bar">
-        <h3>Calculadora y simulador de calificaciones</h3>
-        <button mat-flat-button color="primary" (click)="openEvaluationModal()">+ Nueva Evaluación</button>
+        <h3>Grade calculator and simulator</h3>
+        <button mat-flat-button color="primary" (click)="openEvaluationModal()">+ New Evaluation</button>
       </div>
 
       <!-- Alertas Visuales (RF25) -->
       @if (gradeSummary?.weightExceeded) {
         <div class="alert-banner alert-warning">
-          ⚠️ <strong>Alerta de ponderación:</strong> La suma de los porcentajes evaluados ({{ gradeSummary?.totalWeight | number: '1.2-2' }}%) excede el 100%. Por favor, ajusta los porcentajes de tus evaluaciones registradas.
+          ⚠️ <strong>Weight alert:</strong> The sum of the evaluated weights ({{ gradeSummary?.totalWeight | number: '1.2-2' }}%) exceeds 100%. Please adjust the weights of your registered evaluations.
         </div>
       }
 
       @if (gradeSummary && !gradeSummary.isAttainable && !gradeSummary.weightExceeded && evaluations.length > 0) {
         <div class="alert-banner alert-danger">
-          ⚠️ <strong>Nota inalcanzable:</strong> La calificación mínima requerida ({{ gradeSummary.requiredGrade | number: '1.2-2' }}) supera el límite de 5.0. No es matemáticamente posible alcanzar la nota de aprobación (3.0).
+          ⚠️ <strong>Unreachable grade:</strong> The minimum required grade ({{ gradeSummary.requiredGrade | number: '1.2-2' }}) exceeds the 5.0 limit. It is mathematically impossible to reach the passing grade (3.0).
         </div>
       }
 
       <!-- Panel de Métricas y Estado Académico -->
       <div class="metrics-grid">
         <mat-card class="metric-card">
-          <span class="metric-title">Promedio Ponderado Actual</span>
+          <span class="metric-title">Current Weighted Average</span>
           <span class="metric-value">{{ (gradeSummary?.currentAverage | number: '1.2-2') || '0.00' }}</span>
           <span class="metric-sub">Ponderado sobre {{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}% evaluado</span>
         </mat-card>
 
         <mat-card class="metric-card">
-          <span class="metric-title">Puntos Acumulados</span>
+          <span class="metric-title">Accumulated Points</span>
           <span class="metric-value">{{ (gradeSummary?.currentContribution | number: '1.2-2') || '0.00' }} <span class="metric-unit">/ 5.0</span></span>
-          <span class="metric-sub">Aporte directo a la nota final</span>
+          <span class="metric-sub">Direct contribution to the final grade</span>
         </mat-card>
 
         <mat-card class="metric-card">
-          <span class="metric-title">Porcentaje Evaluado</span>
+          <span class="metric-title">Evaluated Weight</span>
           <span class="metric-value" [class.warn-text]="gradeSummary?.weightExceeded">
             {{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}%
           </span>
@@ -56,12 +56,12 @@
         </mat-card>
 
         <mat-card class="metric-card">
-          <span class="metric-title">Nota Requerida (Aprobar 3.0)</span>
+          <span class="metric-title">Required Grade (to Pass 3.0)</span>
           <span class="metric-value" [class.danger-text]="gradeSummary && !gradeSummary.isAttainable && evaluations.length > 0">
             @if (gradeSummary?.status === 'Aprobado') {
               0.00
             } @else if (gradeSummary && !gradeSummary.isAttainable && evaluations.length > 0) {
-              Inalcanzable
+              Unreachable
             } @else if (evaluations.length === 0) {
               3.00
             } @else {
@@ -70,9 +70,9 @@
           </span>
           <span class="metric-sub">
             @if (gradeSummary?.status === 'Aprobado') {
-              ¡Materia aprobada!
+              Subject passed!
             } @else {
-              Mínimo en el {{ (gradeSummary?.remainingWeight | number: '1.2-2') || '100.00' }}% restante
+              Minimum on the remaining {{ (gradeSummary?.remainingWeight | number: '1.2-2') || '100.00' }}% 
             }
           </span>
         </mat-card>
@@ -81,7 +81,7 @@
       <!-- Barra de Progreso Reactiva del Porcentaje Evaluado (RNF09) -->
       <div class="progress-container">
         <div class="progress-info">
-          <span class="progress-label">Progreso evaluado del semestre ({{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}% de 100%)</span>
+          <span class="progress-label">Evaluated semester progress ({{ (gradeSummary?.totalWeight | number: '1.2-2') || '0.00' }}% of 100%)</span>
           <span
             class="status-chip"
             [class.status-aprobado]="gradeSummary?.status === 'Aprobado'"
@@ -89,7 +89,7 @@
             [class.status-en-riesgo]="gradeSummary?.status === 'En riesgo'"
             [class.status-sin-calificaciones]="!gradeSummary?.status || gradeSummary?.status === 'Sin calificaciones'"
           >
-            Estado: {{ gradeSummary?.status || 'Sin calificaciones' }}
+            Status: {{ statusLabel(gradeSummary?.status) }}
           </span>
         </div>
         <div class="progress-bar-track">
@@ -105,40 +105,40 @@
       @if (evaluations.length > 0 && gradeSummary && gradeSummary.remainingWeight > 0) {
         <mat-card class="simulator-card">
           <div class="simulator-header">
-            <h4>🎯 Simulador de Escenarios ({{ gradeSummary.remainingWeight | number: '1.2-2' }}% restante por evaluar)</h4>
-            <p>Calcula en tiempo real tu nota definitiva proyectada o simula la nota necesaria para alcanzar cualquier meta.</p>
+            <h4>🎯 Scenario Simulator ({{ gradeSummary.remainingWeight | number: '1.2-2' }}% left to evaluate)</h4>
+            <p>Calculate your projected final grade in real time or simulate the grade needed to reach any goal.</p>
           </div>
 
           <div class="simulator-inputs">
             <div class="sim-input-group">
-              <label for="hypotheticalInput">Si obtengo esta nota en lo restante (0.0 - 5.0):</label>
+              <label for="hypotheticalInput">If I get this grade on the remaining work (0.0 - 5.0):</label>
               <input
                 id="hypotheticalInput"
                 type="number"
                 class="sim-input"
                 [(ngModel)]="hypotheticalScore"
                 (ngModelChange)="onSimulationChange()"
-                placeholder="Ej. 3.8"
+                placeholder="e.g. 3.8"
                 min="0"
                 max="5"
                 step="0.1"
               />
               @if (simResult?.hypotheticalFinalGrade !== null && simResult?.hypotheticalFinalGrade !== undefined) {
                 <div class="sim-feedback">
-                  Definitiva estimada: <strong>{{ simResult?.hypotheticalFinalGrade | number: '1.2-2' }}</strong>
+                  Estimated final grade: <strong>{{ simResult?.hypotheticalFinalGrade | number: '1.2-2' }}</strong>
                   <span
                     class="sim-badge"
                     [class.sim-badge-pass]="simResult?.hypotheticalStatus === 'Aprobando'"
                     [class.sim-badge-risk]="simResult?.hypotheticalStatus === 'En riesgo'"
                   >
-                    {{ simResult?.hypotheticalStatus }}
+                    {{ statusLabel(simResult?.hypotheticalStatus) }}
                   </span>
                 </div>
               }
             </div>
 
             <div class="sim-input-group">
-              <label for="targetGoalInput">Calcular nota para obtener una meta específica:</label>
+              <label for="targetGoalInput">Calculate the grade needed to reach a specific goal:</label>
               <input
                 id="targetGoalInput"
                 type="number"
@@ -153,9 +153,9 @@
               @if (simResult?.requiredForTarget !== null && simResult?.requiredForTarget !== undefined) {
                 <div class="sim-feedback">
                   @if (simResult?.isTargetAttainable) {
-                    Nota requerida: <strong>{{ simResult?.requiredForTarget | number: '1.2-2' }}</strong>
+                    Required grade: <strong>{{ simResult?.requiredForTarget | number: '1.2-2' }}</strong>
                   } @else {
-                    <span class="danger-text">⚠️ Requiere {{ simResult?.requiredForTarget | number: '1.2-2' }} (Supera 5.0)</span>
+                    <span class="danger-text">⚠️ Requires {{ simResult?.requiredForTarget | number: '1.2-2' }} (Exceeds 5.0)</span>
                   }
                 </div>
               }
@@ -167,25 +167,25 @@
       <!-- Listado de Evaluaciones Registradas (CA1 & CA3) -->
       @if (loadingEvaluations) {
         <div class="loading-state">
-          <p>Cargando evaluaciones...</p>
+          <p>Loading evaluations...</p>
         </div>
       } @else if (evaluations.length === 0) {
         <div class="empty-evaluations">
           <div class="empty-icon">📊</div>
-          <h4>No hay evaluaciones registradas para esta asignatura</h4>
-          <p>Registra tus parciales, talleres y quizes para calcular tu promedio acumulado en tiempo real y simular la nota requerida para aprobar.</p>
-          <button mat-raised-button color="primary" (click)="openEvaluationModal()">Registrar primera evaluación</button>
+          <h4>No evaluations registered for this subject</h4>
+          <p>Record your exams, workshops and quizzes to calculate your running average in real time and simulate the grade needed to pass.</p>
+          <button mat-raised-button color="primary" (click)="openEvaluationModal()">Add first evaluation</button>
         </div>
       } @else {
         <div class="evaluations-table-wrapper">
           <table class="evaluations-table">
             <thead>
               <tr>
-                <th>Evaluación</th>
-                <th>Porcentaje</th>
-                <th>Calificación</th>
-                <th>Aporte a definitiva</th>
-                <th class="actions-col">Acciones</th>
+                <th>Evaluation</th>
+                <th>Weight</th>
+                <th>Grade</th>
+                <th>Contribution</th>
+                <th class="actions-col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -196,8 +196,8 @@
                   <td><span class="score-badge" [class.score-low]="ev.score < 3.0">{{ ev.score | number: '1.2-2' }}</span></td>
                   <td class="contribution-col">+{{ (ev.score * ev.weight / 100) | number: '1.2-2' }} pts</td>
                   <td class="actions-col">
-                    <button mat-button color="primary" (click)="openEvaluationModal(ev)">Editar</button>
-                    <button mat-button color="warn" (click)="deleteEvaluation(ev)">Eliminar</button>
+                    <button mat-button color="primary" (click)="openEvaluationModal(ev)">Edit</button>
+                    <button mat-button color="warn" (click)="deleteEvaluation(ev)">Delete</button>
                   </td>
                 </tr>
               }
@@ -210,21 +210,21 @@
     <!-- F24: Bitácora de apuntes y recursos rápidos por asignatura -->
     <div class="bitacora-section">
       <div class="section-title-bar">
-        <h3>Bitácora de apuntes y recursos rápidos</h3>
-        <button mat-flat-button color="primary" (click)="openNoteModal()">+ Nuevo Apunte</button>
+        <h3>Notes and quick resources log</h3>
+        <button mat-flat-button color="primary" (click)="openNoteModal()">+ New Note</button>
       </div>
 
       @if (loadingNotes) {
         <div class="loading-state">
-          <p>Cargando bitácora de apuntes...</p>
+          <p>Loading notes log...</p>
         </div>
       } @else if (notes.length === 0) {
         <!-- HU24 Criterio 3: Mensaje informativo ante ausencia de apuntes con opción de crear el primero -->
         <div class="empty-bitacora">
           <div class="empty-icon">📝</div>
-          <h4>No hay apuntes ni recursos registrados para esta asignatura</h4>
-          <p>Centraliza aquí tus notas de estudio, fórmulas, acuerdos de clase y accesos virtuales.</p>
-          <button mat-raised-button color="primary" (click)="openNoteModal()">Crear el primer apunte</button>
+          <h4>No notes or resources registered for this subject</h4>
+          <p>Keep your study notes, formulas, class agreements and online links in one place.</p>
+          <button mat-raised-button color="primary" (click)="openNoteModal()">Create the first note</button>
         </div>
       } @else {
         <div class="notes-list">
@@ -245,8 +245,8 @@
                 }
               </mat-card-content>
               <div class="note-actions">
-                <button mat-button color="primary" (click)="editNote(note)">Editar</button>
-                <button mat-button color="warn" (click)="deleteNote(note)">Eliminar</button>
+                <button mat-button color="primary" (click)="editNote(note)">Edit</button>
+                <button mat-button color="warn" (click)="deleteNote(note)">Delete</button>
               </div>
             </mat-card>
           }

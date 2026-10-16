@@ -150,21 +150,21 @@ export class SubjectsComponent implements OnInit {
 
   getLoadStatusText(status?: string): string {
     switch (status) {
-      case 'baja': return 'Carga baja';
-      case 'balanceada': return 'Carga balanceada';
-      case 'sobrecarga': return 'Sobrecarga';
-      default: return 'Carga no calculada';
+      case 'baja': return 'Low load';
+      case 'balanceada': return 'Balanced load';
+      case 'sobrecarga': return 'Overload';
+      default: return 'Load not calculated';
     }
   }
 
   getLoadStatusDescription(status?: string): string {
     switch (status) {
       case 'baja':
-        return 'Tu carga académica es ligera (< 12 créditos). Tienes margen para inscribir más materias o actividades.';
+        return 'Your academic load is light (< 12 credits). You have room to enroll in more subjects or activities.';
       case 'balanceada':
-        return 'Tu carga académica está en un rango equilibrado y recomendado (12 a 18 créditos).';
+        return 'Your academic load is in a balanced, recommended range (12 to 18 credits).';
       case 'sobrecarga':
-        return 'Carga académica alta (> 18 créditos). Requerirá una dedicación horaria exigente durante el semestre.';
+        return 'High academic load (> 18 credits). It will require a demanding time commitment during the semester.';
       default:
         return '';
     }

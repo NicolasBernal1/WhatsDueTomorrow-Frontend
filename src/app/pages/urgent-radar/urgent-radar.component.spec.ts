@@ -140,17 +140,17 @@ describe('UrgentRadarComponent (F21 — Alertas y Radar de Entregas Urgentes)', 
     // Caso 1: Concedido
     urgentAlertServiceMock.requestPermission.and.resolveTo('granted');
     await component.enableNotifications();
-    component.notificationMessage.Should().Be('Las alertas web están activadas.');
+    component.notificationMessage.Should().Be('Web alerts are enabled.');
 
     // Caso 2: No soportado
     urgentAlertServiceMock.requestPermission.and.resolveTo('unsupported');
     await component.enableNotifications();
-    component.notificationMessage.Should().Be('Este navegador no admite alertas web.');
+    component.notificationMessage.Should().Be('This browser does not support web alerts.');
 
     // Caso 3: Denegado
     urgentAlertServiceMock.requestPermission.and.resolveTo('denied');
     await component.enableNotifications();
-    component.notificationMessage.Should().Be('No se concedió permiso para mostrar alertas.');
+    component.notificationMessage.Should().Be('Permission to show alerts was not granted.');
   });
 
   // Camino P7: 1-2-3-4-5-6-3-9-10-11-12-13-15-16-20 (Entrega vencida: diffHours < 0)

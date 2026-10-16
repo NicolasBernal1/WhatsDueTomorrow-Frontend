@@ -166,8 +166,8 @@ describe('UrgentAlertService (F21 — Servicio de Alertas Preventivas de Entrega
       (window as any).Notification.permission = 'granted';
       (service as any).notifyDueAssignments([sampleAssignment]);
 
-      Should(notificationConstructorSpy).HaveBeenCalledWith('Entrega próxima', {
-        body: 'Taller de Algoritmos vence pronto (Estructuras de Datos).',
+      Should(notificationConstructorSpy).HaveBeenCalledWith('Assignment due soon', {
+        body: 'Taller de Algoritmos is due soon (Estructuras de Datos).',
       });
 
       const key = `urgent-alert-501-${new Date(sampleAssignment.dueDate).getTime()}`;
