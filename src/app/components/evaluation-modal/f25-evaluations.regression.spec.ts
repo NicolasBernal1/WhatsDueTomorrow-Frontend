@@ -208,7 +208,7 @@ describe('F25 Regression Suite: Promedio ponderado y simulador de calificaciones
       component.onSave();
 
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible registrar la evaluación.');
+      component.errorMessage.Should().Be('Could not register the evaluation.');
     });
   });
 

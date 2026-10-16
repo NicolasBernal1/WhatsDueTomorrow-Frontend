@@ -104,8 +104,8 @@ export class ScheduleComponent implements OnInit {
     const todayIndex = this.getTodayIndex(now);
     const classDayIndex = this.days.indexOf(cls.dayOfWeek.toLowerCase());
 
-    if (classDayIndex === todayIndex) return 'Hoy';
-    if (classDayIndex === (todayIndex + 1) % 7) return 'Mañana';
+    if (classDayIndex === todayIndex) return 'Today';
+    if (classDayIndex === (todayIndex + 1) % 7) return 'Tomorrow';
 
     return cls.dayOfWeek.charAt(0).toUpperCase() + cls.dayOfWeek.slice(1);
   }

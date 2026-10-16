@@ -205,7 +205,7 @@ describe('F24 Regression Suite: Bitácora de apuntes y recursos rápidos (Fronte
       component.onSave();
 
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible guardar el apunte.');
+      component.errorMessage.Should().Be('Could not save the note.');
       Should(saveSpy).NotHaveBeenCalled();
       Should(closeSpy).NotHaveBeenCalled();
     });
@@ -221,7 +221,7 @@ describe('F24 Regression Suite: Bitácora de apuntes y recursos rápidos (Fronte
       component.onSave();
 
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible actualizar el apunte.');
+      component.errorMessage.Should().Be('Could not update the note.');
     });
   });
 

@@ -468,7 +468,7 @@ describe('ScheduleComponent', () => {
       const result = component.getNextClass();
 
       expect(result?.id).toBe(1);
-      expect(component.getNextClassDayLabel(result!)).toBe('Hoy');
+      expect(component.getNextClassDayLabel(result!)).toBe('Today');
     });
 
     // Camino: ya pasaron todas las clases de hoy, hay una mañana
@@ -485,7 +485,7 @@ describe('ScheduleComponent', () => {
       const result = component.getNextClass();
 
       expect(result?.id).toBe(2);
-      expect(component.getNextClassDayLabel(result!)).toBe('Mañana');
+      expect(component.getNextClassDayLabel(result!)).toBe('Tomorrow');
     });
 
     // Camino: la clase mas proxima esta mas adelante en la semana

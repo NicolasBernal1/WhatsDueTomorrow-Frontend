@@ -115,7 +115,7 @@ export class SubjectDetailsComponent implements OnInit {
         this.loadingNotes = false;
       },
       error: () => {
-        this.noteError = 'Error al cargar los apuntes de la asignatura';
+        this.noteError = 'Error loading the subject notes';
         this.loadingNotes = false;
       }
     });
@@ -180,7 +180,7 @@ export class SubjectDetailsComponent implements OnInit {
   deleteNote(note: Note): void {
     if (!this.subject) return;
 
-    const confirmed = confirm(`¿Estás seguro de eliminar el apunte "${note.title}"?`);
+    const confirmed = confirm(`Are you sure you want to delete the note "${note.title}"?`);
     if (confirmed) {
       this.noteService.deleteNote(this.subject.id, note.id).subscribe({
         next: () => {
@@ -207,7 +207,7 @@ export class SubjectDetailsComponent implements OnInit {
       },
       error: () => {
         this.evaluationError =
-          'Error al cargar las calificaciones de la asignatura';
+          'Error loading the subject grades';
         this.loadingEvaluations = false;
       },
     });
@@ -236,7 +236,7 @@ export class SubjectDetailsComponent implements OnInit {
     if (!this.subject) return;
 
     const confirmed = confirm(
-      `¿Estás seguro de eliminar la evaluación "${evaluation.name}"?`,
+      `Are you sure you want to delete the evaluation "${evaluation.name}"?`,
     );
     if (confirmed) {
       this.evaluationService
@@ -305,5 +305,15 @@ export class SubjectDetailsComponent implements OnInit {
     this.contextMenuVisible = false;
 
     document.body.style.overflow = 'hidden';
+  }
+
+  statusLabel(status?: string | null): string {
+    const labels: Record<string, string> = {
+      'Aprobado': 'Passed',
+      'Aprobando': 'Passing',
+      'En riesgo': 'At risk',
+      'Sin calificaciones': 'No grades',
+    };
+    return labels[status ?? ''] ?? 'No grades';
   }
 }

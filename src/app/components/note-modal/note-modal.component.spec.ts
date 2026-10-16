@@ -80,7 +80,7 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
         linkUrl: 'https://docs.google.com/resumen',
       });
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible guardar el apunte.');
+      component.errorMessage.Should().Be('Could not save the note.');
     });
   });
 
@@ -136,7 +136,7 @@ describe('NoteModalComponent (F24 — Modal de Apuntes - Caminos Básicos Tabla 
 
       Should(noteServiceMock.updateNote).HaveBeenCalled();
       component.isSubmitting.Should().BeFalse();
-      component.errorMessage.Should().Be('No fue posible actualizar el apunte.');
+      component.errorMessage.Should().Be('Could not update the note.');
       Should(component.save.emit).NotHaveBeenCalled();
       Should(component.close.emit).NotHaveBeenCalled();
     });

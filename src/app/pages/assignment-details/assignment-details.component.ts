@@ -53,7 +53,7 @@ export class AssignmentDetailsComponent implements OnInit {
     if (!this.assignment || !this.newTitle.trim()) return;
     this.subtaskService.create(this.assignment.id, this.newTitle).subscribe({
       next: response => { this.applyResponse(response.data); this.newTitle = ''; },
-      error: () => this.error = 'No fue posible guardar la subtarea.'
+      error: () => this.error = 'Could not save the subtask.'
     });
   }
 
@@ -64,7 +64,7 @@ export class AssignmentDetailsComponent implements OnInit {
     this.refreshProgress();
     this.subtaskService.update(this.assignment.id, subtask.id, { completed: subtask.completed }).subscribe({
       next: response => this.applyResponse(response.data),
-      error: () => { subtask.completed = previous; this.refreshProgress(); this.error = 'No fue posible actualizar el progreso.'; }
+      error: () => { subtask.completed = previous; this.refreshProgress(); this.error = 'Could not update the progress.'; }
     });
   }
 
@@ -74,7 +74,7 @@ export class AssignmentDetailsComponent implements OnInit {
     if (!this.assignment || !this.editingTitle.trim()) return;
     this.subtaskService.update(this.assignment.id, subtask.id, { title: this.editingTitle }).subscribe({
       next: response => { this.applyResponse(response.data); this.editingId = undefined; },
-      error: () => this.error = 'No fue posible editar la subtarea.'
+      error: () => this.error = 'Could not edit the subtask.'
     });
   }
 
@@ -82,7 +82,7 @@ export class AssignmentDetailsComponent implements OnInit {
     if (!this.assignment) return;
     this.subtaskService.remove(this.assignment.id, subtask.id).subscribe({
       next: response => this.applyResponse(response.data),
-      error: () => this.error = 'No fue posible eliminar la subtarea.'
+      error: () => this.error = 'Could not delete the subtask.'
     });
   }
 
@@ -94,7 +94,7 @@ export class AssignmentDetailsComponent implements OnInit {
     [this.subtasks[currentIndex], this.subtasks[targetIndex]] = [this.subtasks[targetIndex], this.subtasks[currentIndex]];
     this.subtaskService.reorder(this.assignment.id, this.subtasks.map(item => item.id)).subscribe({
       next: response => this.applyResponse(response.data),
-      error: () => { this.loadSubtasks(); this.error = 'No fue posible cambiar el orden.'; }
+      error: () => { this.loadSubtasks(); this.error = 'Could not change the order.'; }
     });
   }
 
@@ -104,7 +104,7 @@ export class AssignmentDetailsComponent implements OnInit {
     if (!this.assignment) return;
     this.subtaskService.getAll(this.assignment.id).subscribe({
       next: response => { this.applyResponse(response.data); this.loading = false; },
-      error: () => { this.error = 'No fue posible cargar las subtareas.'; this.loading = false; }
+      error: () => { this.error = 'Could not load the subtasks.'; this.loading = false; }
     });
   }
 

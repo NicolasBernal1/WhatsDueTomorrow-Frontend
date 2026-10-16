@@ -134,7 +134,7 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
     component.ngOnInit();
 
     // Assert (Fluent Assertions)
-    component.error.Should().Be('No fue posible cargar las subtareas.');
+    component.error.Should().Be('Could not load the subtasks.');
     component.loading.Should().BeFalse();
   });
 
@@ -221,7 +221,7 @@ describe('AssignmentDetailsComponent (F22 — Desglosar tareas en subtareas con 
 
     // Assert (Fluent Assertions)
     targetSubtask.completed.Should().BeFalse();
-    component.error.Should().Be('No fue posible actualizar el progreso.');
+    component.error.Should().Be('Could not update the progress.');
   });
 
   // Camino P9: 1-2-4-5-7-8-9-11-12-18-11-12-24 (Edición con título vacío previene actualización)

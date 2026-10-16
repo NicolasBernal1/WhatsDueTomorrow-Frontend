@@ -211,7 +211,7 @@ describe('F21 Regression Suite: Alertas y Radar de Entregas Urgentes (Frontend)'
 
       // Componente
       await component.enableNotifications();
-      component.notificationMessage.Should().Be('Este navegador no admite alertas web.');
+      component.notificationMessage.Should().Be('This browser does not support web alerts.');
     });
 
     it('no debe disparar alertas si Notification.permission es "denied"', () => {

@@ -157,7 +157,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
 
       component.loadNotes(10);
 
-      component.noteError.Should().Be('Error al cargar los apuntes de la asignatura');
+      component.noteError.Should().Be('Error loading the subject notes');
       component.loadingNotes.Should().BeFalse();
     });
 
@@ -271,7 +271,7 @@ describe('SubjectDetailsComponent (F24 & F25)', () => {
         component.loadEvaluations(10);
 
         component.evaluationError.Should().Be(
-          'Error al cargar las calificaciones de la asignatura',
+          'Error loading the subject grades',
         );
         component.loadingEvaluations.Should().BeFalse();
       });

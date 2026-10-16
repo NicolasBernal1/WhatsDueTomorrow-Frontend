@@ -11,8 +11,8 @@ import { OpenClassFromSchedule } from '../../test/tasks/OpenClassFromSchedule';
 const WAIT = Duration.ofSeconds(15);
 
 function expectedDayLabel(weekday: Weekday): string {
-  if (weekday === toWeekday('hoy')) return 'Hoy';
-  if (weekday === toWeekday('mañana')) return 'Mañana';
+  if (weekday === toWeekday('Today')) return 'Hoy';
+  if (weekday === toWeekday('Tomorrow')) return 'Mañana';
   return toOptionLabel(weekday);
 }
 
