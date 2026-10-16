@@ -15,11 +15,11 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
-export class ScheduleComponent implements OnInit{
+export class ScheduleComponent implements OnInit {
   subscriptionUrl = '';
   calendarMessage = '';
 
-  constructor(private subjectService: SubjectService, private router: Router, private calendarService: CalendarService){}
+  constructor(private subjectService: SubjectService, private router: Router, private calendarService: CalendarService) { }
 
   hours: string[] = hours;
   days: string[] = days;
@@ -129,8 +129,8 @@ export class ScheduleComponent implements OnInit{
     event.preventDefault();
 
     this.selectedClass = subjectClass;
-    this.contextMenuX = event.clientX;
-    this.contextMenuY = event.clientY;
+    this.contextMenuX = Math.min(event.clientX, window.innerWidth - 150);
+    this.contextMenuY = Math.min(event.clientY, window.innerHeight - 110);
     this.contextMenuVisible = true;
   }
 
@@ -175,13 +175,13 @@ export class ScheduleComponent implements OnInit{
   }
 
   onClassSaved(): void {
-  this.closeEditModal();
+    this.closeEditModal();
 
-  this.subjectService.getClass().subscribe({
-    next: (res) => {
-      this.classes = res.data || [];
-    },
-    error: () => alert('Error getting classes')
+    this.subjectService.getClass().subscribe({
+      next: (res) => {
+        this.classes = res.data || [];
+      },
+      error: () => alert('Error getting classes')
     });
   }
 

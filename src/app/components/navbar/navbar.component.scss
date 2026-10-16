@@ -3,8 +3,8 @@
 }
 
 mat-toolbar.navbar {
-  background-color: #0078d4; 
-  color: #ffffff; 
+  background-color: #0078d4;
+  color: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -78,8 +78,8 @@ mat-toolbar.navbar {
 }
 
 .profile-content {
-  width: 360px;
-  max-width: 360px;
+  width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -120,8 +120,9 @@ mat-toolbar.navbar {
 }
 
 ::ng-deep .profile-menu {
-  min-width: 360px !important;
-  max-width: 360px !important;
+  min-width: 0 !important;
+  width: min(360px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px) !important;
 }
 
 ::ng-deep .profile-menu .mat-mdc-menu-content {
@@ -171,10 +172,43 @@ mat-toolbar.navbar {
   min-width: 280px !important;
   max-width: 280px !important;
 }
+
 .delete-confirm-section {
   padding: 8px 20px 16px;
 
   p {
     margin: 0 0 10px;
+  }
+}
+
+.nav-toggle {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  mat-toolbar.navbar {
+    padding: 0 12px;
+  }
+
+  mat-toolbar.navbar .navbar-center {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 480px) {
+  mat-toolbar.navbar .logo {
+    font-size: 1rem;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  mat-toolbar.navbar .profile-label {
+    display: none;
   }
 }

@@ -1,4 +1,13 @@
 <mat-toolbar color="primary" class="navbar">
+  <button mat-icon-button class="nav-toggle" [matMenuTriggerFor]="navMenu" aria-label="Open navigation menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #navMenu="matMenu">
+    <a mat-menu-item routerLink="/schedule" routerLinkActive="active">Schedule</a>
+    <a mat-menu-item routerLink="/subjects" routerLinkActive="active">Subjects</a>
+    <a mat-menu-item routerLink="/assignments" routerLinkActive="active">Assignments</a>
+    <a mat-menu-item routerLink="/urgent-radar" routerLinkActive="active">Urgent radar</a>
+  </mat-menu>
   <span class="logo" routerLink="/schedule">What's Due Tomorrow?</span>
 
   <span class="navbar-center">
@@ -10,13 +19,8 @@
 
   <span class="spacer"></span>
 
-  <button
-    mat-icon-button
-    [matMenuTriggerFor]="upcomingMenu"
-    [matBadge]="upcomingAssignments.length"
-    [matBadgeHidden]="upcomingAssignments.length === 0"
-    matBadgeColor="warn"
-    matBadgeSize="small"
+  <button mat-icon-button [matMenuTriggerFor]="upcomingMenu" [matBadge]="upcomingAssignments.length"
+    [matBadgeHidden]="upcomingAssignments.length === 0" matBadgeColor="warn" matBadgeSize="small"
     aria-label="Upcoming assignments">
     <mat-icon>notifications</mat-icon>
   </button>
@@ -26,68 +30,63 @@
       <h4>Due soon</h4>
 
       @if (upcomingAssignments.length === 0) {
-        <p class="empty-message">Nothing due in the next 48 hours 🎉</p>
+      <p class="empty-message">Nothing due in the next 48 hours 🎉</p>
       } @else {
-        @for (assignment of upcomingAssignments; track assignment.id) {
-          <div class="upcoming-item">
-            <strong>{{ assignment.title }}</strong>
-            <span>{{ assignment.subjectName }} · {{ assignment.dueDate | date:'short' }}</span>
-          </div>
-        }
+      @for (assignment of upcomingAssignments; track assignment.id) {
+      <div class="upcoming-item">
+        <strong>{{ assignment.title }}</strong>
+        <span>{{ assignment.subjectName }} · {{ assignment.dueDate | date:'short' }}</span>
+      </div>
+      }
       }
     </div>
   </mat-menu>
 
-  <button
-    mat-button
-    [matMenuTriggerFor]="profileMenu"
-    (click)="loadProfile(); resetPasswordState()">
+  <button mat-button [matMenuTriggerFor]="profileMenu" (click)="loadProfile(); resetPasswordState()">
     <mat-icon>account_circle</mat-icon>
-    Profile
+    <span class="profile-label">Profile</span>
   </button>
 
   <mat-menu #profileMenu="matMenu" class="profile-menu">
 
-    <div class="profile-content" (click)="$event.stopPropagation()" role="button" tabindex="0" (keydown.escape)="$event.stopPropagation()">
+    <div class="profile-content" (click)="$event.stopPropagation()" role="button" tabindex="0"
+      (keydown.escape)="$event.stopPropagation()">
 
       @if (user) {
-        @if (!editingProfile) {
-          <div class="profile-info">
-            <mat-icon class="profile-icon">account_circle</mat-icon>
+      @if (!editingProfile) {
+      <div class="profile-info">
+        <mat-icon class="profile-icon">account_circle</mat-icon>
 
-            <div>
-              <h3>{{ user.name }}</h3>
-              <p>{{ user.email }}</p>
-            </div>
+        <div>
+          <h3>{{ user.name }}</h3>
+          <p>{{ user.email }}</p>
+        </div>
 
-            <button mat-icon-button (click)="startEditingProfile()" aria-label="Edit profile">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </div>
-        } @else {
-          <div class="edit-profile-section">
-            <mat-form-field appearance="outline">
-              <mat-label>Name</mat-label>
-              <input matInput [(ngModel)]="editName" />
-            </mat-form-field>
+        <button mat-icon-button (click)="startEditingProfile()" aria-label="Edit profile">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      } @else {
+      <div class="edit-profile-section">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="editName" />
+        </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" [(ngModel)]="editEmail" />
-            </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="editEmail" />
+        </mat-form-field>
 
-            <div class="edit-profile-actions">
-              <button mat-button (click)="cancelEditingProfile()">Cancel</button>
-              <button
-                mat-flat-button
-                color="primary"
-                (click)="saveProfile()"
-                [disabled]="!editName || !editEmail || savingProfile">
-                {{ savingProfile ? 'Saving...' : 'Save' }}
-              </button>
-            </div>
-          </div>
-        }
+        <div class="edit-profile-actions">
+          <button mat-button (click)="cancelEditingProfile()">Cancel</button>
+          <button mat-flat-button color="primary" (click)="saveProfile()"
+            [disabled]="!editName || !editEmail || savingProfile">
+            {{ savingProfile ? 'Saving...' : 'Save' }}
+          </button>
+        </div>
+      </div>
+      }
       }
 
       <div class="divider"></div>
@@ -97,50 +96,36 @@
 
         @if (!passwordVerified) {
 
-          <mat-form-field appearance="outline">
-            <mat-label>Current password</mat-label>
-            <input
-              matInput
-              type="password"
-              [(ngModel)]="password"
-              (keydown.enter)="verifyPassword()" />
-          </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Current password</mat-label>
+          <input matInput type="password" [(ngModel)]="password" (keydown.enter)="verifyPassword()" />
+        </mat-form-field>
 
-          @if (passwordError) {
-            <p class="error-message">
-              Incorrect password
-            </p>
-          }
+        @if (passwordError) {
+        <p class="error-message">
+          Incorrect password
+        </p>
+        }
 
-          <button
-            mat-flat-button
-            color="primary"
-            (click)="verifyPassword()"
-            [disabled]="!password">
-            Verify Password
-          </button>
+        <button mat-flat-button color="primary" (click)="verifyPassword()" [disabled]="!password">
+          Verify Password
+        </button>
 
         } @else {
 
-          <p class="verified-message">
-            ✓ Current password verified
-          </p>
+        <p class="verified-message">
+          ✓ Current password verified
+        </p>
 
-          <mat-form-field appearance="outline">
-            <mat-label>New password</mat-label>
-            <input
-              matInput
-              type="password"
-              [(ngModel)]="newPassword" />
-          </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>New password</mat-label>
+          <input matInput type="password" [(ngModel)]="newPassword" />
+        </mat-form-field>
 
-          <button
-            mat-flat-button
-            color="primary"
-            (click)="changePassword()"
-            [disabled]="!newPassword || changingPassword">
-            {{ changingPassword ? 'Changing...' : 'Change Password' }}
-          </button>
+        <button mat-flat-button color="primary" (click)="changePassword()"
+          [disabled]="!newPassword || changingPassword">
+          {{ changingPassword ? 'Changing...' : 'Change Password' }}
+        </button>
         }
       </div>
 
@@ -152,18 +137,18 @@
       </button>
 
       @if (!pendingDeleteConfirmation) {
-        <button mat-menu-item (click)="requestDeleteAccount()">
-          <mat-icon color="warn">delete_forever</mat-icon>
-          Delete Account
-        </button>
+      <button mat-menu-item (click)="requestDeleteAccount()">
+        <mat-icon color="warn">delete_forever</mat-icon>
+        Delete Account
+      </button>
       } @else {
-        <div class="delete-confirm-section">
-          <p class="error-message">This action cannot be undone. Delete your account?</p>
-          <div class="edit-profile-actions">
-            <button mat-button (click)="cancelDeleteAccount()">Cancel</button>
-            <button mat-flat-button color="warn" (click)="confirmDelete()">Yes, delete</button>
-          </div>
+      <div class="delete-confirm-section">
+        <p class="error-message">This action cannot be undone. Delete your account?</p>
+        <div class="edit-profile-actions">
+          <button mat-button (click)="cancelDeleteAccount()">Cancel</button>
+          <button mat-flat-button color="warn" (click)="confirmDelete()">Yes, delete</button>
         </div>
+      </div>
       }
 
     </div>

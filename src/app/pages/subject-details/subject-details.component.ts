@@ -75,7 +75,7 @@ export class SubjectDetailsComponent implements OnInit {
     private assignmentService: AssignmentService,
     private noteService: NoteService,
     private evaluationService: EvaluationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -269,8 +269,8 @@ export class SubjectDetailsComponent implements OnInit {
     event.preventDefault();
 
     this.selectedAssignment = assignment;
-    this.contextMenuX = event.clientX;
-    this.contextMenuY = event.clientY;
+    this.contextMenuX = Math.min(event.clientX, window.innerWidth - 150);
+    this.contextMenuY = Math.min(event.clientY, window.innerHeight - 110);
     this.contextMenuVisible = true;
   }
 

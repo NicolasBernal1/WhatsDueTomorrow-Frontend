@@ -24,7 +24,7 @@
 
   .assignments-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 20px;
     width: 100%;
     max-width: 1000px;
@@ -85,4 +85,8 @@
       background: #f2f2f2;
     }
   }
+}
+
+@media (max-width: 640px) {
+  .assignments-container { padding: 16px 12px; }
 }

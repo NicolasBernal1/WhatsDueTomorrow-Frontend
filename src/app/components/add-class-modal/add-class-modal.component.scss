@@ -11,8 +11,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 360px;
+  width: calc(100% - 32px); 
+  max-width: 360px;
   padding: 24px;
+  box-sizing: border-box;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   background: #fff;
   border-radius: 12px;
   z-index: 11;
