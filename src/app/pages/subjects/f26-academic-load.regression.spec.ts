@@ -121,7 +121,7 @@ describe('F26 Regression Suite: Semáforo de Carga y Gestión de Créditos (Fron
       Should(component.academicLoad?.status).Be('baja');
       Should(component.academicLoad?.totalCredits).Be(8);
       Should(component.getLoadStatusIcon('baja')).Be('trending_down');
-      Should(component.getLoadStatusText('baja')).Be('Carga baja');
+      Should(component.getLoadStatusText('baja')).Be('Low load');
       Should(component.getLoadStatusDescription('baja')).Contain('< 12 créditos');
     });
 
@@ -135,7 +135,7 @@ describe('F26 Regression Suite: Semáforo de Carga y Gestión de Créditos (Fron
       Should(component.academicLoad?.status).Be('balanceada');
       Should(component.academicLoad?.totalCredits).Be(15);
       Should(component.getLoadStatusIcon('balanceada')).Be('check_circle');
-      Should(component.getLoadStatusText('balanceada')).Be('Carga balanceada');
+      Should(component.getLoadStatusText('balanceada')).Be('Balanced load');
       Should(component.getLoadStatusDescription('balanceada')).Contain('12 a 18 créditos');
     });
 
@@ -149,13 +149,13 @@ describe('F26 Regression Suite: Semáforo de Carga y Gestión de Créditos (Fron
       Should(component.academicLoad?.status).Be('sobrecarga');
       Should(component.academicLoad?.totalCredits).Be(22);
       Should(component.getLoadStatusIcon('sobrecarga')).Be('warning');
-      Should(component.getLoadStatusText('sobrecarga')).Be('Sobrecarga');
+      Should(component.getLoadStatusText('sobrecarga')).Be('Overload');
       Should(component.getLoadStatusDescription('sobrecarga')).Contain('> 18 créditos');
     });
 
     it('REG-F26-06: debe proporcionar valores por defecto seguros para estados indefinidos o no reconocidos', () => {
       Should(component.getLoadStatusIcon(undefined)).Be('help_outline');
-      Should(component.getLoadStatusText(undefined)).Be('Carga no calculada');
+      Should(component.getLoadStatusText(undefined)).Be('Load not calculated');
       Should(component.getLoadStatusDescription(undefined)).Be('');
     });
   });
