@@ -122,7 +122,7 @@ describe('F26 Regression Suite: Semáforo de Carga y Gestión de Créditos (Fron
       Should(component.academicLoad?.totalCredits).Be(8);
       Should(component.getLoadStatusIcon('baja')).Be('trending_down');
       Should(component.getLoadStatusText('baja')).Be('Low load');
-      Should(component.getLoadStatusDescription('baja')).Contain('< 12 créditos');
+      Should(component.getLoadStatusDescription('baja')).Contain('< 12 credits');
     });
 
     it('REG-F26-04: debe clasificar y formatear adecuadamente la carga académica "balanceada" (12 a 18 créditos)', () => {
@@ -136,7 +136,7 @@ describe('F26 Regression Suite: Semáforo de Carga y Gestión de Créditos (Fron
       Should(component.academicLoad?.totalCredits).Be(15);
       Should(component.getLoadStatusIcon('balanceada')).Be('check_circle');
       Should(component.getLoadStatusText('balanceada')).Be('Balanced load');
-      Should(component.getLoadStatusDescription('balanceada')).Contain('12 a 18 créditos');
+      Should(component.getLoadStatusDescription('balanceada')).Contain('12 to 18 credits');
     });
 
     it('REG-F26-05: debe clasificar y formatear adecuadamente la carga académica "sobrecarga" (> 18 créditos)', () => {
@@ -150,7 +150,7 @@ describe('F26 Regression Suite: Semáforo de Carga y Gestión de Créditos (Fron
       Should(component.academicLoad?.totalCredits).Be(22);
       Should(component.getLoadStatusIcon('sobrecarga')).Be('warning');
       Should(component.getLoadStatusText('sobrecarga')).Be('Overload');
-      Should(component.getLoadStatusDescription('sobrecarga')).Contain('> 18 créditos');
+      Should(component.getLoadStatusDescription('sobrecarga')).Contain('> 18 credits');
     });
 
     it('REG-F26-06: debe proporcionar valores por defecto seguros para estados indefinidos o no reconocidos', () => {
