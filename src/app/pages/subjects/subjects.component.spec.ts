@@ -314,7 +314,7 @@ describe('SubjectsComponent', () => {
       Should(component.academicLoad?.status).Be('baja');
       Should(component.academicLoad?.statusLabel).Be('Carga baja');
       component.getLoadStatusIcon('baja').Should().Be('trending_down');
-      component.getLoadStatusText('baja').Should().Be('Carga baja');
+      component.getLoadStatusText('baja').Should().Be('Low load');
       component.getLoadStatusDescription('baja').Should().Contain('< 12 créditos');
     });
 
@@ -340,7 +340,7 @@ describe('SubjectsComponent', () => {
       Should(component.academicLoad?.status).Be('balanceada');
       Should(component.academicLoad?.statusLabel).Be('Carga balanceada');
       component.getLoadStatusIcon('balanceada').Should().Be('check_circle');
-      component.getLoadStatusText('balanceada').Should().Be('Carga balanceada');
+      component.getLoadStatusText('balanceada').Should().Be('Balanced load');
       component.getLoadStatusDescription('balanceada').Should().Contain('12 a 18 créditos');
     });
 
@@ -366,7 +366,7 @@ describe('SubjectsComponent', () => {
       Should(component.academicLoad?.status).Be('sobrecarga');
       Should(component.academicLoad?.statusLabel).Be('Sobrecarga');
       component.getLoadStatusIcon('sobrecarga').Should().Be('warning');
-      component.getLoadStatusText('sobrecarga').Should().Be('Sobrecarga');
+      component.getLoadStatusText('sobrecarga').Should().Be('Overload');
       component.getLoadStatusDescription('sobrecarga').Should().Contain('> 18 créditos');
     });
 
@@ -468,7 +468,7 @@ describe('SubjectsComponent', () => {
 
     it('debe proveer textos e iconos accesibles por defecto ante estados indefinidos', () => {
       component.getLoadStatusIcon(undefined).Should().Be('help_outline');
-      component.getLoadStatusText(undefined).Should().Be('Carga no calculada');
+      component.getLoadStatusText(undefined).Should().Be('Load not calculated');
       component.getLoadStatusDescription(undefined).Should().Be('');
     });
 
