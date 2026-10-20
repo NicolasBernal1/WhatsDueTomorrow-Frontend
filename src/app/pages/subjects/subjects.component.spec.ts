@@ -315,7 +315,7 @@ describe('SubjectsComponent', () => {
       Should(component.academicLoad?.statusLabel).Be('Carga baja');
       component.getLoadStatusIcon('baja').Should().Be('trending_down');
       component.getLoadStatusText('baja').Should().Be('Low load');
-      component.getLoadStatusDescription('baja').Should().Contain('< 12 créditos');
+      component.getLoadStatusDescription('baja').Should().Contain('< 12 credits');
     });
 
     it('[P3: 1 → 2 → 3 → 5 → 6 → 8 → 10 → 9 → 22] debe clasificar como carga balanceada cuando 12 <= totalCredits <= 18', () => {
@@ -341,7 +341,7 @@ describe('SubjectsComponent', () => {
       Should(component.academicLoad?.statusLabel).Be('Carga balanceada');
       component.getLoadStatusIcon('balanceada').Should().Be('check_circle');
       component.getLoadStatusText('balanceada').Should().Be('Balanced load');
-      component.getLoadStatusDescription('balanceada').Should().Contain('12 a 18 créditos');
+      component.getLoadStatusDescription('balanceada').Should().Contain('12 to 18 credits');
     });
 
     it('[P4: 1 → 2 → 3 → 5 → 6 → 8 → 11 → 9 → 22] debe clasificar como sobrecarga cuando totalCredits > 18', () => {
@@ -367,7 +367,7 @@ describe('SubjectsComponent', () => {
       Should(component.academicLoad?.statusLabel).Be('Sobrecarga');
       component.getLoadStatusIcon('sobrecarga').Should().Be('warning');
       component.getLoadStatusText('sobrecarga').Should().Be('Overload');
-      component.getLoadStatusDescription('sobrecarga').Should().Contain('> 18 créditos');
+      component.getLoadStatusDescription('sobrecarga').Should().Contain('> 18 credits');
     });
 
     it('[P5: 1 → 2 → 3 → 5 → 6 → 7 → 9 → 21 → 22] usuario abre modal y cancela/cierra sin alterar catálogo', () => {
