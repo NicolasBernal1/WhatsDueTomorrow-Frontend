@@ -13,7 +13,12 @@
     "cypress:open": "cypress open --browser chrome",
     "cypress:run": "cypress run --browser chrome",
     "test:cy:f21": "cypress run --browser chrome --headed --spec \"cypress/e2e/f21-urgent-radar/**/*.cy.ts\"",
-    "test:cy:f21:headless": "cypress run --browser chrome --spec \"cypress/e2e/f21-urgent-radar/**/*.cy.ts\""
+    "test:cy:f21:headless": "cypress run --browser chrome --spec \"cypress/e2e/f21-urgent-radar/**/*.cy.ts\"",
+    "test:cy:f22": "cypress run --browser chrome --headed --spec \"cypress/e2e/f22-subtasks/**/*.cy.ts\"",
+    "test:cy:f23": "cypress run --browser chrome --headed --spec \"cypress/e2e/f23-calendar/**/*.cy.ts\"",
+    "test:cy:f24": "cypress run --browser chrome --headed --spec \"cypress/e2e/f24-notes/**/*.cy.ts\"",
+    "test:cy:f25": "cypress run --browser chrome --headed --spec \"cypress/e2e/f25-evaluations/**/*.cy.ts\"",
+    "test:cy:f26": "cypress run --browser chrome --headed --spec \"cypress/e2e/f26-academic-load/**/*.cy.ts\""
   },
   "private": true,
   "dependencies": {
