@@ -1,7 +1,7 @@
-<div class="modal-backdrop" (click)="onClose()" role="button" tabindex="0" (keydown.enter)="onClose()"></div>
+<div class="modal-backdrop" (click)="onClose()" aria-hidden="true"></div>
 
-<div class="modal" (click)="$event.stopImmediatePropagation()" role="button" tabindex="0" (keydown.enter)="$event.stopImmediatePropagation()">
- <h2>{{ subject ? 'Edit Subject' : 'Add New Subject' }}</h2>
+<div class="modal" (click)="$event.stopImmediatePropagation()" (keydown.escape)="onClose()" role="dialog" aria-modal="true" aria-labelledby="subject-modal-title">
+ <h2 id="subject-modal-title">{{ subject ? 'Edit Subject' : 'Add New Subject' }}</h2>
 
   <form [formGroup]="addSubjectForm" (ngSubmit)="onSave()" class="form-content">
     <mat-form-field appearance="outline">
@@ -46,8 +46,10 @@
             [style.background]="color"
             [class.selected]="addSubjectForm.value.color === color"
             (click)="selectColor(color)"
-            role="button" 
-            tabindex="0" 
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="'Select color ' + color"
+            [attr.aria-pressed]="addSubjectForm.value.color === color"
             (keydown.enter)="selectColor(color)">
           </div>
         }

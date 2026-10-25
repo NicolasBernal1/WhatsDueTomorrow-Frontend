@@ -3,7 +3,7 @@
 }
 
 mat-toolbar.navbar {
-  background-color: #0078d4;
+  background-color: #0067b8;
   color: #ffffff;
   display: flex;
   justify-content: space-between;
@@ -48,6 +48,10 @@ mat-toolbar.navbar {
   }
 
   mat-icon {
+    color: #ffffff;
+  }
+
+  > button[mat-button] {
     color: #ffffff;
   }
 }
