@@ -1,12 +1,12 @@
 <div class="modal-backdrop" (click)="onClose()" role="button" tabindex="0" (keydown.enter)="onClose()"></div>
 
-<mat-card class="modal" (click)="$event.stopPropagation()">
-  <h2>{{ classToEdit ? 'Edit Class Schedule' : 'Add Class Schedule' }}</h2>
+<mat-card class="modal" data-cy="class-modal" (click)="$event.stopPropagation()">
+  <h2 data-cy="class-modal-title">{{ classToEdit ? 'Edit Class Schedule' : 'Add Class Schedule' }}</h2>
 
   <form [formGroup]="addClassForm" (ngSubmit)="onSave()">
     <mat-form-field appearance="outline" class="form-field full-width">
       <mat-label>Day</mat-label>
-      <mat-select formControlName="dayOfWeek">
+      <mat-select formControlName="dayOfWeek" data-cy="class-day">
         @for (day of days; track day) {
           <mat-option [value]="day">{{ day | titlecase }}</mat-option>
         }
@@ -15,7 +15,7 @@
 
     <mat-form-field appearance="outline" class="form-field full-width">
       <mat-label>Start time</mat-label>
-      <mat-select formControlName="startTime">
+      <mat-select formControlName="startTime" data-cy="class-start">
         @for (hour of hours; track hour) {
           <mat-option [value]="hour">{{ hour }}</mat-option>
         }
@@ -24,7 +24,7 @@
 
     <mat-form-field appearance="outline" class="form-field full-width">
       <mat-label>End time</mat-label>
-      <mat-select formControlName="endTime">
+      <mat-select formControlName="endTime" data-cy="class-end">
         @for (hour of hours; track hour) {
           <mat-option [value]="hour">{{ hour }}</mat-option>
         }
@@ -32,19 +32,19 @@
     </mat-form-field>
 
     @if (isStartGrater) {
-      <mat-error>
+      <mat-error data-cy="class-error">
         End time must be greater than start time.
       </mat-error>
     }
     @if (hasConflict) {
-      <mat-error>
+      <mat-error data-cy="class-error">
         This class overlaps with another class in your schedule.
       </mat-error>
     }
 
     <div class="actions">
-      <button mat-stroked-button type="button" color="warn" (click)="onClose()">Cancel</button>
-      <button mat-flat-button color="primary" type="submit">Save</button>
+      <button mat-stroked-button type="button" color="warn" data-cy="class-cancel" (click)="onClose()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit" data-cy="class-save">Save</button>
     </div>
   </form>
 </mat-card>
