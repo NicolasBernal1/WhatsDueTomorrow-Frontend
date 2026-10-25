@@ -5,8 +5,7 @@ import { env } from './env';
 
 const STRICT_AI = process.env.STRICT_AI === 'true';
 const AI_DROPDOWNS = process.env.AI_DROPDOWNS === 'true';
-
-const SKIP_AI = process.env.SKIP_AI === 'true'; //para probar si 
+const SKIP_AI = process.env.SKIP_AI === 'true';
 
 export async function waitForSchedule(page: Page): Promise<void> {
   await page.waitForSelector('.schedule-grid .header', { timeout: 30_000 });
@@ -29,10 +28,17 @@ async function reached(page: Page, target: Target, timeout: number): Promise<boo
   }
 }
 
+async function clickDirect(page: Page, target: Target): Promise<boolean> {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    await page.locator(target.click).first().click();
+    if (await reached(page, target, 10_000)) return true;
+  }
+  return false;
+}
+
 export async function act(page: Page, instruction: string, target: Target): Promise<void> {
   if (SKIP_AI) {
-    await page.locator(target.click).first().click();
-    if (!(await reached(page, target, 15_000))) throw new Error(`"${instruction}" no produjo el resultado esperado (${target.click})`);
+    if (!(await clickDirect(page, target))) throw new Error(`"${instruction}" no produjo el resultado esperado (${target.click})`);
     return;
   }
 
@@ -50,8 +56,7 @@ export async function act(page: Page, instruction: string, target: Target): Prom
   if (STRICT_AI) throw new Error(`[IA] "${instruction}" -> ${reason}`);
 
   console.warn(`[FALLBACK] "${instruction}" -> ${reason}. Click directo en ${target.click}`);
-  await page.locator(target.click).first().click();
-  if (!(await reached(page, target, 15_000))) {
+  if (!(await clickDirect(page, target))) {
     throw new Error(`"${instruction}" fallo con la IA y con el click directo (${target.click})`);
   }
 }
@@ -211,7 +216,8 @@ export async function readSchedule(page: Page, quietMs = 1200, timeoutMs = 20_00
   return value;
 }
 
-export function readModalErrors(page: Page): Promise<string[]> {
+export async function readModalErrors(page: Page): Promise<string[]> {
+  await page.waitForSelector('mat-card.modal mat-error', { state: 'visible', timeout: 4_000 }).catch(() => undefined);
   return page.evaluate(() =>
     Array.from(document.querySelectorAll('mat-card.modal mat-error'))
       .map(e => e.textContent?.replace(/\s+/g, ' ').trim() ?? ''));

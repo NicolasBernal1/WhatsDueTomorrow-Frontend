@@ -22,7 +22,9 @@ describe('Eliminar clase', () => {
     await rightClickClassCard(world.page, 'Cálculo');
     await chooseFromContextMenu(world.page, 'Delete');
 
-    await world.page.waitForSelector('.schedule-grid .class-card', { state: 'detached' });
+    await expect.poll(async () => (await world.student.classes()).length, { timeout: 15_000 }).toBe(0);
+
+    await world.page.waitForSelector('.schedule-grid .class-card', { state: 'detached', timeout: 15_000 });
     expect((await readSchedule(world.page)).cards).toHaveLength(0);
   });
 
@@ -30,12 +32,12 @@ describe('Eliminar clase', () => {
     await answerNextConfirmWith(world.page, true);
     await rightClickClassCard(world.page, 'Cálculo');
     await chooseFromContextMenu(world.page, 'Delete');
-    await world.page.waitForSelector('.schedule-grid .class-card', { state: 'detached' });
+
+    await expect.poll(async () => (await world.student.classes()).length, { timeout: 15_000 }).toBe(0);
 
     await world.page.reload();
     await waitForSchedule(world.page);
     expect((await readSchedule(world.page)).cards).toHaveLength(0);
-    expect(await world.student.classes()).toHaveLength(0);
   });
 
   it('cancelar la confirmacion conserva la clase', async () => {
