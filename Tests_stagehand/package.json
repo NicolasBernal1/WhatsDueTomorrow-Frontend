@@ -1,0 +1,26 @@
+{
+  "name": "stagehand-e2e-asignaturas",
+  "version": "1.0.0",
+  "description": "Pruebas E2E con IA (Stagehand) del módulo de asignaturas de WhatsDueTomorrow.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:login": "node --import tsx tests/login.e2e.ts",
+    "test:listar": "node --import tsx tests/listar.e2e.ts",
+    "test:registrar": "node --import tsx tests/registrar.e2e.ts",
+    "test:buscar": "node --import tsx tests/buscar.e2e.ts",
+    "test:detalle": "node --import tsx tests/detalle.e2e.ts",
+    "test:all": "npm run test:login && npm run test:listar && npm run test:registrar && npm run test:buscar && npm run test:detalle"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "4.3.0",
+    "dotenv": "18.0.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  },
+  "engines": { "node": ">=22.18.0" }
+}
