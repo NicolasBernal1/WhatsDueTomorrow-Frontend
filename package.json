@@ -34,7 +34,14 @@
     "test:bdd:f25": "npm --prefix tests-bdd run test:bdd:f25",
     "test:bdd:f26": "npm --prefix tests-bdd run test:bdd:f26",
     "test:bdd:all": "npm --prefix tests-bdd run test:bdd:all",
-    "test:bdd:report": "npm --prefix tests-bdd run test:bdd:report"
+    "test:cy:nicolas": "cypress run --browser chrome --config-file cypress.nicolas.config.ts",
+    "test:cy:nicolas:regression": "cypress run --browser chrome --config-file cypress.nicolas.config.ts --spec \"cypress_nicolas/e2e/regression/**/*.cy.ts\"",
+    "test:cy:nicolas:ui": "cypress run --browser chrome --config-file cypress.nicolas.config.ts --spec \"cypress_nicolas/e2e/ui/**/*.cy.ts\"",
+    "test:cy:nicolas:security": "cypress run --browser chrome --config-file cypress.nicolas.config.ts --spec \"cypress_nicolas/e2e/security/**/*.cy.ts\"",
+    "test:cy:nicolas:a11y": "cypress run --browser chrome --config-file cypress.nicolas.config.ts --spec \"cypress_nicolas/e2e/accessibility/**/*.cy.ts\"",
+    "test:cy:nicolas:perf": "cypress run --browser chrome --config-file cypress.nicolas.config.ts --spec \"cypress_nicolas/e2e/performance/**/*.cy.ts\"",
+    "test:cy:nicolas:unit": "cypress run --component --browser chrome --config-file cypress.nicolas.config.ts",
+    "cypress:nicolas:open": "cypress open --browser chrome --config-file cypress.nicolas.config.ts"
   },
   "private": true,
   "dependencies": {

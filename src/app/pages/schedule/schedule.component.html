@@ -1,25 +1,25 @@
 <div class="schedule-container" (click)="closeContextMenu()" role="button" tabindex="0"
   (keydown.escape)="closeContextMenu()">
-  <section class="next-class" aria-labelledby="next-class-title">
+  <section class="next-class" data-cy="next-class" aria-labelledby="next-class-title">
     <h2 id="next-class-title">Your Next Class</h2>
     @if (getNextClass(); as nextClass) {
-    <div class="next-class-card" [style.borderLeftColor]="nextClass.subject.color || '#007bff'">
+    <div class="next-class-card" data-cy="next-class-card" [style.borderLeftColor]="nextClass.subject.color || '#007bff'">
       <div class="next-class-info">
-        <div class="next-class-subject">{{ nextClass.subject.name }}</div>
-        <div class="next-class-professor">{{ nextClass.subject.professor }}</div>
-        <div class="next-class-time">{{ getNextClassDayLabel(nextClass) }} · {{ nextClass.startTime }} - {{
+        <div class="next-class-subject" data-cy="next-class-subject">{{ nextClass.subject.name }}</div>
+        <div class="next-class-professor" data-cy="next-class-professor">{{ nextClass.subject.professor }}</div>
+        <div class="next-class-time" data-cy="next-class-time">{{ getNextClassDayLabel(nextClass) }} · {{ nextClass.startTime }} - {{
           nextClass.endTime }}</div>
       </div>
-      <button mat-stroked-button color="primary" (click)="onClickClass(nextClass.subject.id)">Details</button>
+      <button mat-stroked-button color="primary" data-cy="next-class-details" (click)="onClickClass(nextClass.subject.id)">Details</button>
     </div>
     } @else {
-    <p class="next-class-empty">You do not have more classes.</p>
+    <p class="next-class-empty" data-cy="next-class-empty">You do not have more classes.</p>
     }
   </section>
-  <div class="schedule-grid">
+  <div class="schedule-grid" data-cy="schedule-grid">
     <div class="empty"></div>
     @for (day of days; track $index) {
-    <div class="header"><span class="day-full">{{ day }}</span><span class="day-short">{{ day.slice(0, 3) }}</span>
+    <div class="header" data-cy="day-header"><span class="day-full">{{ day }}</span><span class="day-short">{{ day.slice(0, 3) }}</span>
     </div>
     }
 
@@ -30,26 +30,26 @@
     @for (day of days; track $index) {
     <div class="cell">
       @if (getClassesFor(day, hour); as cls) {
-      <div class="class-card" [class.class-card--current]="isCurrentClass(cls)"
+      <div class="class-card" data-cy="class-card" [class.class-card--current]="isCurrentClass(cls)"
         [style.background]="cls.subject.color || '#007bff'" (click)="onClickClass(cls.subject.id)"
         (contextmenu)="onRightClickClass($event, cls)" role="button" tabindex="0"
         (keydown.enter)="onClickClass(cls.subject.id)">
         @if (isCurrentClass(cls)) {
-          <div class="current-badge" aria-label="Class in progress">Now</div>
+          <div class="current-badge" data-cy="now-badge" aria-label="Class in progress">Now</div>
         }
-        <div class="class-name">{{ cls.subject.name }}</div>
-        <div class="class-professor">{{ cls.subject.professor }}</div>
-        <div class="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>
+        <div class="class-name" data-cy="class-name">{{ cls.subject.name }}</div>
+        <div class="class-professor" data-cy="class-professor">{{ cls.subject.professor }}</div>
+        <div class="class-time" data-cy="class-time">{{ cls.startTime }} - {{ cls.endTime }}</div>
       </div>
       }
     </div>
     }
     }
     @if (contextMenuVisible) {
-    <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY"
+    <div class="context-menu" data-cy="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY"
       (click)="$event.stopPropagation()" role="button" tabindex="0" (keydown.escape)="$event.stopPropagation()">
-      <button (click)="editClass()">Edit</button>
-      <button (click)="deleteClass()">Delete</button>
+      <button data-cy="menu-edit" (click)="editClass()">Edit</button>
+      <button data-cy="menu-delete" (click)="deleteClass()">Delete</button>
     </div>
     }
     @if (showEditModal && selectedClass) {

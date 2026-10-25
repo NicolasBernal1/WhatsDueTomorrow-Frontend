@@ -1,0 +1,26 @@
+{
+  "name": "whatsduetomorrow-stagehand",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pruebas E2E con Stagehand + Ollama local para horario y clases (F08, F12-F16)",
+  "scripts": {
+    "ollama:check": "node scripts/check-ollama.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:smoke": "vitest run -t smoke",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "^2.5.0",
+    "ai": "^4.3.16",
+    "dotenv": "^16.4.5",
+    "ollama-ai-provider": "^1.2.0",
+    "zod": "3.25.67"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "mochawesome": "^8.1.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
