@@ -1,0 +1,29 @@
+{
+  "name": "stagehand-e2e-usuario",
+  "version": "1.0.0",
+  "description": "Pruebas E2E con IA (Stagehand + Ollama) de las funcionalidades de usuario F01-F06 de WhatsDueTomorrow.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:f01": "node --import tsx tests/f01-registrar.e2e.ts",
+    "test:f02": "node --import tsx tests/f02-iniciar-sesion.e2e.ts",
+    "test:f03": "node --import tsx tests/f03-cerrar-sesion.e2e.ts",
+    "test:f04": "node --import tsx tests/f04-consultar-perfil.e2e.ts",
+    "test:f05": "node --import tsx tests/f05-cambiar-contrasena.e2e.ts",
+    "test:f06": "node --import tsx tests/f06-notificaciones.e2e.ts",
+    "test:all": "npm run test:f01 && npm run test:f02 && npm run test:f03 && npm run test:f04 && npm run test:f05 && npm run test:f06"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "4.3.0",
+    "dotenv": "18.0.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
