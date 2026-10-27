@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { APP_URL, createAccount, loginWithAi, withSession } from '../src/app.js';
+import { APP_URL, createAccount, actOr, clickByText, loginWithAi, withSession } from '../src/app.js';
 import { assertIncludes } from '../src/assert.js';
 import { run } from '../src/run.js';
 
@@ -14,11 +14,11 @@ run(() =>
     await s.page.goto(`${APP_URL}/subjects`);
     await s.page.waitForSelector('#subject-search', { timeout: 30_000 });
 
-    await s.stagehand.act('Abre el formulario para agregar una nueva asignatura', { page: s.page });
-    await s.stagehand.act('Escribe %n% en el campo Name', { page: s.page, variables: { n: 'Ciencias' } });
-    await s.stagehand.act('Escribe %p% en el campo Professor', { page: s.page, variables: { p: 'Marco' } });
-    await s.stagehand.act('Escribe %c% en el campo de créditos', { page: s.page, variables: { c: '4' } });
-    await s.stagehand.act('Haz clic en el botón Save', { page: s.page });
+    await actOr(s, 'Abre el formulario para agregar una nueva asignatura', () => clickByText(s, 'button', 'Add Subject'));
+    await actOr(s, 'Escribe %n% en el campo Name', () => s.page.locator('input[formcontrolname="name"]').fill('Ciencias'), { n: 'Ciencias' });
+    await actOr(s, 'Escribe %p% en el campo Professor', () => s.page.locator('input[formcontrolname="professor"]').fill('Marco'), { p: 'Marco' });
+    await actOr(s, 'Escribe %c% en el campo de créditos', () => s.page.locator('input[formcontrolname="credits"]').fill('4'), { c: '4' });
+    await actOr(s, 'Haz clic en el botón Save', () => s.page.locator('button[type="submit"]').click());
 
     await s.page.waitForSelector('mat-card.subject-card', { timeout: 30_000 });
     const card = await s.page.locator('mat-card.subject-card').first().innerText();

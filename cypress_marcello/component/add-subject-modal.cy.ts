@@ -3,10 +3,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AddSubjectModalComponent } from '../../src/app/components/add-subject-modal/add-subject-modal.component';
 
-/**
- * Component testing — requiere ejecutarse desde la raíz del proyecto Angular
- * (donde está angular.json). Ver README.
- */
+
 describe('AddSubjectModalComponent', () => {
   beforeEach(() => {
     cy.mount(AddSubjectModalComponent, {

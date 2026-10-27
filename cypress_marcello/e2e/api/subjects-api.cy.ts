@@ -1,5 +1,5 @@
-import '../../../support/subjects-commands';
-/** Pruebas de API con cy.request — contrato de /subjects. */
+import '../../support/commands';
+
 describe('Asignaturas — API', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
   let auth: { Authorization: string };

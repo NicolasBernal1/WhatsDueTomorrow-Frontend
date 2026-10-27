@@ -1,8 +1,4 @@
-import '../../../support/subjects-commands';
-/**
- * E2E UI — F07 listar, F08 detalle, F09 registrar, F10 editar, F11 eliminar, búsqueda.
- * Títulos en estilo Gherkin (Dado/Cuando/Entonces).
- */
+import '../../support/commands';
 describe('Asignaturas — E2E UI', () => {
   let token: string;
 

@@ -24,6 +24,22 @@ function contentAsText(content: GenerateInput['messages'][number]['content']): s
     .join('\n');
 }
 
+function fixElementIds(value: any): any {
+  if (Array.isArray(value)) return value.map(fixElementIds);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, v]) => {
+        if (key === 'elementId' && typeof v === 'string') {
+          const id = v.replace(/[\[\]\s]/g, '');
+          return [key, /^\d+$/.test(id) ? `0-${id}` : id];
+        }
+        return [key, fixElementIds(v)];
+      }),
+    );
+  }
+  return value;
+}
+
 export function createOllamaClient(): ClientLLM {
   const baseUrl = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434/v1').replace(/\/$/, '');
   const apiKey = process.env.OLLAMA_API_KEY ?? 'ollama';
@@ -88,7 +104,7 @@ export function createOllamaClient(): ClientLLM {
           role: 'assistant',
           content: { type: 'text', text },
           outputFormat: 'json_schema',
-          structuredContent: JSON.parse(text),
+          structuredContent: fixElementIds(JSON.parse(text)),
           usage,
         };
       }

@@ -40,7 +40,6 @@ export async function createSubjectApi(
   if (!res.ok) throw new Error(`Crear materia falló: ${res.status} ${await res.text()}`);
 }
 
-/** Abre sesión de navegador+IA e inicia sesión en la app usando la IA (act). */
 /** Stagehand no trae waitForURL: se consulta page.url() hasta que coincida. */
 export async function waitForUrl(session: TestSession, pattern: RegExp, timeoutMs = 60_000): Promise<string> {
   const end = Date.now() + timeoutMs;
@@ -53,12 +52,47 @@ export async function waitForUrl(session: TestSession, pattern: RegExp, timeoutM
   throw new Error(`La URL no coincidió con ${pattern} tras ${timeoutMs} ms. Última: ${url}`);
 }
 
-async function actOk(session: TestSession, instruction: string, variables?: Record<string, string>): Promise<void> {
-  const result: any = await session.stagehand.act(instruction, { page: session.page, ...(variables ? { variables } : {}) });
-  console.log('  act →', instruction, '=>', result?.success ?? result);
-  if (result && result.success === false) {
-    throw new Error(`La IA no pudo ejecutar: "${instruction}". ${result.message ?? ''}`);
+/**
+ * Pide la acción a la IA (act). Si la IA falla (modelo local débil), ejecuta el respaldo
+ * directo y lo avisa en la terminal. Con STRICT_AI=true no hay respaldo y la prueba falla.
+ */
+export async function actOr(
+  session: TestSession,
+  instruction: string,
+  fallback: () => Promise<void>,
+  variables?: Record<string, string>,
+): Promise<void> {
+  let reason = '';
+  try {
+    const result: any = await session.stagehand.act(instruction, { page: session.page, ...(variables ? { variables } : {}) });
+    const ok = result?.data?.success ?? result?.success;
+    if (ok === false) reason = `la IA devolvió success:false (${result?.data?.message ?? result?.message ?? ''})`;
+  } catch (error) {
+    reason = `la IA lanzó un error: ${(error as Error).message.split('\n')[0]}`;
   }
+  if (!reason) {
+    console.log('  act ✔', instruction);
+    return;
+  }
+  if (process.env.STRICT_AI === 'true') throw new Error(`[IA] "${instruction}" → ${reason}`);
+  console.warn(`  [RESPALDO] "${instruction}" → ${reason}. Se hace directo.`);
+  await fallback();
+}
+
+/** Clic directo en el primer elemento (selector CSS) cuyo texto contiene `text`. */
+export async function clickByText(session: TestSession, css: string, text: string): Promise<void> {
+  const clicked = await session.page.evaluate(
+    (arg: { css: string; text: string }) => {
+      const el = Array.from(document.querySelectorAll<HTMLElement>(arg.css)).find((e) =>
+        (e.textContent ?? '').includes(arg.text),
+      );
+      if (!el) return false;
+      el.click();
+      return true;
+    },
+    { css, text },
+  );
+  if (!clicked) throw new Error(`No se encontró "${css}" con el texto "${text}".`);
 }
 
 /** Abre sesión de navegador+IA e inicia sesión en la app usando la IA (act). */
@@ -66,9 +100,12 @@ export async function loginWithAi(session: TestSession, acc: Account): Promise<v
   await session.page.goto(`${APP_URL}/login`);
   // Angular tarda en pintar el formulario: esperar a que exista antes de pedirle algo a la IA.
   await session.page.waitForSelector('input[formcontrolname="email"]', { state: 'visible', timeout: 60_000 });
-  await actOk(session, 'Escribe %correo% en el campo de email', { correo: acc.email });
-  await actOk(session, 'Escribe %clave% en el campo de contraseña', { clave: acc.password });
-  await actOk(session, 'Haz clic en el botón para iniciar sesión');
+  await actOr(session, 'Escribe %correo% en el campo de email',
+    () => session.page.locator('input[formcontrolname="email"]').fill(acc.email), { correo: acc.email });
+  await actOr(session, 'Escribe %clave% en el campo de contraseña',
+    () => session.page.locator('input[formcontrolname="password"]').fill(acc.password), { clave: acc.password });
+  await actOr(session, 'Haz clic en el botón para iniciar sesión',
+    () => session.page.locator('button[type="submit"]').click());
   await waitForUrl(session, /\/(schedule|subjects|assignments|urgent-radar)/);
 }
 
