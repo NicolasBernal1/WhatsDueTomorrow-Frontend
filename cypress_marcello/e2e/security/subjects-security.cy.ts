@@ -1,5 +1,4 @@
-import '../../../support/subjects-commands';
-/** Seguridad: autenticación, XSS, inyección, IDOR y cabeceras. */
+import '../../support/commands';
 describe('Asignaturas — Seguridad', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
 

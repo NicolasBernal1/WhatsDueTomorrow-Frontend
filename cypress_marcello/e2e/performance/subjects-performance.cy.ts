@@ -1,5 +1,5 @@
-import '../../../support/subjects-commands';
-/** Rendimiento: umbrales holgados (el back en Render puede tardar en despertar). */
+import '../../support/commands';
+
 describe('Asignaturas — Rendimiento', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
   let token: string;

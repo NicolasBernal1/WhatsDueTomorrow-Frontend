@@ -1,5 +1,5 @@
-import '../../../support/subjects-commands';
-/** Regresión: flujo completo crear → buscar → detalle → editar → eliminar. */
+import '../../support/commands';
+
 describe('Asignaturas — Regresión (flujo completo)', () => {
   it('Ciclo de vida de una asignatura sin romper las demás funciones', () => {
     cy.on('window:confirm', () => true);

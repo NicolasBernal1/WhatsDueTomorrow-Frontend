@@ -3,11 +3,11 @@
 declare global {
   namespace Cypress {
     interface Chainable {
-      /** Crea un usuario nuevo por API y devuelve { email, password, token }. */
+     
       createAccount(): Chainable<{ email: string; password: string; token: string }>;
-      /** Crea una asignatura por API (usa el token dado). */
+      
       createSubject(token: string, s?: Partial<{ name: string; professor: string; credits: number; color: string }>): Chainable<any>;
-      /** Visita una ruta del front con la sesión iniciada. */
+      
       visitAs(token: string, path?: string): Chainable<void>;
     }
   }

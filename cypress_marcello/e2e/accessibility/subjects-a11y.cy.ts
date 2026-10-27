@@ -1,5 +1,4 @@
-import '../../../support/subjects-commands';
-/** Accesibilidad con cypress-axe (WCAG 2.0/2.1 A y AA). */
+import '../../support/commands';
 const opts = { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } };
 
 function logViolations(violations: any[]) {
@@ -7,7 +6,7 @@ function logViolations(violations: any[]) {
     id, impact, help, nodos: nodes.map((n: any) => n.target.join(' ')),
   }));
   cy.log(JSON.stringify(rows));
-  // Evidencia: queda en cypress/reports/a11y-<hora>.json
+  
   cy.writeFile(`cypress/reports/a11y-${Date.now()}.json`, rows);
 }
 

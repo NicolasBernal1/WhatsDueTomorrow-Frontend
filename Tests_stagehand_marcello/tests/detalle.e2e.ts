@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
-import { APP_URL, createAccount, createSubjectApi, loginWithAi, waitForUrl, withSession } from '../src/app.js';
+import { APP_URL, createAccount, createSubjectApi, actOr, clickByText, loginWithAi, waitForUrl, withSession } from '../src/app.js';
 import { assertIncludes } from '../src/assert.js';
 import { run } from '../src/run.js';
 
@@ -16,7 +16,7 @@ run(() =>
     await s.page.goto(`${APP_URL}/subjects`);
     await s.page.waitForSelector('mat-card.subject-card', { timeout: 30_000 });
 
-    await s.stagehand.act('Haz clic en la tarjeta de la asignatura Ciencias', { page: s.page });
+    await actOr(s, 'Haz clic en la tarjeta de la asignatura Ciencias', () => clickByText(s, 'mat-card.subject-card', 'Ciencias'));
     await waitForUrl(s, /\/subjects\/[\w-]+$/, 30_000);
 
     const out = await s.stagehand.extract(

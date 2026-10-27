@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { APP_URL, createAccount, createSubjectApi, loginWithAi, withSession } from '../src/app.js';
+import { APP_URL, createAccount, createSubjectApi, actOr, loginWithAi, withSession } from '../src/app.js';
 import { assertIncludes } from '../src/assert.js';
 import { run } from '../src/run.js';
 
@@ -19,14 +19,14 @@ run(() =>
     const found = await s.stagehand.observe('Encuentra el campo de búsqueda de asignaturas', { page: s.page });
     if (found.data.length === 0) throw new Error('Observe no encontró el buscador.');
 
-    await s.stagehand.act('Escribe %q% en el campo de búsqueda', { page: s.page, variables: { q: 'Ciencias' } });
+    await actOr(s, 'Escribe %q% en el campo de búsqueda', () => s.page.locator('#subject-search').fill('Ciencias'), { q: 'Ciencias' });
     await s.page.waitForFunction(() => document.querySelectorAll('mat-card.subject-card').length === 1, undefined, {
       timeout: 30_000,
     });
     assertIncludes(await s.page.locator('mat-card.subject-card').first().innerText(), 'Ciencias', 'Filtro incorrecto.');
 
     await s.page.locator('#subject-search').fill('');
-    await s.stagehand.act('Escribe %q% en el campo de búsqueda', { page: s.page, variables: { q: 'zzzz-no-existe' } });
+    await actOr(s, 'Escribe %q% en el campo de búsqueda', () => s.page.locator('#subject-search').fill('zzzz-no-existe'), { q: 'zzzz-no-existe' });
     await s.page.waitForSelector('p.empty', { state: 'visible', timeout: 30_000 });
     assertIncludes(await s.page.locator('p.empty').innerText(), 'You have no subjects yet', 'Falta mensaje vacío.');
   }),
