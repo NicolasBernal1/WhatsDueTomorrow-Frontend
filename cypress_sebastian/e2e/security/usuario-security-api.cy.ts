@@ -1,11 +1,5 @@
 import '../../support/commands';
-/**
- * Seguridad (API) — autenticación, tokens manipulados, exposición de datos, inyección,
- * asignación masiva y aislamiento entre usuarios para F01..F06.
- *
- * Las pruebas "BRECHA" describen el comportamiento seguro esperado que HOY no se cumple;
- * se omiten salvo que se ejecuten con --env expectAuthHardening=true.
- */
+
 describe('Usuario — Seguridad (API)', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
   const email = () => `cy.seb.sec.${Date.now()}${Cypress._.random(999)}@test.com`;

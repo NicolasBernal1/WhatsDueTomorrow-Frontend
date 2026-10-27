@@ -1,8 +1,5 @@
 import '../../support/commands';
-/**
- * Rendimiento — tiempos de respuesta de los endpoints de F01..F06 y de las pantallas del front.
- * Umbrales pensados para Render (plan gratuito): el before() "despierta" el backend para no medir el arranque en frío.
- */
+
 describe('Usuario — Rendimiento', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
   const auth = (token: string) => ({ Authorization: `Bearer ${token}` });

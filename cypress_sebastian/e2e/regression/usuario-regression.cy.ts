@@ -1,8 +1,5 @@
 import '../../support/commands';
-/**
- * Regresión — flujo completo F01→F06 y casos que ya se rompieron o son frágiles:
- * bordes de la ventana de 48 h, persistencia de sesión, reintentos y cambio de cuenta.
- */
+
 describe('Usuario — Regresión', () => {
   const bell = 'button[aria-label="Upcoming assignments"]';
   const badge = `${bell} .mat-badge-content`;

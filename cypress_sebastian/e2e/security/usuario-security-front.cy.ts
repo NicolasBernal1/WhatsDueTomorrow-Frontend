@@ -1,11 +1,5 @@
 import '../../support/commands';
-/**
- * Seguridad (Front) — guards de rutas, sesión, XSS al renderizar y token falso en localStorage.
- * Lo que solo prueba la API (tokens manipulados, inyección, exposición de datos) está en usuario-security-api.
- *
- * La prueba "BRECHA" describe el comportamiento seguro esperado que HOY no se cumple;
- * se omite salvo que se ejecute con --env expectAuthHardening=true (o true en cypress.sebastian.config.ts).
- */
+
 describe('Usuario — Seguridad (Front)', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
 

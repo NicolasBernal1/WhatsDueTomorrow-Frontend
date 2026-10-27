@@ -1,8 +1,5 @@
 import '../../support/commands';
-/**
- * API — contrato de los endpoints de F01..F06.
- * Nota: Nest responde HTTP 201 a todo @Post sin @HttpCode, aunque el cuerpo del login diga status 200.
- */
+
 describe('Usuario — API', () => {
   const api = () => (Cypress.env('apiUrl') || 'https://whatsduetomorrow-backed.onrender.com') as string;
   const email = () => `cy.seb.api.${Date.now()}${Cypress._.random(999)}@test.com`;

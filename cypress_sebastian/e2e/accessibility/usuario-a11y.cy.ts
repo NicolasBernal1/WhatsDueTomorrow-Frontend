@@ -1,15 +1,5 @@
 import '../../support/commands';
-/**
- * Accesibilidad con cypress-axe (WCAG 2.0/2.1 A y AA) de F01..F06, más operabilidad con teclado.
- * Se analiza solo lo que pertenece a estas funcionalidades: login, registro, navbar y sus menús.
- */
-/**
- * Violaciones reales ya conocidas (detectadas por estas pruebas, pendientes de corregir en la app).
- * Se desactivan solo en la pantalla donde ocurren; con --env expectA11yFixed=true se vuelven a exigir.
- *  - color-contrast: enlace "Register now!"/"Log in" (#0078d4 sobre #ffffffee) < 4.5:1.
- *  - aria-required-children / aria-required-parent: mat-menu (role=menu) envuelve su contenido en un <div>.
- *  - nested-interactive: .profile-content tiene role="button" y contiene botones e inputs.
- */
+ 
 const opts = (...conocidas: string[]) => ({
   runOnly: { type: 'tag' as const, values: ['wcag2a', 'wcag2aa', 'wcag21aa'] },
   includedImpacts: ['critical', 'serious'],
