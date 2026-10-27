@@ -1,53 +1,45 @@
-@web @F05
-Feature: Cambiar contraseña
+Característica: Cambiar contraseña
 
   Como estudiante con la sesión iniciada
   Quiero cambiar mi contraseña verificando primero la actual
   Para mantener mi cuenta segura
 
-  Background:
-    Given Ana usa la aplicación con un servidor simulado
-    And Ana tiene una sesión iniciada
-    And el servidor devuelve el perfil de "Ana" con correo "ana@test.com"
-    And ella abre la ruta "/schedule"
+  Antecedentes:
+    Dado Alicia tiene una cuenta
+    Y Alicia inició sesión en la aplicación
 
   @smoke
-  Scenario: Verificar la contraseña actual habilita la nueva contraseña
-    Given el servidor confirma la contraseña actual
-    When ella verifica su contraseña actual "Clave123"
-    Then ella ve el mensaje "Current password verified" en el menú de perfil
-    And el servidor recibió en PATCH "/auth/verify-password" el cuerpo "{\"password\":\"Clave123\"}"
+  Escenario: Verificar la contraseña actual habilita la nueva contraseña
+    Cuando ella verifica su contraseña actual
+    Entonces ella ve el mensaje "Current password verified" en el menú de perfil
 
-  Scenario: Una contraseña actual incorrecta no permite continuar
-    Given el servidor rechaza la contraseña actual
-    When ella verifica su contraseña actual "mala"
-    Then ella ve el mensaje "Incorrect password" en el menú de perfil
-    And ella no puede escribir una nueva contraseña
+  Escenario: Una contraseña actual incorrecta no permite continuar
+    Cuando ella verifica la contraseña "mala"
+    Entonces ella ve el mensaje "Incorrect password" en el menú de perfil
+    Y ella no puede escribir una nueva contraseña
 
-  Scenario: El botón de verificar está bloqueado con el campo vacío
-    When ella abre el menú de perfil
-    Then ella ve el botón "Verify Password" bloqueado
+  Escenario: El botón de verificar está bloqueado con el campo vacío
+    Cuando ella abre el menú de perfil
+    Entonces ella ve el botón "Verify Password" bloqueado
 
   @smoke
-  Scenario: Cambio exitoso cierra la sesión y vuelve al inicio de sesión
-    Given el servidor confirma la contraseña actual
-    And el servidor acepta el cambio de contraseña
-    When ella cambia su contraseña de "Clave123" a "Nueva456"
-    Then ella llega a la ruta "/login"
-    And no hay ninguna sesión guardada
-    And ella ve el aviso "Password changed successfully."
-    And el servidor recibió en PATCH "/auth/change-password" el cuerpo "{\"currentPassword\":\"Clave123\",\"newPassword\":\"Nueva456\"}"
+  Escenario: Cambio exitoso cierra la sesión y solo vale la nueva contraseña
+    Cuando ella cambia su contraseña por "Nueva456"
+    Entonces ella llega a la ruta "/login"
+    Y no hay ninguna sesión guardada
+    Y ella ve el aviso "Password changed successfully."
+    Y el backend acepta su contraseña "Nueva456"
+    Y el backend rechaza su contraseña "Clave123"
 
-  Scenario: Si el servidor rechaza el cambio la sesión sigue iniciada
-    Given el servidor confirma la contraseña actual
-    And el servidor rechaza el cambio de contraseña con el código 400
-    When ella cambia su contraseña de "Clave123" a "Nueva456"
-    Then ella sigue en la ruta "/schedule"
-    And la sesión guardada es "jwt-ana"
+  Escenario: Si el servidor rechaza el cambio la sesión sigue iniciada
+    Dado el servidor rechaza el cambio de contraseña con el código 400
+    Cuando ella cambia su contraseña por "Nueva456"
+    Entonces ella sigue en la ruta "/schedule"
+    Y ella tiene una sesión guardada
+    Y el backend acepta su contraseña "Clave123"
 
-  Scenario: Cambiar contraseña está bloqueado hasta escribir la nueva
-    Given el servidor confirma la contraseña actual
-    When ella verifica su contraseña actual "Clave123"
-    Then ella ve el botón "Change Password" bloqueado
-    When ella escribe la nueva contraseña "Nueva456"
-    Then ella ve el botón "Change Password" habilitado
+  Escenario: Cambiar contraseña está bloqueado hasta escribir la nueva
+    Cuando ella verifica su contraseña actual
+    Entonces ella ve el botón "Change Password" bloqueado
+    Cuando ella escribe la nueva contraseña "Nueva456"
+    Entonces ella ve el botón "Change Password" habilitado

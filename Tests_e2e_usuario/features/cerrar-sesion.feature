@@ -1,25 +1,20 @@
-@web @F03
-Feature: Cerrar sesión
+Característica: Cerrar sesión
 
   Como estudiante con la sesión iniciada
   Quiero cerrar mi sesión
   Para que nadie más use mi cuenta desde este navegador
 
-  Background:
-    Given Ana usa la aplicación con un servidor simulado
-    And Ana tiene una sesión iniciada
-    And el servidor devuelve el perfil de "Ana" con correo "ana@test.com"
-    And ella abre la ruta "/schedule"
+  Antecedentes:
+    Dado Alicia tiene una cuenta
+    Y Alicia inició sesión en la aplicación
 
   @smoke
-  Scenario: Cerrar sesión borra la sesión y vuelve al inicio de sesión
-    Given la sesión guardada es "jwt-ana"
-    When ella cierra sesión
-    Then ella llega a la ruta "/login"
-    And no hay ninguna sesión guardada
+  Escenario: Cerrar sesión borra la sesión y vuelve al inicio de sesión
+    Cuando ella cierra sesión
+    Entonces ella llega a la ruta "/login"
+    Y no hay ninguna sesión guardada
 
-  Scenario: Después de cerrar sesión una ruta protegida la devuelve al inicio de sesión
-    When ella cierra sesión
-    And ella llega a la ruta "/login"
-    And ella abre la ruta "/subjects"
-    Then ella llega a la ruta "/login"
+  Escenario: Después de cerrar sesión una ruta protegida la devuelve al inicio de sesión
+    Cuando ella cierra sesión
+    Y ella abre la ruta "/subjects"
+    Entonces ella llega a la ruta "/login"
