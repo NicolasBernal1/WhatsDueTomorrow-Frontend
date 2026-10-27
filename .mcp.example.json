@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "argos-ci": {
+      "url": "https://mcp.argos-ci.com/",
+      "headers": {
+        "Authorization": "Bearer YOUR_ARGOS_PAT_TOKEN_HERE",
+        "Accept": "application/json, text/event-stream"
+      }
+    },
+    "playwright-test": {
+      "command": "npx",
+      "args": [
+        "playwright",
+        "run-test-mcp-server"
+      ]
+    }
+  }
+}

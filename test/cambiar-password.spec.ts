@@ -22,7 +22,7 @@ test.describe('Cambiar Contraseña', () => {
     await page.route('**/auth/verify-password', (route) => route.fulfill({ status: 401 }));
 
     await page.getByLabel('Current password').fill('incorrecta');
-    await page.getByRole('button', { name: 'Verify Password' }).click();
+    await page.getByRole('button', { name: 'Verify Password', exact: true }).click();
 
     await expect(page.getByText('Incorrect password')).toBeVisible();
     // No debe avanzar al formulario de nueva contraseña
@@ -35,7 +35,7 @@ test.describe('Cambiar Contraseña', () => {
     );
 
     await page.getByLabel('Current password').fill('correcta123');
-    await page.getByRole('button', { name: 'Verify Password' }).click();
+    await page.getByRole('button', { name: 'Verify Password', exact: true }).click();
 
     await expect(page.getByText('Current password verified')).toBeVisible();
     await expect(page.getByLabel('New password')).toBeVisible();
@@ -50,17 +50,13 @@ test.describe('Cambiar Contraseña', () => {
     );
 
     await page.getByLabel('Current password').fill('correcta123');
-    await page.getByRole('button', { name: 'Verify Password' }).click();
+    await page.getByRole('button', { name: 'Verify Password', exact: true }).click();
     await expect(page.getByLabel('New password')).toBeVisible();
 
-    const dialogPromise = page.waitForEvent('dialog');
     await page.getByLabel('New password').fill('NuevaClave1');
-    await page.getByRole('button', { name: 'Change Password' }).click();
+    await page.getByRole('button', { name: 'Change Password', exact: true }).click();
 
-    const dialog = await dialogPromise;
-    expect(dialog.message()).toBe('Password changed successfully.');
-    await dialog.accept();
-
+    await expect(page.getByText('Password changed successfully.')).toBeVisible();
     await expect(page).toHaveURL(/login/);
   });
 
@@ -70,9 +66,9 @@ test.describe('Cambiar Contraseña', () => {
     );
 
     await page.getByLabel('Current password').fill('correcta123');
-    await page.getByRole('button', { name: 'Verify Password' }).click();
+    await page.getByRole('button', { name: 'Verify Password', exact: true }).click();
     await expect(page.getByLabel('New password')).toBeVisible();
 
-    await expect(page.getByRole('button', { name: 'Change Password' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Change Password', exact: true })).toBeDisabled();
   });
 });

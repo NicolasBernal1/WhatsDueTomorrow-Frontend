@@ -1,0 +1,32 @@
+{
+  "name": "whats-due-tomorrow-stagehand",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pruebas E2E asistidas por IA con Stagehand sobre What's Due Tomorrow (Vercel & Render)",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck",
+    "test:warmup": "node --import tsx src/warmup-helper.ts",
+    "test:f21": "node --import tsx tests/f21-urgent-radar.e2e.ts",
+    "test:f22": "node --import tsx tests/f22-subtasks-progress.e2e.ts",
+    "test:f23": "node --import tsx tests/f23-calendar-sync.e2e.ts",
+    "test:f24": "node --import tsx tests/f24-notes-log.e2e.ts",
+    "test:f25": "node --import tsx tests/f25-grades-calculator.e2e.ts",
+    "test:f26": "node --import tsx tests/f26-academic-load.e2e.ts",
+    "test:all": "npm run typecheck && npm run test:warmup && npm run test:f21 && npm run test:f22 && npm run test:f23 && npm run test:f24 && npm run test:f25 && npm run test:f26"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "4.3.0",
+    "dotenv": "18.0.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

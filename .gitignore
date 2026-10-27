@@ -41,4 +41,11 @@ testem.log
 .DS_Store
 Thumbs.db
 .env
+.env.visual
+.mcp.json
 reports/
+screenshots/
+test-results-visual/
+playwright-report/
+test-results/
+

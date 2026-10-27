@@ -32,3 +32,55 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  visual-regression:
+    name: Argos Visual Regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar navegadores Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar pruebas de regresión visual
+        run: npm run test:visual
+
+      - name: Subir capturas a Argos CI
+        uses: argos-ci/argos-action@v2
+        if: always()
+        with:
+          token: ${{ secrets.ARGOS_TOKEN }}
+          dir: screenshots
+
+      - name: Inspección Visual y Análisis de Causa Raíz (RCA) con Agente de IA
+        if: always()
+        env:
+          ARGOS_PAT: ${{ secrets.ARGOS_PAT || secrets.ARGOS_TOKEN }}
+          ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+        run: |
+          npm run test:visual:ai-inspect || true
+          if [ -f test-results-visual/ai-inspection-report.md ]; then
+            cat test-results-visual/ai-inspection-report.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Archivar reportes de IA y evidencias visuales
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-regression-ai-reports
+          path: |
+            test-results-visual/
+            screenshots/
+          retention-days: 7
+
